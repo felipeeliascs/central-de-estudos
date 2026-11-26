@@ -56,16 +56,18 @@ export function ProductivityPanel({
   demo,
   close,
   externalMock = false,
+  startIncidence = false,
 }: {
   snapshot: Snapshot;
   user: string;
   demo: boolean;
   close: () => void;
   externalMock?: boolean;
+  startIncidence?: boolean;
 }) {
   const [view, setView] = useState<
     "timer" | "dashboard" | "results" | "incidence"
-  >(externalMock ? "results" : "timer");
+  >(startIncidence ? "incidence" : externalMock ? "results" : "timer");
   const [resultKind, setResultKind] = useState<"practice" | "mock">(
     externalMock ? "mock" : "practice",
   );

@@ -26,7 +26,7 @@ O build fica em `dist/`. Use HTTP(S) para servi-lo. O Vite usa base relativa `./
 
 ## Configurar Supabase
 
-1. Use primeiro um projeto de homologação, de preferência sem dados reais. Confira o project ref e o ambiente. Com a CLI do Supabase instalada, execute `supabase init` se ainda não houver `supabase/config.toml`, depois `supabase link --project-ref REF_DE_HOMOLOGACAO`, `supabase migration list` e `supabase db push --dry-run`. Confira as versões pendentes antes de `supabase db push`. Em banco vazio devem entrar todas as migrações de `202611250001` a `202611250010`, em ordem. Num banco existente, faça backup e aplique apenas as pendentes. Se migrações anteriores foram rodadas pelo SQL Editor, confira o histórico real antes de usar a CLI. Nunca marque uma versão como aplicada sem verificar o esquema correspondente.
+1. Use primeiro um projeto de homologação, de preferência sem dados reais. Confira o project ref e o ambiente. Com a CLI do Supabase instalada, execute `supabase init` se ainda não houver `supabase/config.toml`, depois `supabase link --project-ref REF_DE_HOMOLOGACAO`, `supabase migration list` e `supabase db push --dry-run`. Confira as versões pendentes antes de `supabase db push`. Em banco vazio devem entrar todas as migrações de `202611250001` a `202611250011`, em ordem. Num banco existente, faça backup e aplique apenas as pendentes. Se migrações anteriores foram rodadas pelo SQL Editor, confira o histórico real antes de usar a CLI. Nunca marque uma versão como aplicada sem verificar o esquema correspondente.
 2. Copie `.env.example` para `.env.local`. Preencha `VITE_SUPABASE_URL` com a URL base do projeto e `VITE_SUPABASE_PUBLISHABLE_KEY` com a chave `sb_publishable_` de **Connect / API Keys**. Reinicie o Vite após salvar. O build aceita apenas essas duas variáveis públicas e rejeita chaves secretas e JWT legados. Desative o modo demonstração somente com um par de valores reais correspondente ao mesmo projeto.
 3. Em **Authentication → Providers → Email**, habilite cadastro por e-mail/senha e confirmação de e-mail. Defina senha mínima de 12 caracteres. Configure SMTP com um remetente autorizado e confirme antes a cota e o custo do provedor. O serviço padrão do Supabase restringe destinatários e taxa de envio, então valide confirmação e recuperação com as duas contas de teste. Preserve `{{ .ConfirmationURL }}` nos templates.
 4. Em **Authentication → URL Configuration**, configure **Site URL** com o endereço canônico do aplicativo e acrescente os redirects exatos abaixo, incluindo a barra final. Em produção, deixe apenas os destinos autorizados para aquele projeto. Se mudar repositório, host ou subpasta, atualize Site URL e redirects juntos. O PKCE precisa que o link de confirmação ou recuperação seja aberto no navegador e dispositivo que iniciou o fluxo.
@@ -60,6 +60,14 @@ on conflict do nothing;
 
 3. Entre como administrador e abra **Meus concursos → Importação JSON**. Carregue `examples/concurso-ficticio.json` na homologação e confira a prévia antes de confirmar. A conta estudante deve ativar o concurso em **Meus concursos**. Cadastre estudo e tente a retificação em `examples/retificacao-ficticia.json`, mantendo IDs. Verifique que o progresso permanece e que reenviar o mesmo arquivo não duplica registros. Para cadastro manual, use o mesmo painel e informe a fonte do edital. Consulte [CONCURSOS-JSON.md](CONCURSOS-JSON.md).
 4. Para uso diário, **Início** mostra o resumo. **Estudar** e **Biblioteca** abrem os assuntos. **Planejamento**, **Questões**, **Revisões** e **Desempenho** registram atividades individuais. A **Central de Prompts** prepara conteúdo para copiar e usar em ferramentas externas. Gran Questões usa links e lançamento manual de resultados.
+
+## Administração e perfil
+
+O administrador acessa os mesmos módulos de estudo do estudante com a própria conta. O menu **Administração** mostra as contas cadastradas, seus papéis e o estado de confirmação do e-mail. O painel também permite autorizar ou revogar futuros cadastros e reúne acessos a editais, modelos de prompts e Raio-X do edital. O banco valida o papel a cada operação administrativa e mantém privados os registros de estudo de outras contas.
+
+Autorizar o cadastro não envia convite e não cria usuário. A pessoa define a própria senha. Revogar uma autorização pendente não bloqueia contas já criadas. Atribuição de papéis e administração de contas existentes permanecem no painel confiável do Supabase.
+
+Em **Meu perfil**, cada pessoa pode editar o nome de exibição ou trocar a própria senha informando a anterior. A troca autenticada não exige SMTP. A recuperação de senha por e-mail usa o serviço de e-mails do Supabase.
 
 ## GitHub e publicação
 

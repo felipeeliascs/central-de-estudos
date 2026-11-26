@@ -24,7 +24,8 @@ import {
   Layers,
   Library,
   BarChart3,
-  Settings,
+  UserRound,
+  ShieldCheck,
   PanelLeftClose,
   PanelLeftOpen,
   Sun,
@@ -54,6 +55,8 @@ import {
   ShareForm,
 } from "./Forms";
 import { AuthGate } from "./AuthGate";
+import { ProfilePage } from "./ProfilePage";
+import { AdminDashboard } from "./AdminDashboard";
 import { YouTube } from "./YouTube";
 import { readPlan } from "./planner-data";
 import { todayInBrazil, type Block } from "./planner";
@@ -103,6 +106,10 @@ function Workspace({
   logout: () => Promise<void>;
 }) {
   const [home, setHome] = useState(true);
+  const [accountPage, setAccountPage] = useState<"profile" | "admin" | null>(
+    null,
+  );
+  const [incidenceOpen, setIncidenceOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [theme, setTheme] = useState(
     () => localStorage.getItem("central-theme") || "light",
@@ -173,6 +180,20 @@ function Workspace({
   >(null);
   const [externalMock, setExternalMock] = useState(false);
   const [catalogAdmin, setCatalogAdmin] = useState(false);
+  useEffect(() => {
+    if (!supabase || repo.demo) return;
+    let active = true;
+    Promise.resolve(supabase.rpc("study_catalog_admin"))
+      .then(({ data, error }) => {
+        if (active) setCatalogAdmin(!error && data === true);
+      })
+      .catch(() => {
+        if (active) setCatalogAdmin(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [repo.demo, repo.user]);
   const hidden = new Set(
     snapshot.nodes
       .filter((n) => n.catalog_archived)
@@ -299,11 +320,19 @@ function Workspace({
           m.role === "editor" &&
           m.contest_id === (n.kind === "contest" ? n.id : chain[0]?.id),
       ));
+  function openProfile() {
+    if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
+    setDirty(false);
+    setMobile(false);
+    setAccountPage("profile");
+  }
+
   function navigate(id: string) {
     if (dirty && !window.confirm("Há anotações não salvas. Sair sem salvar?"))
       return;
     setDirty(false);
     setSelected(id);
+    setAccountPage(null);
     setHome(false);
     setMobile(false);
     setError("");
@@ -390,6 +419,7 @@ function Workspace({
               if (!dirty || window.confirm("Sair sem salvar as anotações?")) {
                 setDirty(false);
                 setHome(true);
+                setAccountPage(null);
                 setMobile(false);
               }
             }}
@@ -436,30 +466,45 @@ function Workspace({
                   GraduationCap,
                   () => setPromptsOpen(true),
                 ],
-                [
-                  "Configurações",
-                  Settings,
-                  () => setTheme(theme === "light" ? "dark" : "light"),
-                ],
+                ["Meu perfil", UserRound, () => setAccountPage("profile")],
+                ...(catalogAdmin
+                  ? ([
+                      [
+                        "Administração",
+                        ShieldCheck,
+                        () => setAccountPage("admin"),
+                      ],
+                    ] as const)
+                  : []),
               ] as const
-            ).map(([label, Icon, action]) => (
-              <button
-                key={label}
-                className={`module-link ${label === "Início" && home ? "current" : ""}`}
-                title={label}
-                aria-current={label === "Início" && home ? "page" : undefined}
-                onClick={() => {
-                  if (dirty && !window.confirm("Sair sem salvar as anotações?"))
-                    return;
-                  setDirty(false);
-                  action();
-                  setMobile(false);
-                }}
-              >
-                <Icon size={18} />
-                <span>{label}</span>
-              </button>
-            ))}
+            ).map(([label, Icon, action]) => {
+              const current =
+                (label === "Início" && home && !accountPage) ||
+                (label === "Meu perfil" && accountPage === "profile") ||
+                (label === "Administração" && accountPage === "admin");
+              return (
+                <button
+                  key={label}
+                  className={`module-link ${current ? "current" : ""}`}
+                  title={label}
+                  aria-current={current ? "page" : undefined}
+                  onClick={() => {
+                    if (
+                      dirty &&
+                      !window.confirm("Sair sem salvar as anotações?")
+                    )
+                      return;
+                    setDirty(false);
+                    setAccountPage(null);
+                    action();
+                    setMobile(false);
+                  }}
+                >
+                  <Icon size={18} />
+                  <span>{label}</span>
+                </button>
+              );
+            })}
           </nav>
           <div className="sidebar-label syllabus-label">
             MEUS CONCURSOS
@@ -531,7 +576,15 @@ function Workspace({
               >
                 <Menu />
               </button>
-              <span>{home ? "Início" : "Biblioteca & estudo"}</span>
+              <span>
+                {accountPage === "admin"
+                  ? "Administração"
+                  : accountPage === "profile"
+                    ? "Conta"
+                    : home
+                      ? "Início"
+                      : "Biblioteca & estudo"}
+              </span>
             </div>
             <button
               className="icon theme-toggle"
@@ -545,6 +598,14 @@ function Workspace({
             <span className="private-indicator">
               <LockKeyhole size={14} /> Seu progresso é só seu
             </span>
+            <button
+              className="icon profile-trigger"
+              onClick={openProfile}
+              aria-label="Abrir meu perfil"
+              title="Meu perfil"
+            >
+              <UserRound size={19} aria-hidden="true" />
+            </button>
           </header>
           <main id="conteudo" tabIndex={-1} className="workspace">
             {!online && (
@@ -553,7 +614,23 @@ function Workspace({
                 não está disponível; alterações podem não ser salvas.
               </div>
             )}
-            {home ? (
+            {accountPage === "admin" && catalogAdmin ? (
+              <AdminDashboard
+                onBack={() => setAccountPage(null)}
+                onCatalog={() => void openCatalog()}
+                onPrompts={() => setPromptsOpen(true)}
+                onIncidence={() => {
+                  setIncidenceOpen(true);
+                  setProductivityOpen(true);
+                }}
+              />
+            ) : accountPage === "profile" ? (
+              <ProfilePage
+                userId={repo.user}
+                demo={repo.demo}
+                onBack={() => setAccountPage(null)}
+              />
+            ) : home ? (
               <div className="home-page">
                 <div className="home-intro">
                   <div>
@@ -1210,12 +1287,14 @@ function Workspace({
           <Suspense fallback={<p role="status">Carregando estatísticas…</p>}>
             <ProductivityPanel
               externalMock={externalMock}
+              startIncidence={incidenceOpen}
               snapshot={snapshot}
               user={repo.user}
               demo={repo.demo}
               close={() => {
                 setProductivityOpen(false);
                 setExternalMock(false);
+                setIncidenceOpen(false);
               }}
             />
           </Suspense>

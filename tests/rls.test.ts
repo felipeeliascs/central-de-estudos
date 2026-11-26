@@ -17,7 +17,7 @@ it("executa a migração e verifica isolamento no PostgreSQL com duas contas, le
   const db = new PGlite();
   try {
     await db.exec(
-      `create schema auth; create table auth.users(id uuid primary key,email text); create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$; create role authenticated; create role anon; grant usage on schema public,auth to authenticated; grant execute on function auth.uid() to authenticated; create schema storage;create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);create table storage.objects(id uuid default gen_random_uuid(),bucket_id text,name text);alter table storage.objects enable row level security;grant usage on schema storage to authenticated;grant select,insert,update,delete on storage.objects to authenticated;create function storage.foldername(name text) returns text[] language sql as $$select (string_to_array(name,'/'))[1:array_length(string_to_array(name,'/'),1)-1]$$;insert into auth.users(id) values('${a}'),('${b}');`,
+      `create schema auth; create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz); create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$; create role authenticated; create role anon; grant usage on schema public,auth to authenticated; grant execute on function auth.uid() to authenticated; create schema storage;create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);create table storage.objects(id uuid default gen_random_uuid(),bucket_id text,name text);alter table storage.objects enable row level security;grant usage on schema storage to authenticated;grant select,insert,update,delete on storage.objects to authenticated;create function storage.foldername(name text) returns text[] language sql as $$select (string_to_array(name,'/'))[1:array_length(string_to_array(name,'/'),1)-1]$$;insert into auth.users(id) values('${a}'),('${b}');`,
     );
     await db.exec(
       readFileSync(
@@ -331,7 +331,83 @@ it("executa a migração e verifica isolamento no PostgreSQL com duas contas, le
         )
       ).rows,
     ).toHaveLength(0);
+    await db.exec("reset role");
+    await db.exec(
+      readFileSync(
+        new URL(
+          "../supabase/migrations/202611250011_admin_dashboard.sql",
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    );
+    await db.query(
+      "update auth.users set email='student@example.test', email_confirmed_at=now() where id=$1",
+      [b],
+    );
+    await account(b);
+    await expect(
+      db.query("select public.study_admin_overview()"),
+    ).rejects.toThrow(/Apenas administradores/);
+    await expect(
+      db.query(
+        "select public.study_admin_allow_signup('other@example.test', 7)",
+      ),
+    ).rejects.toThrow(/Apenas administradores/);
+    await expect(
+      db.query("select public.study_admin_revoke_signup('other@example.test')"),
+    ).rejects.toThrow(/Apenas administradores/);
+    await account(a);
+    const visible = await db.query<{ result: { users: unknown[] } }>(
+      "select public.study_admin_overview('STUDENT@') as result",
+    );
+    expect(visible.rows[0].result.users).toEqual([
+      {
+        id: b,
+        email: "student@example.test",
+        display_name: "",
+        role: "student",
+        confirmed: true,
+      },
+    ]);
+    expect(
+      (await db.query("select * from public.study_notes where user_id=$1", [b]))
+        .rows,
+    ).toHaveLength(0);
+    await expect(
+      db.query(
+        "select public.study_admin_allow_signup('student@example.test', 7)",
+      ),
+    ).rejects.toThrow(/Já existe/);
+    await expect(
+      db.query(
+        "select public.study_admin_allow_signup('future@example.test', 31)",
+      ),
+    ).rejects.toThrow(/1 e 30/);
+    await db.query(
+      "select public.study_admin_allow_signup('Future@example.test', 7)",
+    );
+    const pending = await db.query<{
+      result: { authorizations: { email: string; active: boolean }[] };
+    }>("select public.study_admin_overview('future@') as result");
+    expect(pending.rows[0].result.authorizations[0]).toMatchObject({
+      email: "future@example.test",
+      active: true,
+    });
+    const revoked = await db.query<{ revoked: boolean }>(
+      "select public.study_admin_revoke_signup('Future@example.test') as revoked",
+    );
+    expect(revoked.rows[0].revoked).toBe(true);
+    await db.exec("reset role");
+    await expect(
+      db.query(
+        "insert into auth.users(id,email) values(gen_random_uuid(),'future@example.test')",
+      ),
+    ).rejects.toThrow(/Cadastro não autorizado/);
     await db.exec("reset role;set role anon;");
+    await expect(
+      db.query("select public.study_admin_overview()"),
+    ).rejects.toThrow(/permission denied/);
     await expect(
       db.query("select * from public.study_materials"),
     ).rejects.toThrow(/permission denied/);

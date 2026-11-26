@@ -288,3 +288,21 @@ A revisão preserva os painéis anteriores; a cobertura visual e de acessibilida
 - [ ] Registrar e reconciliar o histórico de migrações da CLI antes de executar um futuro push de migrações nesse projeto. A instalação inicial ocorreu pelo SQL Editor.
 - [ ] Configurar envio de e-mails e redirects, concluir os cadastros, atribuir o papel de administrador depois da confirmação do e-mail e testar duas contas na API real.
 - [ ] Confirmar e executar o envio de código ao repositório público e a publicação no GitHub Pages.
+- [x] Enviar os 83 arquivos da primeira versão, conferidos por SHA de cada blob, para a branch principal do repositório público autorizado. Commit 31a3dcc.
+- [x] Configurar GitHub Pages com origem GitHub Actions, URL e chave publicável no repositório e destinos exatos de confirmação e recuperação no Supabase.
+- [ ] Configurar SMTP de autenticação, verificar os logins com duas contas e disparar manualmente a publicação autorizada.
+
+## Meu perfil e troca de senha
+
+- [x] Adicionar a página Meu perfil ao menu e ao cabeçalho. Exibir iniciais, e-mail da sessão e nome de exibição editável.
+- [x] Reutilizar o perfil individual e o Supabase Auth. A troca autenticada solicita a senha atual e confirma a nova senha no formulário. A recuperação de senha continua sendo um fluxo separado.
+- [x] Verificar 40 testes em 15 arquivos, lint, build e acesso à página em três tamanhos de tela. Os cenários de troca de senha usam Supabase simulado.
+- [ ] Publicar a atualização após aprovação para o GitHub Pages.
+
+## Painel de administração
+
+- [x] Adicionar Administração ao menu de contas com papel administrativo, preservando todos os módulos de estudo e Meu perfil.
+- [x] Listar contas e estado de confirmação, filtrar por nome/e-mail, autorizar novos cadastros e revogar autorizações pendentes.
+- [x] Reunir atalhos para gestão de concursos, editais, modelos de prompts e Raio-X. Os dados pessoais de estudo continuam protegidos pelas regras existentes.
+- [x] Verificar 42 testes em 16 arquivos, lint e build. PostgreSQL local verifica privilégios, isolamento, autorização e revogação.
+- [ ] Aplicar a migração 011 no Supabase e publicar após aprovação. Administração de contas já criadas e atribuição de papéis seguem no painel do Supabase.

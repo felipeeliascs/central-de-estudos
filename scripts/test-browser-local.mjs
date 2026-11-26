@@ -180,6 +180,22 @@ try {
       );
       await evaluate("document.querySelector('.collapse-control').click()");
     }
+    await evaluate("document.querySelector('.profile-trigger').click()");
+    await until(
+      "document.querySelector('#profile-title')?.textContent === 'Meu perfil'",
+    );
+    assert.equal(
+      await evaluate(
+        "document.documentElement.scrollWidth <= document.documentElement.clientWidth",
+      ),
+      true,
+    );
+    assert.equal(
+      await evaluate("!!document.querySelector('.profile-form')"),
+      false,
+    );
+    await evaluate("document.querySelector('.profile-back').click()");
+    await until("!!document.querySelector('.home-intro')");
     await evaluate("document.querySelector('.home-intro button').focus()");
     await press("Enter", "Enter", 13);
     await until("!!document.querySelector('.tabs')");
