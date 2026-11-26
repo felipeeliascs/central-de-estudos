@@ -1354,6 +1354,12 @@ input[type="checkbox"] {
 }
 /* Shared navigation and overview */
 .sidebar { overflow-y: auto; padding-top: 22px; }
+#navegacao-principal {
+  scrollbar-width: none;
+}
+#navegacao-principal::-webkit-scrollbar {
+  display: none;
+}
 .sidebar-label { margin-top: 24px; }
 .module-nav { display: grid; gap: 2px; }
 .module-link { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 40px; padding: 8px 12px; border-radius: 9px; text-align: left; font-size: 13px; font-weight: 600; }
