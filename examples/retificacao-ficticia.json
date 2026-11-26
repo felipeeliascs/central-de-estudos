@@ -1,0 +1,91 @@
+{
+  "schema_version": "1.0",
+  "type": "contest",
+  "id": "exemplo-concurso-ficticio",
+  "name": "Concurso de demonstração — dados fictícios",
+  "organization": "Instituição fictícia",
+  "role": "Cargo fictício",
+  "board": "Banca fictícia",
+  "exam_date": "2027-09-21",
+  "listed": false,
+  "questions": 20,
+  "weight": 1.5,
+  "notice": { "version": 2, "url": "https://example.org/retificacao-ficticia" },
+  "sources": [
+    {
+      "title": "Retificação fictícia",
+      "url": "https://example.org/origem-retificacao"
+    }
+  ],
+  "items": [
+    {
+      "id": "d01",
+      "parent": null,
+      "kind": "discipline",
+      "name": "Disciplina fictícia",
+      "questions": 20,
+      "weight": 1.5
+    },
+    {
+      "id": "a01",
+      "parent": "d01",
+      "kind": "topic",
+      "name": "Assunto fictício renomeado",
+      "priority": "medium",
+      "minutes": 60,
+      "checklist": [0, 1, 4]
+    },
+    {
+      "id": "s01",
+      "parent": "a01",
+      "kind": "subtopic",
+      "name": "Subassunto fictício",
+      "archived": true
+    },
+    {
+      "id": "s02",
+      "parent": "a01",
+      "kind": "subtopic",
+      "name": "Novo subassunto fictício"
+    }
+  ],
+  "resources": [
+    {
+      "id": "b01",
+      "item": "a01",
+      "kind": "bibliography",
+      "title": "Obra fictícia",
+      "author": "Autoria fictícia",
+      "edition": "2ª edição fictícia"
+    },
+    {
+      "id": "v01",
+      "item": "a01",
+      "kind": "video",
+      "title": "Videoaula fictícia — ID ilustrativo não verificado",
+      "url": "https://www.youtube.com/watch?v=abcdefghijk"
+    },
+    {
+      "id": "l01",
+      "item": "s01",
+      "kind": "legislation",
+      "title": "Referência legislativa fictícia",
+      "url": "https://example.org/legislacao",
+      "archived": true
+    },
+    {
+      "id": "m01",
+      "item": "a01",
+      "kind": "material",
+      "title": "Resumo fictício",
+      "text": "Exemplo sem conteúdo de edital real."
+    },
+    {
+      "id": "q01",
+      "item": "a01",
+      "kind": "external_questions",
+      "title": "Link fictício de questões",
+      "url": "https://example.org/questoes"
+    }
+  ]
+}

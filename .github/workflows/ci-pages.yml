@@ -1,0 +1,73 @@
+name: CI e GitHub Pages
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      confirm_publication:
+        description: "Digite PUBLICAR para publicar este commit no GitHub Pages"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  pages-build:
+    if: github.event_name == 'workflow_dispatch' && inputs.confirm_publication == 'PUBLICAR' && github.ref_name == github.event.repository.default_branch && github.ref_type == 'branch'
+    needs: verify
+    permissions:
+      contents: read
+      pages: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/configure-pages@v5
+      - run: npm ci
+      - run: npm run build
+        env:
+          CENTRAL_REQUIRE_SUPABASE: "1"
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    if: github.event_name == 'workflow_dispatch' && inputs.confirm_publication == 'PUBLICAR'
+    needs: pages-build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,1663 @@
+import { lazy, Suspense, useEffect, useState } from "react";
+import {
+  ArrowDown,
+  ArrowUp,
+  BookOpen,
+  CheckCheck,
+  ChevronRight,
+  ExternalLink,
+  FileText,
+  FolderOpen,
+  GraduationCap,
+  LockKeyhole,
+  LogOut,
+  Menu,
+  Pencil,
+  Plus,
+  Search,
+  Share2,
+  Trash2,
+  Video,
+  Home,
+  CalendarDays,
+  CircleHelp,
+  Layers,
+  Library,
+  BarChart3,
+  Settings,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Sun,
+  Moon,
+  WifiOff,
+} from "lucide-react";
+import {
+  sections,
+  steps,
+  progress,
+  descendants,
+  empty,
+  granUrl,
+  safeUrl,
+  youtubeId,
+  type Material,
+  type Node,
+  type Section,
+  type Snapshot,
+} from "./domain";
+import { supabase, type Repository, type Member } from "./repository";
+import {
+  FeedbackContext,
+  MaterialForm,
+  Modal,
+  NodeForm,
+  ShareForm,
+} from "./Forms";
+import { AuthGate } from "./AuthGate";
+import { YouTube } from "./YouTube";
+import { readPlan } from "./planner-data";
+import { todayInBrazil, type Block } from "./planner";
+import { countDueReviews } from "./flashcard-data";
+const ContestPanel = lazy(() =>
+  import("./ContestPanel").then((module) => ({ default: module.ContestPanel })),
+);
+const PlannerPanel = lazy(() =>
+  import("./PlannerPanel").then((module) => ({ default: module.PlannerPanel })),
+);
+const FlashcardPanel = lazy(() =>
+  import("./FlashcardPanel").then((module) => ({
+    default: module.FlashcardPanel,
+  })),
+);
+const ProductivityPanel = lazy(() =>
+  import("./ProductivityPanel").then((module) => ({
+    default: module.ProductivityPanel,
+  })),
+);
+const QuestionsPanel = lazy(() =>
+  import("./QuestionsPanel").then((module) => ({
+    default: module.QuestionsPanel,
+  })),
+);
+const PromptPanel = lazy(() =>
+  import("./PromptPanel").then((module) => ({ default: module.PromptPanel })),
+);
+export default function App() {
+  return (
+    <AuthGate>
+      {(repo, logout) => (
+        <Workspace
+          key={String(repo.demo) + repo.user}
+          repo={repo}
+          logout={logout}
+        />
+      )}
+    </AuthGate>
+  );
+}
+function Workspace({
+  repo,
+  logout,
+}: {
+  repo: Repository;
+  logout: () => Promise<void>;
+}) {
+  const [home, setHome] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("central-theme") || "light",
+  );
+  const [online, setOnline] = useState(navigator.onLine);
+  const [plannerOpen, setPlannerOpen] = useState(false);
+  const [flashcardsOpen, setFlashcardsOpen] = useState(false);
+  const [todayBlocks, setTodayBlocks] = useState<Block[]>([]);
+  const [dueCount, setDueCount] = useState<number | null>(null);
+  const [homeError, setHomeError] = useState(false);
+  const [overviewLoading, setOverviewLoading] = useState(true);
+  const [reloadOverview, setReloadOverview] = useState(0);
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("central-theme", theme);
+  }, [theme]);
+  useEffect(() => {
+    const update = () => setOnline(navigator.onLine);
+    window.addEventListener("online", update);
+    window.addEventListener("offline", update);
+    return () => {
+      window.removeEventListener("online", update);
+      window.removeEventListener("offline", update);
+    };
+  }, []);
+  useEffect(() => {
+    if (!home || plannerOpen || flashcardsOpen || (!online && !repo.demo))
+      return;
+    let active = true;
+    setOverviewLoading(true);
+    setHomeError(false);
+    const now = new Date();
+    Promise.allSettled([
+      readPlan(repo.user, repo.demo),
+      countDueReviews(repo.user, repo.demo, now),
+    ]).then(([plan, reviews]) => {
+      if (!active) return;
+      setTodayBlocks(
+        plan.status === "fulfilled"
+          ? plan.value.state.blocks.filter(
+              (block) => block.day === todayInBrazil(now),
+            )
+          : [],
+      );
+      setDueCount(reviews.status === "fulfilled" ? reviews.value : null);
+      setHomeError(plan.status === "rejected" || reviews.status === "rejected");
+      setOverviewLoading(false);
+    });
+    return () => {
+      active = false;
+    };
+  }, [
+    home,
+    plannerOpen,
+    flashcardsOpen,
+    online,
+    repo.user,
+    repo.demo,
+    reloadOverview,
+  ]);
+  const [snapshot, setData] = useState<Snapshot>(empty);
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  const [productivityOpen, setProductivityOpen] = useState(false);
+  const [questionsOpen, setQuestionsOpen] = useState(false);
+  const [promptsOpen, setPromptsOpen] = useState(false);
+  const [importTarget, setImportTarget] = useState<
+    "contest" | "cards" | "questions" | null
+  >(null);
+  const [externalMock, setExternalMock] = useState(false);
+  const [catalogAdmin, setCatalogAdmin] = useState(false);
+  const hidden = new Set(
+    snapshot.nodes
+      .filter((n) => n.catalog_archived)
+      .flatMap((n) => [
+        n.id,
+        ...descendants(snapshot.nodes, n.id).map((child) => child.id),
+      ]),
+  );
+  const data = {
+    ...snapshot,
+    nodes: snapshot.nodes.filter((n) => !hidden.has(n.id)),
+    materials: snapshot.materials.filter(
+      (m) => !m.catalog_archived && !hidden.has(m.topic_id),
+    ),
+  };
+  async function openCatalog() {
+    if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
+    if (!supabase || repo.demo) return;
+    const result = await supabase.rpc("study_catalog_admin");
+    if (result.error) {
+      setError(result.error.message);
+      return;
+    }
+    setCatalogAdmin(result.data === true);
+    setCatalogOpen(true);
+    setMobile(false);
+  }
+  const [members, setMembers] = useState<Member[]>([]);
+  const [selected, setSelected] = useState("");
+  const [section, setSection] = useState<Section>("Videoaulas");
+  const [search, setSearch] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
+  const [mobile, setMobile] = useState(false);
+  const [materialForm, setMaterialForm] = useState<Material | "new" | null>(
+    null,
+  );
+  const [nodeForm, setNodeForm] = useState<{
+    parent?: Node;
+    initial?: Node;
+  } | null>(null);
+  const [deleting, setDeleting] = useState<Material | null>(null);
+  const [share, setShare] = useState(false);
+  const [fileView, setFileView] = useState<{
+    url: string;
+    material: Material;
+  } | null>(null);
+  const [dirty, setDirty] = useState(false);
+  async function refresh() {
+    const [next, nextMembers] = await Promise.all([
+      repo.load(),
+      repo.members(),
+    ]);
+    setData(next);
+    setMembers(nextMembers);
+  }
+  useEffect(() => {
+    let active = true;
+    Promise.all([repo.load(), repo.members()])
+      .then(([next, ms]) => {
+        if (active) {
+          setData(next);
+          setMembers(ms);
+          setSelected(
+            next.nodes.find((n) => n.kind === "topic")?.id ||
+              next.nodes.find((n) => n.kind === "contest")?.id ||
+              "",
+          );
+        }
+      })
+      .catch((e) => {
+        if (active) setError(e.message);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [repo]);
+  useEffect(() => {
+    if (!dirty) return;
+    const handler = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [dirty]);
+  async function run(
+    action: () => Promise<void>,
+    message = "Alterações salvas.",
+  ) {
+    if (busy) return false;
+    setBusy(true);
+    setError("");
+    setStatus("");
+    try {
+      await action();
+      await refresh();
+      setStatus(message);
+      return true;
+    } catch (e) {
+      setError((e as Error).message);
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  }
+  const node = data.nodes.find((n) => n.id === selected);
+  const chain: Node[] = [];
+  let ancestor = node;
+  while (ancestor) {
+    chain.unshift(ancestor);
+    ancestor = data.nodes.find((n) => n.id === ancestor!.parent_id);
+  }
+  const contest = chain[0];
+  const isTopic = node?.kind === "topic" || node?.kind === "subtopic";
+  const canEdit = (n: Node) =>
+    !contest?.catalog_key &&
+    (n.owner_id === repo.user ||
+      members.some(
+        (m) =>
+          m.user_id === repo.user &&
+          m.role === "editor" &&
+          m.contest_id === (n.kind === "contest" ? n.id : chain[0]?.id),
+      ));
+  function navigate(id: string) {
+    if (dirty && !window.confirm("Há anotações não salvas. Sair sem salvar?"))
+      return;
+    setDirty(false);
+    setSelected(id);
+    setHome(false);
+    setMobile(false);
+    setError("");
+  }
+  function changeSection(s: Section) {
+    if (dirty && !window.confirm("Há anotações não salvas. Sair sem salvar?"))
+      return;
+    setDirty(false);
+    setSection(s);
+  }
+  const p = node
+    ? progress(data.nodes, data.checks, node.id, repo.user)
+    : { done: 0, total: 0, percent: 0 };
+  const list = data.materials
+    .filter((m) => m.topic_id === selected && m.section === section)
+    .sort((a, b) => a.position - b.position || a.id.localeCompare(b.id));
+  async function openFile(m: Material) {
+    setError("");
+    try {
+      setFileView({ url: await repo.fileUrl(m), material: m });
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+  function tree(parent: string | null, depth = 0): React.ReactNode {
+    return data.nodes
+      .filter((n) => n.parent_id === parent)
+      .sort((a, b) => a.position - b.position || a.id.localeCompare(b.id))
+      .map((n) => {
+        const matches =
+          !search ||
+          [n, ...descendants(data.nodes, n.id)].some((x) =>
+            x.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
+          );
+        if (!matches) return null;
+        return (
+          <li key={n.id}>
+            <button
+              className={`tree-node ${selected === n.id ? "selected" : ""}`}
+              style={{ paddingLeft: 12 + depth * 14 }}
+              onClick={() => navigate(n.id)}
+            >
+              {n.kind === "contest" ? (
+                <FolderOpen size={17} />
+              ) : n.kind === "discipline" ? (
+                <BookOpen size={16} />
+              ) : (
+                <span className="tree-dot" />
+              )}
+              <span>{n.name}</span>
+              {n.kind === "topic" && (
+                <small>
+                  {progress(data.nodes, data.checks, n.id, repo.user).percent}%
+                </small>
+              )}
+            </button>
+            <ul>{tree(n.id, depth + 1)}</ul>
+          </li>
+        );
+      });
+  }
+  return (
+    <FeedbackContext.Provider value={error}>
+      <div className={`app-shell ${collapsed ? "sidebar-collapsed" : ""}`}>
+        <a className="skip-link" href="#conteudo">
+          Pular para o conteúdo
+        </a>
+        {mobile && (
+          <button
+            className="scrim"
+            aria-label="Fechar navegação"
+            onClick={() => setMobile(false)}
+          />
+        )}
+        <aside
+          id="navegacao-principal"
+          className={`sidebar ${mobile ? "mobile-open" : ""}`}
+        >
+          <a
+            className="brand"
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              if (!dirty || window.confirm("Sair sem salvar as anotações?")) {
+                setDirty(false);
+                setHome(true);
+                setMobile(false);
+              }
+            }}
+          >
+            <span className="brand-icon">
+              <BookOpen size={23} />
+            </span>
+            <span>
+              Central<span className="brand-sub">DE ESTUDOS</span>
+            </span>
+          </a>
+          <button
+            className="collapse-control icon"
+            aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
+            onClick={() => setCollapsed(!collapsed)}
+          >
+            {collapsed ? (
+              <PanelLeftOpen size={19} />
+            ) : (
+              <PanelLeftClose size={19} />
+            )}
+          </button>
+          <div className="sidebar-label">SEU ESPAÇO</div>
+          <nav className="module-nav" aria-label="Módulos principais">
+            {(
+              [
+                ["Início", Home, () => setHome(true)],
+                [
+                  "Meus concursos",
+                  FolderOpen,
+                  () => {
+                    if (repo.demo) setHome(false);
+                    else void openCatalog();
+                  },
+                ],
+                ["Estudar", BookOpen, () => setHome(false)],
+                ["Planejamento", CalendarDays, () => setPlannerOpen(true)],
+                ["Questões", CircleHelp, () => setQuestionsOpen(true)],
+                ["Revisões", Layers, () => setFlashcardsOpen(true)],
+                ["Biblioteca", Library, () => setHome(false)],
+                ["Desempenho", BarChart3, () => setProductivityOpen(true)],
+                [
+                  "Central de Prompts",
+                  GraduationCap,
+                  () => setPromptsOpen(true),
+                ],
+                [
+                  "Configurações",
+                  Settings,
+                  () => setTheme(theme === "light" ? "dark" : "light"),
+                ],
+              ] as const
+            ).map(([label, Icon, action]) => (
+              <button
+                key={label}
+                className={`module-link ${label === "Início" && home ? "current" : ""}`}
+                title={label}
+                aria-current={label === "Início" && home ? "page" : undefined}
+                onClick={() => {
+                  if (dirty && !window.confirm("Sair sem salvar as anotações?"))
+                    return;
+                  setDirty(false);
+                  action();
+                  setMobile(false);
+                }}
+              >
+                <Icon size={18} />
+                <span>{label}</span>
+              </button>
+            ))}
+          </nav>
+          <div className="sidebar-label syllabus-label">
+            MEUS CONCURSOS
+            {repo.demo ? (
+              <button
+                className="icon"
+                onClick={() => setNodeForm({})}
+                aria-label="Adicionar concurso"
+              >
+                <Plus size={17} />
+              </button>
+            ) : (
+              <button
+                className="text-button"
+                onClick={() => void openCatalog()}
+              >
+                Ver catálogo
+              </button>
+            )}
+          </div>
+          <label className="search">
+            <Search size={16} />
+            <input
+              aria-label="Buscar na hierarquia"
+              placeholder="Buscar no edital"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </label>
+          <nav aria-label="Concursos, disciplinas e assuntos">
+            <ul className="tree">{tree(null)}</ul>
+            {!loading && !data.nodes.length && (
+              <p className="muted">Adicione seu primeiro concurso.</p>
+            )}
+          </nav>
+          <div className="sidebar-footer">
+            <div className="avatar">{repo.demo ? "D" : "E"}</div>
+            <div>
+              <strong>{repo.demo ? "Modo demonstração" : "Minha conta"}</strong>
+              <small>
+                {repo.demo
+                  ? "Dados fictícios · neste navegador"
+                  : "Sessão individual"}
+              </small>
+            </div>
+            {supabase && (
+              <button
+                className="icon"
+                onClick={() => {
+                  if (!dirty || window.confirm("Sair sem salvar as anotações?"))
+                    void logout().catch((e: Error) => setError(e.message));
+                }}
+                aria-label="Sair"
+              >
+                <LogOut size={18} />
+              </button>
+            )}
+          </div>
+        </aside>
+        <div className="main-shell">
+          <header className="topbar">
+            <div>
+              <button
+                className="icon menu"
+                aria-label={mobile ? "Fechar navegação" : "Abrir navegação"}
+                aria-controls="navegacao-principal"
+                aria-expanded={mobile}
+                onClick={() => setMobile((value) => !value)}
+              >
+                <Menu />
+              </button>
+              <span>{home ? "Início" : "Biblioteca & estudo"}</span>
+            </div>
+            <button
+              className="icon theme-toggle"
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              aria-label={
+                theme === "light" ? "Ativar tema escuro" : "Ativar tema claro"
+              }
+            >
+              {theme === "light" ? <Moon size={19} /> : <Sun size={19} />}
+            </button>
+            <span className="private-indicator">
+              <LockKeyhole size={14} /> Seu progresso é só seu
+            </span>
+          </header>
+          <main id="conteudo" tabIndex={-1} className="workspace">
+            {!online && (
+              <div className="offline-notice" role="status">
+                <WifiOff size={18} /> Você está offline. A sincronização offline
+                não está disponível; alterações podem não ser salvas.
+              </div>
+            )}
+            {home ? (
+              <div className="home-page">
+                <div className="home-intro">
+                  <div>
+                    <div className="eyebrow">SEU ESPAÇO DE ESTUDOS</div>
+                    <h1>Um passo de cada vez.</h1>
+                    <p>Organize seu dia e continue de onde parou.</p>
+                  </div>
+                  <button className="primary" onClick={() => setHome(false)}>
+                    Continuar estudando <ChevronRight size={18} />
+                  </button>
+                </div>
+                {repo.demo && (
+                  <div className="demo-banner">
+                    <strong>Demonstração fictícia.</strong> Dados salvos neste
+                    navegador.
+                  </div>
+                )}
+                {overviewLoading && (online || repo.demo) && (
+                  <p role="status">Carregando plano e revisões…</p>
+                )}
+                {error && !catalogOpen && (
+                  <div className="error" role="alert">
+                    {error}
+                    <button
+                      className="text-button"
+                      disabled={busy}
+                      onClick={() => run(refresh, "Dados recarregados.")}
+                    >
+                      Tentar recarregar dados
+                    </button>
+                  </div>
+                )}
+                {homeError && (
+                  <div className="error">
+                    <p role="alert">Parte do resumo não pôde ser carregada.</p>
+                    <button
+                      className="secondary"
+                      onClick={() => setReloadOverview((value) => value + 1)}
+                    >
+                      Tentar novamente
+                    </button>
+                  </div>
+                )}
+                <div className="home-grid">
+                  <section className="home-card home-plan">
+                    <div className="home-card-head">
+                      <div>
+                        <div className="eyebrow">SEU RITMO</div>
+                        <h2>Plano de hoje</h2>
+                      </div>
+                      <CalendarDays size={22} />
+                    </div>
+                    {todayBlocks.length ? (
+                      <ul className="today-list">
+                        {todayBlocks.map((b) => (
+                          <li key={b.id}>
+                            <span>
+                              {b.completed ? "✓ " : ""}
+                              {b.name}
+                            </span>
+                            <small>
+                              {b.minutes} min{b.completed ? " · concluído" : ""}
+                            </small>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="muted">
+                        {overviewLoading
+                          ? "Consultando o planejamento…"
+                          : homeError
+                            ? "Consulte seu plano no planejamento."
+                            : "Nenhuma atividade planejada para hoje. Crie ou atualize seu plano."}
+                      </p>
+                    )}
+                    <button
+                      className="text-button home-action"
+                      onClick={() => setPlannerOpen(true)}
+                    >
+                      Abrir planejamento →
+                    </button>
+                  </section>
+                  <section className="home-card">
+                    <div className="home-card-head">
+                      <div>
+                        <div className="eyebrow">MEMÓRIA EM DIA</div>
+                        <h2>Revisões pendentes</h2>
+                      </div>
+                      <Layers size={22} />
+                    </div>
+                    <strong className="home-number">
+                      {dueCount === null ? "—" : dueCount}
+                    </strong>
+                    <p className="muted">Cartões com revisão vencida</p>
+                    <button
+                      className="text-button home-action"
+                      onClick={() => setFlashcardsOpen(true)}
+                    >
+                      Abrir revisões →
+                    </button>
+                  </section>
+                  <section className="home-card">
+                    <div className="home-card-head">
+                      <div>
+                        <div className="eyebrow">SUA CAMINHADA</div>
+                        <h2>Progresso</h2>
+                      </div>
+                      <CheckCheck size={22} />
+                    </div>
+                    {contest ? (
+                      <>
+                        <strong className="home-number">
+                          {
+                            progress(
+                              data.nodes,
+                              data.checks,
+                              contest.id,
+                              repo.user,
+                            ).percent
+                          }
+                          %
+                        </strong>
+                        <p className="muted">Checklist de {contest.name}</p>
+                      </>
+                    ) : (
+                      <p className="muted">
+                        Selecione um concurso para acompanhar seu progresso.
+                      </p>
+                    )}
+                    <button
+                      className="text-button home-action"
+                      onClick={() => setHome(false)}
+                    >
+                      Ver conteúdo →
+                    </button>
+                  </section>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="breadcrumb">
+                  <span>Meus concursos</span>
+                  {chain.map((n) => (
+                    <span key={n.id}>
+                      <ChevronRight size={13} />
+                      <button onClick={() => navigate(n.id)}>{n.name}</button>
+                    </span>
+                  ))}
+                </div>
+                {repo.demo && (
+                  <div className="demo-banner">
+                    <span>
+                      <strong>Demonstração fictícia.</strong> Dados salvos
+                      apenas neste navegador. Arquivos e compartilhamento
+                      precisam do Supabase.
+                    </span>
+                  </div>
+                )}
+                <div aria-live="polite">
+                  {loading && <p>Carregando seu ambiente…</p>}
+                  {busy && <p className="muted">Salvando…</p>}
+                  {status && (
+                    <p className="success" role="status">
+                      {status}
+                    </p>
+                  )}
+                </div>
+                {error && (
+                  <div className="error" role="alert">
+                    {error}
+                    <button
+                      className="text-button"
+                      disabled={busy}
+                      onClick={() => run(refresh, "Dados recarregados.")}
+                    >
+                      Tentar recarregar
+                    </button>
+                  </div>
+                )}
+                <div className="page-heading">
+                  <div>
+                    <div className="eyebrow">UM ASSUNTO DE CADA VEZ</div>
+                    <h1>{node?.name || "Seu ambiente de estudos"}</h1>
+                    <p>
+                      {isTopic
+                        ? "Reúna o que importa. Estude no seu ritmo."
+                        : "Organize seu edital e transforme cada etapa em progresso."}
+                    </p>
+                  </div>
+                  <div className="heading-actions">
+                    {node && canEdit(node) && (
+                      <>
+                        <button
+                          className="icon"
+                          title="Editar nome"
+                          aria-label="Editar item"
+                          onClick={() => setNodeForm({ initial: node })}
+                        >
+                          <Pencil size={17} />
+                        </button>
+                        {node.kind !== "subtopic" && (
+                          <button
+                            className="secondary"
+                            onClick={() => setNodeForm({ parent: node })}
+                          >
+                            <Plus size={17} />
+                            {node.kind === "contest"
+                              ? "Disciplina"
+                              : node.kind === "discipline"
+                                ? "Assunto"
+                                : "Subassunto"}
+                          </button>
+                        )}
+                      </>
+                    )}
+                    {!node && (
+                      <button
+                        className="primary"
+                        onClick={() =>
+                          repo.demo ? setNodeForm({}) : void openCatalog()
+                        }
+                      >
+                        <Plus size={18} />
+                        {repo.demo ? "Adicionar concurso" : "Ver concursos"}
+                      </button>
+                    )}
+                    {contest?.owner_id === repo.user && !repo.demo && (
+                      <button
+                        className="icon"
+                        aria-label="Gerenciar acesso ao concurso"
+                        title="Acesso ao concurso"
+                        onClick={() => setShare(true)}
+                      >
+                        <Share2 size={18} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+                {node && (
+                  <div className="summary-grid">
+                    <section className="summary-card">
+                      <div className="summary-icon">
+                        <CheckCheck size={22} />
+                      </div>
+                      <div>
+                        <span>
+                          Seu progresso{" "}
+                          {isTopic
+                            ? "neste assunto"
+                            : node.kind === "contest"
+                              ? "no concurso"
+                              : "na disciplina"}
+                        </span>
+                        <strong>
+                          {p.total ? `${p.percent}%` : "Sem dados"}
+                        </strong>
+                        <small>
+                          {p.done} de {p.total} etapas concluídas
+                          {node.kind === "topic" ? " · inclui subassuntos" : ""}
+                        </small>
+                      </div>
+                      <div className="progress-track">
+                        <span style={{ width: `${p.percent}%` }} />
+                      </div>
+                    </section>
+                    <section className="summary-card">
+                      <div className="summary-icon sand">
+                        <FolderOpen size={22} />
+                      </div>
+                      <div>
+                        <span>Materiais disponíveis</span>
+                        <strong>
+                          {
+                            data.materials.filter((m) =>
+                              [
+                                selected,
+                                ...descendants(data.nodes, selected).map(
+                                  (n) => n.id,
+                                ),
+                              ].includes(m.topic_id),
+                            ).length
+                          }
+                        </strong>
+                        <small>Seu acervo e materiais autorizados</small>
+                      </div>
+                    </section>
+                    <section className="summary-card quote">
+                      <span className="mini-label">FOCO NO PROCESSO</span>
+                      <p>
+                        O próximo passo
+                        <br />
+                        também conta.
+                      </p>
+                      <GraduationCap size={39} />
+                    </section>
+                  </div>
+                )}
+                {isTopic && node ? (
+                  <>
+                    <div
+                      className="tabs"
+                      role="tablist"
+                      aria-label="Seções do assunto"
+                    >
+                      {sections.map((s, i) => (
+                        <button
+                          key={s}
+                          id={`tab-${i}`}
+                          role="tab"
+                          aria-selected={section === s}
+                          aria-controls="study-panel"
+                          tabIndex={section === s ? 0 : -1}
+                          onKeyDown={(e) => {
+                            if (
+                              [
+                                "ArrowRight",
+                                "ArrowLeft",
+                                "Home",
+                                "End",
+                              ].includes(e.key)
+                            ) {
+                              e.preventDefault();
+                              const next =
+                                e.key === "Home"
+                                  ? 0
+                                  : e.key === "End"
+                                    ? sections.length - 1
+                                    : (i +
+                                        (e.key === "ArrowRight" ? 1 : -1) +
+                                        sections.length) %
+                                      sections.length;
+                              changeSection(sections[next]);
+                              document.getElementById(`tab-${next}`)?.focus();
+                            }
+                          }}
+                          onClick={() => changeSection(s)}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                    <section
+                      className="study-panel"
+                      id="study-panel"
+                      role="tabpanel"
+                      aria-labelledby={`tab-${sections.indexOf(section)}`}
+                      tabIndex={0}
+                    >
+                      <div className="section-heading">
+                        <div>
+                          <h2>{section}</h2>
+                          <p>
+                            {section === "Videoaulas"
+                              ? "Suas aulas, organizadas para continuar de onde parou."
+                              : section === "Anotações"
+                                ? "Um espaço privado para conectar suas ideias."
+                                : section === "Progresso e checklist"
+                                  ? "Pequenas etapas para um estudo completo."
+                                  : section === "Flashcards"
+                                    ? "Registre perguntas e pratique a recuperação da memória."
+                                    : "Suas referências, sempre perto do estudo."}
+                          </p>
+                        </div>
+                        {!["Anotações", "Progresso e checklist"].includes(
+                          section,
+                        ) && (
+                          <button
+                            className="primary"
+                            disabled={busy}
+                            onClick={() => setMaterialForm("new")}
+                          >
+                            <Plus size={17} />
+                            Adicionar material
+                          </button>
+                        )}
+                      </div>
+                      {section === "Questões externas" && (
+                        <div className="gran-card">
+                          <div>
+                            <span className="mini-label">PRÁTICA EXTERNA</span>
+                            <h3>Encontre questões no Gran</h3>
+                            <p>
+                              Na plataforma, selecione a disciplina{" "}
+                              <strong>
+                                {
+                                  chain.find((n) => n.kind === "discipline")
+                                    ?.name
+                                }
+                              </strong>
+                              , o assunto <strong>{node.name}</strong>
+                              {contest?.board && (
+                                <>
+                                  {" "}
+                                  e a banca <strong>{contest.board}</strong>
+                                </>
+                              )}
+                              . Se houver subassunto, refine o filtro por ele.
+                            </p>
+                            <small>
+                              Sem URL específica confirmada? Use os filtros
+                              acima. Disponibilidade dos filtros e acesso
+                              dependem da plataforma. Nenhum resultado é
+                              sincronizado.
+                            </small>
+                          </div>
+                          <a
+                            className="secondary"
+                            href={granUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Abrir Gran Questões
+                            <ExternalLink size={15} />
+                          </a>
+                        </div>
+                      )}
+                      {section === "Progresso e checklist" ? (
+                        <Checklist
+                          node={node}
+                          data={data}
+                          user={repo.user}
+                          disabled={busy}
+                          toggle={(step, done) =>
+                            run(() =>
+                              repo.check({
+                                topic_id: node.id,
+                                user_id: repo.user,
+                                step,
+                                done,
+                              }),
+                            )
+                          }
+                        />
+                      ) : section === "Anotações" ? (
+                        <Notes
+                          key={selected}
+                          body={
+                            data.notes.find(
+                              (n) =>
+                                n.topic_id === selected &&
+                                n.user_id === repo.user,
+                            )?.body || ""
+                          }
+                          busy={busy}
+                          dirty={setDirty}
+                          save={(body) =>
+                            run(() =>
+                              repo.note({
+                                user_id: repo.user,
+                                topic_id: selected,
+                                body,
+                              }),
+                            )
+                          }
+                        />
+                      ) : (
+                        <>
+                          {section === "Flashcards" && (
+                            <p className="muted">
+                              Cartões de consulta por assunto. Agendamento FSRS
+                              pertence à etapa de revisões e ainda não está
+                              disponível.
+                            </p>
+                          )}
+                          {list.length ? (
+                            <div className="materials">
+                              {list.map((m) => (
+                                <MaterialCard
+                                  key={`${m.id}:${m.url}:${m.embed}`}
+                                  m={m}
+                                  own={
+                                    m.owner_id === repo.user &&
+                                    !m.catalog_managed
+                                  }
+                                  disabled={busy}
+                                  edit={() => setMaterialForm(m)}
+                                  remove={() => setDeleting(m)}
+                                  move={(direction) =>
+                                    run(
+                                      () => repo.move(m, direction),
+                                      "Ordem atualizada.",
+                                    )
+                                  }
+                                  open={() => openFile(m)}
+                                />
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="empty-state">
+                              {section === "Videoaulas" ? (
+                                <Video size={35} />
+                              ) : (
+                                <FolderOpen size={35} />
+                              )}
+                              <h3>
+                                {section === "Videoaulas"
+                                  ? "Sua próxima aula começa aqui"
+                                  : "Espaço para novas referências"}
+                              </h3>
+                              <p>
+                                {section === "Videoaulas"
+                                  ? "Adicione um link do YouTube ou uma referência externa."
+                                  : "Adicione um material para consultar durante o estudo."}
+                              </p>
+                              <button
+                                className="secondary"
+                                onClick={() => setMaterialForm("new")}
+                              >
+                                <Plus size={17} />
+                                Adicionar primeiro material
+                              </button>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </section>
+                    <div className="bottom-checklist">
+                      <div>
+                        <CheckCheck size={20} />
+                        <strong>Meu checklist</strong>
+                        <span>
+                          {
+                            data.checks.filter(
+                              (c) =>
+                                c.topic_id === selected &&
+                                c.user_id === repo.user &&
+                                c.done,
+                            ).length
+                          }
+                          /5
+                        </span>
+                      </div>
+                      <button
+                        className="text-button"
+                        onClick={() => changeSection("Progresso e checklist")}
+                      >
+                        Acompanhar etapas <ChevronRight size={15} />
+                      </button>
+                    </div>
+                  </>
+                ) : node ? (
+                  <section className="overview">
+                    <div className="section-heading">
+                      <div>
+                        <h2>
+                          {node.kind === "contest"
+                            ? "Disciplinas do concurso"
+                            : "Assuntos para estudar"}
+                        </h2>
+                        <p>
+                          Escolha um item para abrir seus materiais e seu
+                          checklist.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="overview-grid">
+                      {data.nodes
+                        .filter((n) => n.parent_id === selected)
+                        .sort((a, b) => a.position - b.position)
+                        .map((n) => {
+                          const np = progress(
+                            data.nodes,
+                            data.checks,
+                            n.id,
+                            repo.user,
+                          );
+                          return (
+                            <button
+                              className="overview-card"
+                              key={n.id}
+                              onClick={() => navigate(n.id)}
+                            >
+                              <BookOpen size={23} />
+                              <strong>{n.name}</strong>
+                              <small>
+                                {np.total
+                                  ? `${np.percent}% concluído`
+                                  : "Sem assuntos cadastrados"}
+                              </small>
+                              <progress value={np.percent} max={100} />
+                              <span>
+                                Continuar estudo <ChevronRight size={15} />
+                              </span>
+                            </button>
+                          );
+                        })}
+                    </div>
+                    {!data.nodes.some((n) => n.parent_id === selected) && (
+                      <p className="muted">
+                        Nenhum item cadastrado. Use o botão acima para
+                        adicionar.
+                      </p>
+                    )}
+                  </section>
+                ) : (
+                  !loading && (
+                    <div className="empty-state">
+                      <BookOpen size={40} />
+                      <h2>Seu próximo objetivo começa aqui</h2>
+                      <p>
+                        Cadastre um concurso, adicione disciplinas e organize os
+                        assuntos.
+                      </p>
+                    </div>
+                  )
+                )}
+              </>
+            )}
+            <footer className="workspace-footer">
+              <span>Central de Estudos · cada passo conta</span>
+              {!repo.demo && (
+                <span className="user-id">ID da conta: {repo.user}</span>
+              )}
+            </footer>
+          </main>
+        </div>
+        {promptsOpen && (
+          <Suspense fallback={<p role="status">Carregando prompts…</p>}>
+            <PromptPanel
+              nodes={data.nodes}
+              user={repo.user}
+              demo={repo.demo}
+              close={() => setPromptsOpen(false)}
+              openImporter={(target) => {
+                setPromptsOpen(false);
+                setImportTarget(target);
+                if (target === "contest") void openCatalog();
+                if (target === "questions") setQuestionsOpen(true);
+                if (target === "cards") setFlashcardsOpen(true);
+              }}
+            />
+          </Suspense>
+        )}
+        {questionsOpen && (
+          <Suspense fallback={<p role="status">Carregando questões…</p>}>
+            <QuestionsPanel
+              startImport={importTarget === "questions"}
+              nodes={data.nodes}
+              user={repo.user}
+              demo={repo.demo}
+              close={() => {
+                setQuestionsOpen(false);
+                setImportTarget(null);
+              }}
+              openExternal={() => {
+                setQuestionsOpen(false);
+                setExternalMock(true);
+                setProductivityOpen(true);
+              }}
+            />
+          </Suspense>
+        )}
+        {productivityOpen && (
+          <Suspense fallback={<p role="status">Carregando estatísticas…</p>}>
+            <ProductivityPanel
+              externalMock={externalMock}
+              snapshot={snapshot}
+              user={repo.user}
+              demo={repo.demo}
+              close={() => {
+                setProductivityOpen(false);
+                setExternalMock(false);
+              }}
+            />
+          </Suspense>
+        )}
+        {flashcardsOpen && (
+          <Suspense fallback={<p role="status">Carregando flashcards…</p>}>
+            <FlashcardPanel
+              startImport={importTarget === "cards"}
+              nodes={data.nodes}
+              user={repo.user}
+              demo={repo.demo}
+              close={() => {
+                setFlashcardsOpen(false);
+                setImportTarget(null);
+              }}
+            />
+          </Suspense>
+        )}
+        {plannerOpen && (
+          <Suspense fallback={<p role="status">Carregando planejamento…</p>}>
+            <PlannerPanel
+              snapshot={snapshot}
+              user={repo.user}
+              demo={repo.demo}
+              close={() => setPlannerOpen(false)}
+              openReviews={() => {
+                setPlannerOpen(false);
+                setFlashcardsOpen(true);
+              }}
+            />
+          </Suspense>
+        )}
+        {catalogOpen && (
+          <Suspense fallback={<p role="status">Carregando catálogo…</p>}>
+            <ContestPanel
+              startImport={importTarget === "contest" && catalogAdmin}
+              nodes={snapshot.nodes}
+              editable={
+                new Set([
+                  ...snapshot.nodes
+                    .filter(
+                      (n) => n.kind === "contest" && n.owner_id === repo.user,
+                    )
+                    .map((n) => n.id),
+                  ...members
+                    .filter(
+                      (m) => m.user_id === repo.user && m.role === "editor",
+                    )
+                    .map((m) => m.contest_id),
+                ])
+              }
+              user={repo.user}
+              admin={catalogAdmin}
+              close={() => {
+                setCatalogOpen(false);
+                setImportTarget(null);
+              }}
+              refresh={refresh}
+              open={(id) => {
+                navigate(id);
+                setCatalogOpen(false);
+              }}
+            />
+          </Suspense>
+        )}
+        {materialForm && isTopic && (
+          <MaterialForm
+            initial={materialForm === "new" ? undefined : materialForm}
+            topic={selected}
+            user={repo.user}
+            section={section}
+            demo={repo.demo}
+            busy={busy}
+            close={() => setMaterialForm(null)}
+            onSave={(m, file) =>
+              run(() =>
+                repo.saveMaterial(
+                  materialForm === "new"
+                    ? {
+                        ...m,
+                        position:
+                          Math.max(
+                            -1,
+                            ...data.materials
+                              .filter(
+                                (x) =>
+                                  x.topic_id === selected &&
+                                  x.section === m.section,
+                              )
+                              .map((x) => x.position),
+                          ) + 1,
+                      }
+                    : m,
+                  file,
+                ),
+              )
+            }
+          />
+        )}
+        {nodeForm && (
+          <NodeForm
+            {...nodeForm}
+            user={repo.user}
+            count={
+              data.nodes.filter(
+                (n) => n.parent_id === (nodeForm.parent?.id || null),
+              ).length
+            }
+            busy={busy}
+            close={() => setNodeForm(null)}
+            save={(n) => run(() => repo.saveNode(n))}
+          />
+        )}
+        {deleting && (
+          <Modal
+            title="Remover material?"
+            busy={busy}
+            close={() => setDeleting(null)}
+          >
+            <p>
+              “{deleting.title}” será removido para você e os destinatários. O
+              arquivo associado também será excluído. Seu checklist será
+              preservado.
+            </p>
+            <div className="form-actions">
+              <button
+                className="secondary"
+                disabled={busy}
+                onClick={() => setDeleting(null)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="danger"
+                disabled={busy}
+                onClick={async () => {
+                  if (
+                    await run(
+                      () => repo.deleteMaterial(deleting),
+                      "Material removido.",
+                    )
+                  )
+                    setDeleting(null);
+                }}
+              >
+                Remover material
+              </button>
+            </div>
+          </Modal>
+        )}
+        {share && contest && (
+          <ShareForm
+            contest={contest}
+            members={members}
+            busy={busy}
+            close={() => setShare(false)}
+            save={(m, remove) => run(() => repo.member(m, remove))}
+          />
+        )}
+        {fileView && (
+          <Modal
+            title={fileView.material.title}
+            close={() => setFileView(null)}
+          >
+            <p>
+              Link temporário, válido por 60 segundos. Reabra o material para
+              renová-lo.
+            </p>
+            {fileView.material.kind === "image" ? (
+              <img
+                className="file-image"
+                src={fileView.url}
+                alt={fileView.material.title}
+              />
+            ) : (
+              <iframe
+                className="pdf-preview"
+                src={fileView.url}
+                title={fileView.material.title}
+              />
+            )}
+            <a
+              className="secondary"
+              href={fileView.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Abrir arquivo <ExternalLink size={15} />
+            </a>
+          </Modal>
+        )}
+      </div>
+    </FeedbackContext.Provider>
+  );
+}
+function MaterialCard({
+  m,
+  own,
+  disabled,
+  edit,
+  remove,
+  move,
+  open,
+}: {
+  m: Material;
+  own: boolean;
+  disabled: boolean;
+  edit: () => void;
+  remove: () => void;
+  move: (d: number) => void;
+  open: () => void;
+}) {
+  const [reveal, setReveal] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  let url = "";
+  try {
+    url = m.url ? safeUrl(m.url) : "";
+  } catch {
+    /* Invalid stored URLs are never linked. */
+  }
+  const videoId = youtubeId(url);
+  return (
+    <article className="material-card">
+      <div className="material-top">
+        <span className="format-tag">
+          {m.kind === "youtube" ? <Video size={14} /> : <FileText size={14} />}
+          {
+            {
+              youtube: "YOUTUBE",
+              text: "TEXTO",
+              pdf: "PDF",
+              image: "IMAGEM",
+              link: "LINK",
+            }[m.kind]
+          }
+        </span>
+        <span className="visibility">
+          {m.visibility === "private" ? (
+            <LockKeyhole size={12} />
+          ) : (
+            <Share2 size={12} />
+          )}{" "}
+          {m.visibility === "private" ? "Privado" : "Compartilhado"}
+          {!own ? " · somente leitura" : ""}
+        </span>
+      </div>
+      <h3>{m.title}</h3>
+      {url && (
+        <span className="verification">
+          {m.verified ? "Conferido pelo autor" : "Link não verificado"}
+        </span>
+      )}
+      {m.section === "Flashcards" ? (
+        <div className="flashcard">
+          <p>{m.body}</p>
+          <button className="secondary" onClick={() => setReveal(!reveal)}>
+            {reveal ? "Ocultar resposta" : "Mostrar resposta"}
+          </button>
+          {reveal && <p className="answer">{m.back}</p>}
+        </div>
+      ) : (
+        m.body && <p className="material-body">{m.body}</p>
+      )}
+      {m.kind === "youtube" &&
+        m.embed &&
+        videoId &&
+        (playing ? (
+          <YouTube id={videoId} />
+        ) : (
+          <button
+            className="video-placeholder"
+            onClick={() => setPlaying(true)}
+          >
+            <Video size={28} />
+            <span>Carregar player do YouTube</span>
+            <small>O player será conectado ao YouTube.</small>
+          </button>
+        ))}
+      <div className="material-actions">
+        <div>
+          {url && (
+            <a
+              className="text-button"
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {m.kind === "youtube" ? "Abrir no YouTube" : "Abrir referência"}
+              <ExternalLink size={15} />
+            </a>
+          )}
+          {m.file_path && (
+            <button className="text-button" onClick={open}>
+              Abrir arquivo
+              <ExternalLink size={15} />
+            </button>
+          )}
+        </div>
+        {own && (
+          <div className="edit-actions">
+            <button
+              className="icon"
+              aria-label={`Mover ${m.title} para cima`}
+              disabled={disabled}
+              onClick={() => move(-1)}
+            >
+              <ArrowUp size={16} />
+            </button>
+            <button
+              className="icon"
+              aria-label={`Mover ${m.title} para baixo`}
+              disabled={disabled}
+              onClick={() => move(1)}
+            >
+              <ArrowDown size={16} />
+            </button>
+            <button
+              className="icon"
+              aria-label={`Editar ${m.title}`}
+              disabled={disabled}
+              onClick={edit}
+            >
+              <Pencil size={16} />
+            </button>
+            <button
+              className="icon"
+              aria-label={`Remover ${m.title}`}
+              disabled={disabled}
+              onClick={remove}
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        )}
+      </div>
+    </article>
+  );
+}
+function Checklist({
+  node,
+  data,
+  user,
+  disabled,
+  toggle,
+}: {
+  node: Node;
+  data: Snapshot;
+  user: string;
+  disabled: boolean;
+  toggle: (step: number, done: boolean) => void;
+}) {
+  return (
+    <div className="checklist">
+      <p className="muted">
+        Etapas individuais deste{" "}
+        {node.kind === "subtopic" ? "subassunto" : "assunto"}. Marcar uma etapa
+        não altera seus subassuntos.
+      </p>
+      {steps.map((label, i) => (
+        <label
+          key={label}
+          className={
+            data.checks.some(
+              (c) =>
+                c.topic_id === node.id &&
+                c.user_id === user &&
+                c.step === i &&
+                c.done,
+            )
+              ? "completed"
+              : ""
+          }
+        >
+          <input
+            type="checkbox"
+            disabled={disabled}
+            checked={data.checks.some(
+              (c) =>
+                c.topic_id === node.id &&
+                c.user_id === user &&
+                c.step === i &&
+                c.done,
+            )}
+            onChange={(e) => toggle(i, e.target.checked)}
+          />
+          <span>{label}</span>
+          <small>{i + 1}/5</small>
+        </label>
+      ))}
+    </div>
+  );
+}
+function Notes({
+  body,
+  busy,
+  dirty,
+  save,
+}: {
+  body: string;
+  busy: boolean;
+  dirty: (v: boolean) => void;
+  save: (v: string) => Promise<boolean>;
+}) {
+  const [draft, setDraft] = useState(body);
+  const [saved, setSaved] = useState(body);
+  return (
+    <div className="notes">
+      <label htmlFor="personal-notes">
+        <LockKeyhole size={14} />
+        Anotações pessoais · somente você
+      </label>
+      <textarea
+        id="personal-notes"
+        rows={12}
+        maxLength={100000}
+        value={draft}
+        onChange={(e) => {
+          setDraft(e.target.value);
+          dirty(e.target.value !== saved);
+        }}
+        placeholder="O que você quer lembrar na próxima revisão?"
+      />
+      <div className="notes-footer">
+        <small>
+          {draft === saved
+            ? "Todas as anotações salvas."
+            : "Alterações ainda não salvas."}{" "}
+          · {draft.length}/100000
+        </small>
+        <button
+          className="primary"
+          disabled={busy || draft === saved}
+          onClick={async () => {
+            if (await save(draft)) {
+              setSaved(draft);
+              dirty(false);
+            }
+          }}
+        >
+          Salvar anotações
+        </button>
+      </div>
+    </div>
+  );
+}
