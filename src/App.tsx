@@ -129,10 +129,7 @@ function Workspace({
       setExternalMock(false);
       setIncidenceOpen(false);
     }
-    if (page) {
-      setAccountPage(null);
-      setMobile(false);
-    }
+    if (page) setMobile(false);
   }
   const setPlannerOpen = (open: boolean) => openModule(open ? "planner" : null);
   const setCatalogOpen = (open: boolean) => openModule(open ? "catalog" : null);
@@ -524,8 +521,8 @@ function Workspace({
                 (label === "Planejamento" && plannerOpen) ||
                 (label === "Central de Prompts" && promptsOpen) ||
                 (label === "Desempenho" && productivityOpen) ||
-                (label === "Meu perfil" && accountPage === "profile") ||
-                (label === "Administração" && accountPage === "admin");
+                (label === "Meu perfil" && accountPage === "profile" && !modulePage) ||
+                (label === "Administração" && accountPage === "admin" && !modulePage);
               return (
                 <button
                   key={label}

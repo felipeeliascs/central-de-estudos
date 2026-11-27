@@ -22,7 +22,7 @@ it("abre os quatro módulos na mesma main e mantém o menu acessível", async ()
     ["Central de Prompts", "Central de Prompts e Inteligência Artificial"],
     ["Desempenho", "Desempenho"],
   ]) {
-    await user.click(nav.getByRole("button", { name: menu, exact: true }));
+    await user.click(nav.getByRole("button", { name: menu }));
     await within(main).findByRole("heading", { name: title, level: 1 });
     expect(screen.getAllByRole("main")).toEqual([main]);
     expect(main.id).toBe("conteudo");
@@ -31,10 +31,10 @@ it("abre os quatro módulos na mesma main e mantém o menu acessível", async ()
     expect(document.activeElement).toBe(main);
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(HTMLDialogElement.prototype.showModal).not.toHaveBeenCalled();
-    expect(nav.getByRole("button", { name: menu, exact: true }).getAttribute("aria-current")).toBe("page");
+    expect(nav.getByRole("button", { name: menu }).getAttribute("aria-current")).toBe("page");
   }
   await within(main).findByText(/Horas líquidas no período/);
-  await user.click(nav.getByRole("button", { name: "Início", exact: true }));
+  await user.click(nav.getByRole("button", { name: "Início" }));
   await within(main).findByRole("heading", { name: "Plano de hoje" });
   expect(screen.queryByRole("heading", { name: "Desempenho" })).toBeNull();
 });
@@ -48,7 +48,7 @@ it("abre atalhos do Início, volta e entra no edital pela página de concursos",
   await user.click(within(main).getByRole("button", { name: "Voltar" }));
   await within(main).findByRole("heading", { name: "Plano de hoje" });
   const nav = within(screen.getByRole("navigation", { name: "Módulos principais" }));
-  await user.click(nav.getByRole("button", { name: "Meus concursos", exact: true }));
+  await user.click(nav.getByRole("button", { name: "Meus concursos" }));
   await user.click(await within(main).findByRole("button", { name: /^Abrir edital de / }));
   await within(main).findByRole("heading", { name: "Disciplinas do concurso" });
   expect(screen.queryByRole("dialog")).toBeNull();
