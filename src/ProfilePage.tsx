@@ -35,6 +35,7 @@ export function ProfilePage({
     catch { return { email: "estudante@example.test", name: "Estudante fictício" }; }
   });
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoBusy, setPhotoBusy] = useState(false);
   const [photoError, setPhotoError] = useState("");
   const [photoStatus, setPhotoStatus] = useState("");
@@ -178,9 +179,10 @@ export function ProfilePage({
   async function savePhoto(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!account) return;
-    const form = new FormData(event.currentTarget);
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
     const bio = String(form.get("bio") ?? "").trim();
-    const file = form.get("photo") as File | null;
+    const file = photoFile;
     setPhotoError(""); setPhotoStatus(""); setPhotoBusy(true);
     let uploaded = "";
     let committed = false;
@@ -207,6 +209,9 @@ export function ProfilePage({
         }
       }
       setAccount(next);
+      setPhotoFile(null);
+      const photoInput = formElement.elements.namedItem("photo") as HTMLInputElement | null;
+      if (photoInput) photoInput.value = "";
       setPhotoStatus("Foto e descrição atualizadas.");
     } catch (error) {
       if (uploaded && !committed) await supabase!.storage.from("profile-photos").remove([uploaded]);
@@ -394,7 +399,7 @@ export function ProfilePage({
           <details>
             <summary><span className="profile-section-icon"><Camera size={19} /></span><span><strong>Foto e descrição</strong><small>Sua identificação pessoal na Central</small></span><ChevronDown size={18} className="profile-chevron" /></summary>
             <form className="profile-form" onSubmit={savePhoto}><fieldset disabled={photoBusy}>
-              <label>Foto do perfil<input name="photo" type="file" accept="image/png,image/jpeg,image/webp" /></label>
+              <label>Foto do perfil<input name="photo" type="file" accept="image/png,image/jpeg,image/webp" onChange={event => setPhotoFile(event.target.files?.[0] ?? null)} /></label>
               <small>PNG, JPEG ou WebP de até 2 MB. A foto permanece privada.</small>
               <label>Descrição<textarea name="bio" maxLength={1000} rows={4} defaultValue={account.bio ?? ""} /></label>
               <button className="primary">Salvar foto e descrição</button>
