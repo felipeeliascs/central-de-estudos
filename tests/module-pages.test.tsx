@@ -22,6 +22,7 @@ it("abre os quatro módulos na mesma main e mantém o menu acessível", async ()
     ["Planejamento", "Planejamento adaptativo"],
     ["Central de Prompts", "Central de Prompts e Inteligência Artificial"],
     ["Desempenho", "Meu desempenho"],
+    ["Trilhas", "Trilha da Semana"],
   ]) {
     await user.click(nav.getByRole("button", { name: menu }));
     await within(main).findByRole("heading", { name: title, level: 1 });
@@ -34,6 +35,7 @@ it("abre os quatro módulos na mesma main e mantém o menu acessível", async ()
     expect(HTMLDialogElement.prototype.showModal).not.toHaveBeenCalled();
     expect(nav.getByRole("button", { name: menu }).getAttribute("aria-current")).toBe("page");
   }
+  await user.click(nav.getByRole("button", { name: "Desempenho" }));
   await within(main).findByText(/Horas líquidas no período/);
   await user.click(nav.getByRole("button", { name: "Início" }));
   await within(main).findByRole("heading", { name: "Plano de hoje" });

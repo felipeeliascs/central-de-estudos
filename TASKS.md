@@ -344,3 +344,16 @@ Diagnóstico de Aparecida: o prompt original de videoaulas tinha target none e s
 - [x] Aprovar lint, testes e build remotos desta ampliação do PR #2. Execução aprovada de referência: https://github.com/felipeeliascs/central-de-estudos/actions/runs/46064278287. O PR registra também as verificações do commit final.
 - [ ] Homologar migração 013, upload e links assinados de foto no Storage real com contas fictícias. Nenhuma migração de produção aplicada. 001–012 são pré-requisitos.
 - [ ] Incorporar e publicar somente após confirmação.
+
+
+## Trilhas, menu da conta e ofensiva — 27/11/2026
+
+- [x] Manter Planejamento e Central de Prompts dentro da main, sem dialog; adicionar Trilhas com URL própria.
+- [x] Criar trilha semanal com linha do tempo, disponibilidade diária, estimativas, pré-requisitos e registro individual de conclusão. Reorganizar pendências preserva o histórico concluído.
+- [x] Priorizar incidência documentada da mesma banca e unidade, respeitando pré-requisitos; a urgência do conteúdo dependente antecipa sua base, sem atribuir a frequência do dependente ao pré-requisito. Sem dados suficientes, mostrar prioridade estimada e sequência revisável.
+- [x] Acrescentar o prompt Organizar trilha lógica de estudos, com contrato study_trail 1.0, UUIDs reais do contexto, importação, prévia, referências/ciclos validados e confirmação. Reimportar configuração não apaga progresso nem materiais.
+- [x] Trocar profile-trigger por menu da conta com identidade real, atalhos, modo noturno, ajuda, uso gratuito e saída, incluindo Escape, setas e clique externo.
+- [x] Calcular ofensiva atual e recorde com dias de tempo de estudo, questões ou revisões; deduplicar o dia em America/Sao_Paulo. Não contar páginas abertas, planejamentos nem estimativas como atividade.
+- [ ] Concluir lint, testes e build no CI remoto.
+- [ ] Homologar a migração 014 após 001–013, incluindo RLS/PostgREST e ofensiva com contas fictícias. Não há aplicação automática em produção.
+- [ ] Incorporar e publicar após confirmação. A versão publicada no Pages ainda pode exibir os diálogos antigos até a aprovação e implantação do PR #2.

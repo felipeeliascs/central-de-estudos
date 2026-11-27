@@ -1,3 +1,4 @@
+import { exerciseTrailsStreak } from "./trails-streak-sql";
 // @vitest-environment node
 import { readFileSync } from "node:fs";
 import { PGlite } from "@electric-sql/pglite";
@@ -412,6 +413,9 @@ it("executa a migração e verifica isolamento no PostgreSQL com duas contas, le
     await db.exec("reset role");
     await db.exec(readFileSync(new URL("../supabase/migrations/202611270013_profile_requests.sql", import.meta.url), "utf8"));
     await exerciseProfileRequests(db, a, b);
+    await db.exec("reset role");
+    await db.exec(readFileSync(new URL("../supabase/migrations/202611270014_trails_streak.sql", import.meta.url), "utf8"));
+    await exerciseTrailsStreak(db,a,b,topic);
     await db.exec("reset role;set role anon;");
     await expect(
       db.query("select public.study_admin_overview()"),

@@ -25,6 +25,7 @@ import {
   Library,
   BarChart3,
   UserRound,
+  Route,
   ShieldCheck,
   PanelLeftClose,
   PanelLeftOpen,
@@ -56,6 +57,7 @@ import {
 } from "./Forms";
 import { AuthGate } from "./AuthGate";
 import { SyllabusIncidence } from "./SyllabusIncidence";
+import { AccountMenu } from "./AccountMenu";
 import { HomePerformance } from "./PerformanceOverview";
 import { pageHref, readRoute, type Page, type Route } from "./page-navigation";
 import { ModulePage } from "./ModulePage";
@@ -65,6 +67,7 @@ import { YouTube } from "./YouTube";
 import { readPlan } from "./planner-data";
 import { todayInBrazil, type Block } from "./planner";
 import { countDueReviews } from "./flashcard-data";
+const TrailPanel = lazy(() => import("./TrailPanel").then(module => ({ default: module.TrailPanel })));
 const ContestPanel = lazy(() =>
   import("./ContestPanel").then((module) => ({ default: module.ContestPanel })),
 );
@@ -119,11 +122,12 @@ function Workspace({
     () => localStorage.getItem("central-theme") || "light",
   );
   const [online, setOnline] = useState(navigator.onLine);
-  type Module = "catalog" | "planner" | "prompts" | "productivity";
+  type Module = "catalog" | "planner" | "prompts" | "productivity" | "trails";
   const [modulePage, setModulePage] = useState<Module | null>(() => {
     const page = readRoute().page;
-    return ["catalog", "planner", "prompts", "productivity"].includes(page) ? page as Module : null;
+    return ["catalog", "planner", "prompts", "productivity", "trails"].includes(page) ? page as Module : null;
   });
+  const trailsOpen = modulePage === "trails";
   const plannerOpen = modulePage === "planner";
   const catalogOpen = modulePage === "catalog";
   const promptsOpen = modulePage === "prompts";
@@ -203,6 +207,7 @@ function Workspace({
     "contest" | "cards" | "questions" | null
   >(null);
   const [externalMock, setExternalMock] = useState(false);
+  const [trailPrompt, setTrailPrompt] = useState(false);
   const [catalogAdmin, setCatalogAdmin] = useState(false);
   useEffect(() => {
     if (!supabase || repo.demo) return;
@@ -394,7 +399,7 @@ function Workspace({
     setAccountPage(null);
     setHome(route.page === "home");
     if (route.page === "profile" || route.page === "admin") setAccountPage(route.page);
-    if (["catalog", "planner", "prompts", "productivity"].includes(route.page)) openModule(route.page as Module);
+    if (["catalog", "planner", "prompts", "productivity", "trails"].includes(route.page)) openModule(route.page as Module);
     if (route.page === "study" && route.item) setSelected(route.item);
     return true;
   }
@@ -538,6 +543,7 @@ function Workspace({
                 ],
                 ["Estudar", BookOpen, () => setHome(false)],
                 ["Planejamento", CalendarDays, () => setPlannerOpen(true)],
+                ["Trilhas", Route, () => openModule("trails")],
                 ["Questões", CircleHelp, () => setQuestionsOpen(true)],
                 ["Revisões", Layers, () => setFlashcardsOpen(true)],
                 ["Biblioteca", Library, () => setHome(false)],
@@ -545,7 +551,7 @@ function Workspace({
                 [
                   "Central de Prompts",
                   GraduationCap,
-                  () => setPromptsOpen(true),
+                  () => { setTrailPrompt(false); setPromptsOpen(true); },
                 ],
                 ["Meu perfil", UserRound, () => setAccountPage("profile")],
                 ...(catalogAdmin
@@ -563,6 +569,7 @@ function Workspace({
                 (label === "Início" && home && !accountPage && !modulePage) ||
                 (label === "Meus concursos" && catalogOpen) ||
                 (label === "Planejamento" && plannerOpen) ||
+                (label === "Trilhas" && trailsOpen) ||
                 (label === "Central de Prompts" && promptsOpen) ||
                 (label === "Desempenho" && productivityOpen) ||
                 (label === "Meu perfil" && accountPage === "profile" && !modulePage) ||
@@ -665,7 +672,7 @@ function Workspace({
               </button>
               <span>
                 {modulePage
-                  ? { catalog: "Meus concursos", planner: "Planejamento", prompts: "Central de Prompts", productivity: "Desempenho" }[modulePage]
+                  ? { catalog: "Meus concursos", planner: "Planejamento", prompts: "Central de Prompts", productivity: "Desempenho", trails: "Trilhas" }[modulePage]
                   : accountPage === "admin"
                   ? "Administração"
                   : accountPage === "profile"
@@ -687,14 +694,23 @@ function Workspace({
             <span className="private-indicator">
               <LockKeyhole size={14} /> Seu progresso é só seu
             </span>
-            <button
-              className="icon profile-trigger"
-              onClick={openProfile}
-              aria-label="Abrir meu perfil"
-              title="Meu perfil"
-            >
-              <UserRound size={19} aria-hidden="true" />
-            </button>
+            <AccountMenu user={repo.user} demo={repo.demo} theme={theme}
+              refreshKey={String(modulePage) + String(accountPage) + questionsOpen + flashcardsOpen}
+              toggleTheme={() => setTheme(theme === "light" ? "dark" : "light")}
+              logout={async () => {
+                if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
+                await logout();
+              }}
+              navigate={target => {
+                if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
+                setDirty(false);
+                if (target === "questions") { openModule(null); setQuestionsOpen(true); return; }
+                if (target === "profile") { openProfile(); return; }
+                if (target === "catalog") { void openCatalog(); return; }
+                if (target === "study") { openModule(null); setAccountPage(null); setHome(false); return; }
+                setAccountPage(null); openModule(target);
+              }}
+            />
           </header>
           <main id="conteudo" tabIndex={-1} className="workspace">
             {!online && (
@@ -705,18 +721,27 @@ function Workspace({
             )}
             <nav className="page-breadcrumbs" aria-label="Caminho da página">
               <a href={pageHref("home")} onClick={routeLink}>Início</a>
-              {currentPage !== "home" && <><ChevronRight size={14} aria-hidden="true" /><a href={pageHref(currentPage, selected)} onClick={routeLink} aria-current="page">{{ study: "Estudar", profile: "Meu perfil", admin: "Administração", catalog: "Meus concursos", planner: "Planejamento", prompts: "Central de Prompts", productivity: "Meu desempenho", home: "Início" }[currentPage]}</a></>}
+              {currentPage !== "home" && <><ChevronRight size={14} aria-hidden="true" /><a href={pageHref(currentPage, selected)} onClick={routeLink} aria-current="page">{{ study: "Estudar", profile: "Meu perfil", admin: "Administração", catalog: "Meus concursos", planner: "Planejamento", prompts: "Central de Prompts", productivity: "Meu desempenho", trails: "Trilha da Semana", home: "Início" }[currentPage]}</a></>}
               {previousHref && <a className="previous-page" href={previousHref} onClick={routeLink}>← Página anterior</a>}
             </nav>
             {modulePage ? (
               <>
+        {trailsOpen && (
+          <Suspense fallback={<p role="status">Carregando trilhas…</p>}>
+            <TrailPanel snapshot={snapshot} user={repo.user} demo={repo.demo}
+              close={() => openModule(null)} study={navigate}
+              prompts={() => { setTrailPrompt(true); setPromptsOpen(true); }} />
+          </Suspense>
+        )}
         {promptsOpen && (
           <Suspense fallback={<p role="status">Carregando prompts…</p>}>
             <PromptPanel
+              startTrail={trailPrompt}
+              openTrails={() => { setTrailPrompt(false); openModule("trails"); }}
               nodes={data.nodes}
               user={repo.user}
               demo={repo.demo}
-              close={() => setPromptsOpen(false)}
+              close={() => { setTrailPrompt(false); setPromptsOpen(false); }}
               openImporter={(target) => {
                 setPromptsOpen(false);
                 setImportTarget(target);
@@ -866,6 +891,7 @@ function Workspace({
                     </button>
                   </div>
                 )}
+                <section className="home-trail-link"><div><h2>Sua trilha da semana</h2><p>Sequência de estudo com pré-requisitos e incidência documentada.</p></div><button className="secondary" onClick={() => openModule("trails")}>Abrir Trilhas →</button></section>
                 <HomePerformance key={String(questionsOpen) + String(flashcardsOpen) + reloadOverview} user={repo.user} demo={repo.demo} open={() => setProductivityOpen(true)} />
                 <div className="home-grid">
                   <section className="home-card home-plan">

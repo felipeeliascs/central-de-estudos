@@ -18,15 +18,19 @@ export function PromptPanel({
   demo,
   close,
   openImporter,
+  openTrails,
+  startTrail = false,
 }: {
   nodes: Node[];
   user: string;
   demo: boolean;
   close: () => void;
+  openTrails?: () => void;
+  startTrail?: boolean;
   openImporter: (target: "contest" | "cards" | "questions") => void;
 }) {
   const [custom, setCustom] = useState<PromptTemplate[]>([]);
-  const [id, setId] = useState(templates[0].id);
+  const [id, setId] = useState(startTrail ? "trilhas" : templates[0].id);
   const [admin, setAdmin] = useState(false);
   const [documents, setDocuments] = useState<Record<string, ContestDocument>>(
     {},
@@ -138,9 +142,12 @@ export function PromptPanel({
     difficulty,
     existing,
     performance,
+    trailContest: contest,
+    trailTopics: subjects.map(n => ({ topic_id: n.id, name: n.name, parent_id: n.parent_id })),
   };
   async function copy() {
     try {
+      if (selected.id === "trilhas" && (!contest || !subjects.length)) throw new Error("Selecione um concurso com assuntos antes de copiar.");
       if (selected.id === "videos") parseContest(existing);
       if (selected.target === "questions" && !topic)
         throw new Error("Selecione um assunto para preencher o identificador.");
@@ -485,6 +492,7 @@ export function PromptPanel({
             >
               Abrir ChatGPT
             </a>
+            {selected.id === "trilhas" && openTrails && <button className="secondary" onClick={openTrails}>Abrir importador de Trilhas</button>}
             {selected.target !== "none" && (
               <button
                 className="secondary"
@@ -498,7 +506,7 @@ export function PromptPanel({
               </button>
             )}
           </div>
-          {selected.target === "none" && (
+          {selected.target === "none" && selected.id !== "trilhas" && (
             <p>
               A resposta é textual. Revise e cadastre os dados na seção
               correspondente.
