@@ -1,0 +1,30 @@
+import type { PGlite } from "@electric-sql/pglite";
+import { expect } from "vitest";
+export async function exerciseProfileRequests(db: PGlite, a: string, b: string) {
+  const account = (id: string) => db.exec("reset role;set role authenticated;set request.jwt.claim.sub='" + id + "'");
+  await account(b);
+  await db.query("update public.study_profiles set username='estudante',phone='11999999999',bio='Descrição privada',avatar_path=$1 where user_id=$2", [b + "/11111111-1111-4111-8111-111111111111.png",b]);
+  await expect(db.query("update public.study_profiles set avatar_path=$1 where user_id=$2", [a+"/11111111-1111-4111-8111-111111111111.png",b])).rejects.toThrow(/check constraint/);
+  await db.query("insert into storage.objects(bucket_id,name) values('profile-photos',$1)", [b+"/11111111-1111-4111-8111-111111111111.png"]);
+  await db.query("select public.study_request_account_deletion('Pedido de teste')");
+  await db.query("select public.study_request_account_deletion('Pedido repetido')");
+  expect((await db.query<{ value: { status: string } }>("select public.study_my_deletion_request() as value")).rows[0].value.status).toBe("pending");
+  await expect(db.query("select public.study_admin_deletion_requests()")).rejects.toThrow(/administradores/);
+  await expect(db.query("select * from public.study_account_deletion_requests")).rejects.toThrow(/permission denied/);
+  await account(a);
+  expect((await db.query("select phone from public.study_profiles where user_id=$1", [b])).rows).toHaveLength(0);
+  expect((await db.query("select * from storage.objects where bucket_id='profile-photos'")).rows).toHaveLength(0);
+  expect((await db.query("delete from storage.objects where bucket_id='profile-photos' returning id")).rows).toHaveLength(0);
+  const requests = (await db.query<{ value: { user_id: string; reason: string }[] }>("select public.study_admin_deletion_requests() as value")).rows[0].value;
+  expect(requests).toHaveLength(1);
+  expect(requests[0]).toMatchObject({ user_id: b, reason: "Pedido repetido" });
+  expect((await db.query<{ value: unknown }>("select public.study_my_deletion_request() as value")).rows[0].value).toBeNull();
+  await db.query("select public.study_cancel_account_deletion()");
+  await account(b);
+  expect((await db.query<{ value: { status: string } }>("select public.study_my_deletion_request() as value")).rows[0].value.status).toBe("pending");
+  await db.query("select public.study_cancel_account_deletion()");
+  expect((await db.query<{ value: { status: string } }>("select public.study_my_deletion_request() as value")).rows[0].value.status).toBe("cancelled");
+  expect((await db.query("select * from public.study_profiles where user_id=$1", [b])).rows).toHaveLength(1);
+  await db.exec("reset role;set role anon");
+  await expect(db.query("select public.study_request_account_deletion('Ataque')")).rejects.toThrow(/permission denied/);
+}

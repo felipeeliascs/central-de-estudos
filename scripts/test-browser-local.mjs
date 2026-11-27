@@ -181,6 +181,8 @@ try {
       await evaluate("document.querySelector('.collapse-control').click()");
     }
     await evaluate("document.querySelector('.profile-trigger').click()");
+    await until("!!document.querySelector('[role=menu]')");
+    await evaluate("[...document.querySelectorAll('[role=menuitem]')].find(b => b.textContent.includes('Configurações do perfil')).click()");
     await until(
       "document.querySelector('#profile-title')?.textContent === 'Meu perfil'",
     );

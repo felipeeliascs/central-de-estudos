@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
@@ -25,6 +25,7 @@ import {
   Library,
   BarChart3,
   UserRound,
+  Route as RouteIcon,
   ShieldCheck,
   PanelLeftClose,
   PanelLeftOpen,
@@ -56,12 +57,17 @@ import {
 } from "./Forms";
 import { AuthGate } from "./AuthGate";
 import { SyllabusIncidence } from "./SyllabusIncidence";
+import { AccountMenu } from "./AccountMenu";
+import { HomePerformance } from "./PerformanceOverview";
+import { pageHref, readRoute, type Page, type Route } from "./page-navigation";
+import { ModulePage } from "./ModulePage";
 import { ProfilePage } from "./ProfilePage";
 import { AdminDashboard } from "./AdminDashboard";
 import { YouTube } from "./YouTube";
 import { readPlan } from "./planner-data";
 import { todayInBrazil, type Block } from "./planner";
 import { countDueReviews } from "./flashcard-data";
+const TrailPanel = lazy(() => import("./TrailPanel").then(module => ({ default: module.TrailPanel })));
 const ContestPanel = lazy(() =>
   import("./ContestPanel").then((module) => ({ default: module.ContestPanel })),
 );
@@ -106,9 +112,9 @@ function Workspace({
   repo: Repository;
   logout: () => Promise<void>;
 }) {
-  const [home, setHome] = useState(true);
+  const [home, setHome] = useState(() => readRoute().page === "home");
   const [accountPage, setAccountPage] = useState<"profile" | "admin" | null>(
-    null,
+    readRoute().page === "profile" ? "profile" : readRoute().page === "admin" ? "admin" : null,
   );
   const [incidenceOpen, setIncidenceOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -116,7 +122,30 @@ function Workspace({
     () => localStorage.getItem("central-theme") || "light",
   );
   const [online, setOnline] = useState(navigator.onLine);
-  const [plannerOpen, setPlannerOpen] = useState(false);
+  type Module = "catalog" | "planner" | "prompts" | "productivity" | "trails";
+  const [modulePage, setModulePage] = useState<Module | null>(() => {
+    const page = readRoute().page;
+    return ["catalog", "planner", "prompts", "productivity", "trails"].includes(page) ? page as Module : null;
+  });
+  const trailsOpen = modulePage === "trails";
+  const plannerOpen = modulePage === "planner";
+  const catalogOpen = modulePage === "catalog";
+  const promptsOpen = modulePage === "prompts";
+  const productivityOpen = modulePage === "productivity";
+  function openModule(page: Module | null) {
+    setModulePage(page);
+    if (page !== "productivity") {
+      setExternalMock(false);
+      setIncidenceOpen(false);
+    }
+    if (page) setMobile(false);
+  }
+  const setPlannerOpen = (open: boolean) => openModule(open ? "planner" : null);
+  const setCatalogOpen = (open: boolean) => openModule(open ? "catalog" : null);
+  const setPromptsOpen = (open: boolean) => openModule(open ? "prompts" : null);
+  const setProductivityOpen = (open: boolean) => {
+    openModule(open ? "productivity" : null);
+  };
   const [flashcardsOpen, setFlashcardsOpen] = useState(false);
   const [todayBlocks, setTodayBlocks] = useState<Block[]>([]);
   const [dueCount, setDueCount] = useState<number | null>(null);
@@ -137,7 +166,7 @@ function Workspace({
     };
   }, []);
   useEffect(() => {
-    if (!home || plannerOpen || flashcardsOpen || (!online && !repo.demo))
+    if (!home || modulePage || flashcardsOpen || (!online && !repo.demo))
       return;
     let active = true;
     setOverviewLoading(true);
@@ -164,7 +193,7 @@ function Workspace({
     };
   }, [
     home,
-    plannerOpen,
+    modulePage,
     flashcardsOpen,
     online,
     repo.user,
@@ -173,14 +202,12 @@ function Workspace({
   ]);
   const [snapshot, setData] = useState<Snapshot>(empty);
   const [enrolled, setEnrolled] = useState<Set<string>>(new Set());
-  const [catalogOpen, setCatalogOpen] = useState(false);
-  const [productivityOpen, setProductivityOpen] = useState(false);
   const [questionsOpen, setQuestionsOpen] = useState(false);
-  const [promptsOpen, setPromptsOpen] = useState(false);
   const [importTarget, setImportTarget] = useState<
     "contest" | "cards" | "questions" | null
   >(null);
   const [externalMock, setExternalMock] = useState(false);
+  const [trailPrompt, setTrailPrompt] = useState(false);
   const [catalogAdmin, setCatalogAdmin] = useState(false);
   useEffect(() => {
     if (!supabase || repo.demo) return;
@@ -211,9 +238,13 @@ function Workspace({
       (m) => !m.catalog_archived && !hidden.has(m.topic_id),
     ),
   };
-  async function openCatalog() {
-    if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
-    if (!supabase || repo.demo) return;
+  async function openCatalog(confirmed = false) {
+    if (!confirmed && dirty && !window.confirm("Sair sem salvar as anotações?")) return;
+    setDirty(false);
+    if (!supabase || repo.demo) {
+      setCatalogOpen(true);
+      return;
+    }
     const result = await supabase.rpc("study_catalog_admin");
     if (result.error) {
       setError(result.error.message);
@@ -224,7 +255,7 @@ function Workspace({
     setMobile(false);
   }
   const [members, setMembers] = useState<Member[]>([]);
-  const [selected, setSelected] = useState("");
+  const [selected, setSelected] = useState(() => readRoute().item);
   const [section, setSection] = useState<Section>("Videoaulas");
   const [search, setSearch] = useState("");
   const [busy, setBusy] = useState(false);
@@ -271,6 +302,7 @@ function Workspace({
           setMembers(ms);
           setEnrolled(activeEnrollments);
           setSelected(
+            (next.nodes.some(n => n.id === readRoute().item) ? readRoute().item : "") ||
             next.nodes.find((n) => n.kind === "topic")?.id ||
               next.nodes.find((n) => n.kind === "contest")?.id ||
               "",
@@ -334,9 +366,10 @@ function Workspace({
           m.contest_id === (n.kind === "contest" ? n.id : chain[0]?.id),
       ));
   function openProfile() {
-    if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
+    if (dirty && !window.confirm("Sair sem salvar as anotações?")) return false;
     setDirty(false);
     setMobile(false);
+    openModule(null);
     setAccountPage("profile");
   }
 
@@ -345,10 +378,53 @@ function Workspace({
       return;
     setDirty(false);
     setSelected(id);
+    openModule(null);
     setAccountPage(null);
     setHome(false);
     setMobile(false);
     setError("");
+  }
+  useEffect(() => {
+    document.getElementById("conteudo")?.focus();
+  }, [modulePage, accountPage, home, selected]);
+
+  const currentPage: Page = modulePage ?? accountPage ?? (home ? "home" : "study");
+  const [previousHref, setPreviousHref] = useState("");
+  const displayedHref = useRef(pageHref(currentPage, selected));
+  function followRoute(route: Route) {
+    if (route.page === currentPage && (route.page !== "study" || !route.item || route.item === selected)) return true;
+    if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
+    setDirty(false);
+    setMobile(false);
+    openModule(null);
+    setAccountPage(null);
+    setHome(route.page === "home");
+    if (route.page === "profile" || route.page === "admin") setAccountPage(route.page);
+    if (["catalog", "planner", "prompts", "productivity", "trails"].includes(route.page)) openModule(route.page as Module);
+    if (route.page === "study" && route.item) setSelected(route.item);
+    return true;
+  }
+  useEffect(() => {
+    const target = pageHref(currentPage, selected);
+    if (displayedHref.current !== target) {
+      setPreviousHref(displayedHref.current);
+      displayedHref.current = target;
+    }
+    if (location.pathname + location.search !== target) history.pushState(null, "", target);
+  }, [currentPage, selected]);
+  useEffect(() => {
+    const pop = () => {
+      if (!followRoute(readRoute())) history.pushState(null, "", pageHref(currentPage, selected));
+    };
+    window.addEventListener("popstate", pop);
+    return () => window.removeEventListener("popstate", pop);
+    // The current unsaved-note guard is needed when browser history changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dirty, currentPage, selected]);
+  function routeLink(event: React.MouseEvent<HTMLAnchorElement>) {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    followRoute(readRoute(new URL(event.currentTarget.href).search));
   }
   function changeSection(s: Section) {
     if (dirty && !window.confirm("Há anotações não salvas. Sair sem salvar?"))
@@ -432,6 +508,7 @@ function Workspace({
               if (!dirty || window.confirm("Sair sem salvar as anotações?")) {
                 setDirty(false);
                 setHome(true);
+                openModule(null);
                 setAccountPage(null);
                 setMobile(false);
               }
@@ -463,13 +540,11 @@ function Workspace({
                 [
                   "Meus concursos",
                   FolderOpen,
-                  () => {
-                    if (repo.demo) setHome(false);
-                    else void openCatalog();
-                  },
+                  () => void openCatalog(true),
                 ],
                 ["Estudar", BookOpen, () => setHome(false)],
                 ["Planejamento", CalendarDays, () => setPlannerOpen(true)],
+                ["Trilhas", RouteIcon, () => openModule("trails")],
                 ["Questões", CircleHelp, () => setQuestionsOpen(true)],
                 ["Revisões", Layers, () => setFlashcardsOpen(true)],
                 ["Biblioteca", Library, () => setHome(false)],
@@ -477,7 +552,7 @@ function Workspace({
                 [
                   "Central de Prompts",
                   GraduationCap,
-                  () => setPromptsOpen(true),
+                  () => { setTrailPrompt(false); setPromptsOpen(true); },
                 ],
                 ["Meu perfil", UserRound, () => setAccountPage("profile")],
                 ...(catalogAdmin
@@ -492,9 +567,14 @@ function Workspace({
               ] as const
             ).map(([label, Icon, action]) => {
               const current =
-                (label === "Início" && home && !accountPage) ||
-                (label === "Meu perfil" && accountPage === "profile") ||
-                (label === "Administração" && accountPage === "admin");
+                (label === "Início" && home && !accountPage && !modulePage) ||
+                (label === "Meus concursos" && catalogOpen) ||
+                (label === "Planejamento" && plannerOpen) ||
+                (label === "Trilhas" && trailsOpen) ||
+                (label === "Central de Prompts" && promptsOpen) ||
+                (label === "Desempenho" && productivityOpen) ||
+                (label === "Meu perfil" && accountPage === "profile" && !modulePage) ||
+                (label === "Administração" && accountPage === "admin" && !modulePage);
               return (
                 <button
                   key={label}
@@ -509,6 +589,8 @@ function Workspace({
                       return;
                     setDirty(false);
                     setAccountPage(null);
+                    openModule(null);
+                    setImportTarget(null);
                     action();
                     setMobile(false);
                   }}
@@ -590,7 +672,9 @@ function Workspace({
                 <Menu />
               </button>
               <span>
-                {accountPage === "admin"
+                {modulePage
+                  ? { catalog: "Meus concursos", planner: "Planejamento", prompts: "Central de Prompts", productivity: "Desempenho", trails: "Trilhas" }[modulePage]
+                  : accountPage === "admin"
                   ? "Administração"
                   : accountPage === "profile"
                     ? "Conta"
@@ -611,14 +695,23 @@ function Workspace({
             <span className="private-indicator">
               <LockKeyhole size={14} /> Seu progresso é só seu
             </span>
-            <button
-              className="icon profile-trigger"
-              onClick={openProfile}
-              aria-label="Abrir meu perfil"
-              title="Meu perfil"
-            >
-              <UserRound size={19} aria-hidden="true" />
-            </button>
+            <AccountMenu user={repo.user} demo={repo.demo} theme={theme}
+              refreshKey={String(modulePage) + String(accountPage) + questionsOpen + flashcardsOpen}
+              toggleTheme={() => setTheme(theme === "light" ? "dark" : "light")}
+              logout={async () => {
+                if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
+                await logout();
+              }}
+              navigate={target => {
+                if (target === "profile") { openProfile(); return; }
+                if (target === "catalog") { void openCatalog(); return; }
+                if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
+                setDirty(false);
+                if (target === "questions") { openModule(null); setQuestionsOpen(true); return; }
+                if (target === "study") { openModule(null); setAccountPage(null); setHome(false); return; }
+                setAccountPage(null); openModule(target);
+              }}
+            />
           </header>
           <main id="conteudo" tabIndex={-1} className="workspace">
             {!online && (
@@ -627,7 +720,118 @@ function Workspace({
                 não está disponível; alterações podem não ser salvas.
               </div>
             )}
-            {accountPage === "admin" && catalogAdmin ? (
+            <nav className="page-breadcrumbs" aria-label="Caminho da página">
+              <a href={pageHref("home")} onClick={routeLink}>Início</a>
+              {currentPage !== "home" && <><ChevronRight size={14} aria-hidden="true" /><a href={pageHref(currentPage, selected)} onClick={routeLink} aria-current="page">{{ study: "Estudar", profile: "Meu perfil", admin: "Administração", catalog: "Meus concursos", planner: "Planejamento", prompts: "Central de Prompts", productivity: "Meu desempenho", trails: "Trilha da Semana", home: "Início" }[currentPage]}</a></>}
+              {previousHref && <a className="previous-page" href={previousHref} onClick={routeLink}>← Página anterior</a>}
+            </nav>
+            {modulePage ? (
+              <>
+        {trailsOpen && (
+          <Suspense fallback={<p role="status">Carregando trilhas…</p>}>
+            <TrailPanel snapshot={snapshot} user={repo.user} demo={repo.demo}
+              close={() => openModule(null)} study={navigate}
+              prompts={() => { setTrailPrompt(true); setPromptsOpen(true); }} />
+          </Suspense>
+        )}
+        {promptsOpen && (
+          <Suspense fallback={<p role="status">Carregando prompts…</p>}>
+            <PromptPanel
+              startTrail={trailPrompt}
+              openTrails={() => { setTrailPrompt(false); openModule("trails"); }}
+              nodes={data.nodes}
+              user={repo.user}
+              demo={repo.demo}
+              close={() => { setTrailPrompt(false); setPromptsOpen(false); }}
+              openImporter={(target) => {
+                setPromptsOpen(false);
+                setImportTarget(target);
+                if (target === "contest") void openCatalog();
+                if (target === "questions") setQuestionsOpen(true);
+                if (target === "cards") setFlashcardsOpen(true);
+              }}
+            />
+          </Suspense>
+        )}
+        {productivityOpen && (
+          <Suspense fallback={<p role="status">Carregando estatísticas…</p>}>
+            <ProductivityPanel
+              startDashboard={!externalMock && !incidenceOpen}
+              externalMock={externalMock}
+              startIncidence={incidenceOpen}
+              snapshot={snapshot}
+              user={repo.user}
+              demo={repo.demo}
+              close={() => {
+                setProductivityOpen(false);
+                setExternalMock(false);
+                setIncidenceOpen(false);
+              }}
+            />
+          </Suspense>
+        )}
+        {plannerOpen && (
+          <Suspense fallback={<p role="status">Carregando planejamento…</p>}>
+            <PlannerPanel
+              snapshot={snapshot}
+              user={repo.user}
+              demo={repo.demo}
+              close={() => setPlannerOpen(false)}
+              openReviews={() => {
+                setPlannerOpen(false);
+                setFlashcardsOpen(true);
+              }}
+            />
+          </Suspense>
+        )}
+        {catalogOpen && (
+          <Suspense fallback={<p role="status">Carregando catálogo…</p>}>
+            {repo.demo ? (
+              <ModulePage title="Meus concursos" close={() => setCatalogOpen(false)}>
+                <p>Dados fictícios salvos neste navegador. O catálogo compartilhado exige conexão com Supabase.</p>
+                <button className="secondary" onClick={() => setNodeForm({})}>Adicionar concurso</button>
+                <div className="overview-grid">
+                  {snapshot.nodes.filter(n => n.kind === "contest").map(n => (
+                    <article className="catalog-entry" key={n.id}>
+                      <h2>{n.name}</h2>
+                      <button className="secondary" onClick={() => navigate(n.id)}>Abrir edital de {n.name}</button>
+                    </article>
+                  ))}
+                </div>
+              </ModulePage>
+            ) : <ContestPanel
+              startImport={importTarget === "contest" && catalogAdmin}
+              nodes={snapshot.nodes}
+              editable={
+                new Set([
+                  ...snapshot.nodes
+                    .filter(
+                      (n) => n.kind === "contest" && n.owner_id === repo.user,
+                    )
+                    .map((n) => n.id),
+                  ...members
+                    .filter(
+                      (m) => m.user_id === repo.user && m.role === "editor",
+                    )
+                    .map((m) => m.contest_id),
+                ])
+              }
+              user={repo.user}
+              admin={catalogAdmin}
+              close={() => {
+                setCatalogOpen(false);
+                setImportTarget(null);
+              }}
+              refresh={refresh}
+              open={(id) => {
+                navigate(id);
+                setCatalogOpen(false);
+              }}
+            />}
+          </Suspense>
+        )}
+              </>
+            ) : accountPage === "admin" && catalogAdmin ? (
               <AdminDashboard
                 onBack={() => setAccountPage(null)}
                 onCatalog={() => void openCatalog()}
@@ -688,6 +892,8 @@ function Workspace({
                     </button>
                   </div>
                 )}
+                <section className="home-trail-link"><div><h2>Sua trilha da semana</h2><p>Sequência de estudo com pré-requisitos e incidência documentada.</p></div><button className="secondary" onClick={() => openModule("trails")}>Abrir Trilhas →</button></section>
+                <HomePerformance key={String(questionsOpen) + String(flashcardsOpen) + reloadOverview} user={repo.user} demo={repo.demo} open={() => setProductivityOpen(true)} />
                 <div className="home-grid">
                   <section className="home-card home-plan">
                     <div className="home-card-head">
@@ -785,15 +991,15 @@ function Workspace({
               </div>
             ) : (
               <>
-                <div className="breadcrumb">
-                  <span>Meus concursos</span>
+                <nav className="breadcrumb" aria-label="Caminho do edital">
+                  <a href={pageHref("catalog")} onClick={routeLink}>Meus concursos</a>
                   {chain.map((n) => (
                     <span key={n.id}>
                       <ChevronRight size={13} />
-                      <button onClick={() => navigate(n.id)}>{n.name}</button>
+                      <a href={pageHref("study", n.id)} onClick={routeLink} aria-current={n.id === selected ? "page" : undefined}>{n.name}</a>
                     </span>
                   ))}
-                </div>
+                </nav>
                 {repo.demo && (
                   <div className="demo-banner">
                     <span>
@@ -1262,23 +1468,7 @@ function Workspace({
             </footer>
           </main>
         </div>
-        {promptsOpen && (
-          <Suspense fallback={<p role="status">Carregando prompts…</p>}>
-            <PromptPanel
-              nodes={data.nodes}
-              user={repo.user}
-              demo={repo.demo}
-              close={() => setPromptsOpen(false)}
-              openImporter={(target) => {
-                setPromptsOpen(false);
-                setImportTarget(target);
-                if (target === "contest") void openCatalog();
-                if (target === "questions") setQuestionsOpen(true);
-                if (target === "cards") setFlashcardsOpen(true);
-              }}
-            />
-          </Suspense>
-        )}
+
         {questionsOpen && (
           <Suspense fallback={<p role="status">Carregando questões…</p>}>
             <QuestionsPanel
@@ -1298,22 +1488,7 @@ function Workspace({
             />
           </Suspense>
         )}
-        {productivityOpen && (
-          <Suspense fallback={<p role="status">Carregando estatísticas…</p>}>
-            <ProductivityPanel
-              externalMock={externalMock}
-              startIncidence={incidenceOpen}
-              snapshot={snapshot}
-              user={repo.user}
-              demo={repo.demo}
-              close={() => {
-                setProductivityOpen(false);
-                setExternalMock(false);
-                setIncidenceOpen(false);
-              }}
-            />
-          </Suspense>
-        )}
+
         {flashcardsOpen && (
           <Suspense fallback={<p role="status">Carregando flashcards…</p>}>
             <FlashcardPanel
@@ -1328,53 +1503,8 @@ function Workspace({
             />
           </Suspense>
         )}
-        {plannerOpen && (
-          <Suspense fallback={<p role="status">Carregando planejamento…</p>}>
-            <PlannerPanel
-              snapshot={snapshot}
-              user={repo.user}
-              demo={repo.demo}
-              close={() => setPlannerOpen(false)}
-              openReviews={() => {
-                setPlannerOpen(false);
-                setFlashcardsOpen(true);
-              }}
-            />
-          </Suspense>
-        )}
-        {catalogOpen && (
-          <Suspense fallback={<p role="status">Carregando catálogo…</p>}>
-            <ContestPanel
-              startImport={importTarget === "contest" && catalogAdmin}
-              nodes={snapshot.nodes}
-              editable={
-                new Set([
-                  ...snapshot.nodes
-                    .filter(
-                      (n) => n.kind === "contest" && n.owner_id === repo.user,
-                    )
-                    .map((n) => n.id),
-                  ...members
-                    .filter(
-                      (m) => m.user_id === repo.user && m.role === "editor",
-                    )
-                    .map((m) => m.contest_id),
-                ])
-              }
-              user={repo.user}
-              admin={catalogAdmin}
-              close={() => {
-                setCatalogOpen(false);
-                setImportTarget(null);
-              }}
-              refresh={refresh}
-              open={(id) => {
-                navigate(id);
-                setCatalogOpen(false);
-              }}
-            />
-          </Suspense>
-        )}
+
+
         {materialForm && isTopic && (
           <MaterialForm
             initial={materialForm === "new" ? undefined : materialForm}

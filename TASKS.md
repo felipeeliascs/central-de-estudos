@@ -320,3 +320,40 @@ A revisão preserva os painéis anteriores; a cobertura visual e de acessibilida
 - [ ] Após revisão e aprovação: reconciliar histórico do banco, ensaiar e aplicar 202611270012_video_incidence.sql (001–011 são pré-requisitos), incorporar o PR e disparar Pages manualmente.
 
 Diagnóstico de Aparecida: o prompt original de videoaulas tinha target none e saída textual, incompatível com o importador contest 1.0. O caminho válido do importador grava recursos video como materiais youtube/Videoaulas e converte item (ID externo) no UUID do assunto via item_map. Não foram fornecidos JSONs originais nem recibos/snapshot do caso “Concurso Público 01/2026 - Prefeitura Municipal de Aparecida”, banca AVANÇASP. Não foi consultado o banco de produção. Não é possível confirmar se houve gravação, falha de importação ou ID incorreto naquele caso. A validação usa exclusivamente exemplos fictícios. Ver CONCURSOS-JSON.md.
+
+
+## Módulos na área principal — 27/11/2026
+
+- [x] Renderizar Meus concursos, Planejamento, Central de Prompts e Desempenho dentro de main#conteudo.workspace, sem dialog, sobreposição ou bloqueio do restante da interface.
+- [x] Centralizar a seleção do módulo, preservar o menu lateral, marcar a página ativa e direcionar o foco para a main após navegar.
+- [x] Adaptar atalhos do Início, Administração, importadores e resultados externos à navegação por página. Desempenho abre no dashboard.
+- [x] Exibir Meus concursos também na demonstração, com acesso aos editais fictícios.
+- [x] Preservar os diálogos de formulários e confirmações específicas.
+- [x] Aprovar lint, 58 testes em 20 arquivos e build no GitHub Actions do PR #2. A falha inicial de tipagem nos seletores dos testes foi corrigida. Execução aprovada: https://github.com/felipeeliascs/central-de-estudos/actions/runs/46062660302.
+- [ ] Incorporar e publicar após confirmação. Não há migração nova de banco nesta mudança.
+
+
+## Perfil e páginas de referência — 27/11/2026
+
+- [x] Adaptar perfil, cartões de concursos e painel de desempenho às referências fornecidas, preservando a identidade real da conta e sem inventar plano pago, vagas, cursos ou assinatura.
+- [x] Adicionar nome, usuário, telefone, descrição e foto privada. A foto aceita PNG/JPEG/WebP de até 2 MB; o e-mail de autenticação permanece somente leitura.
+- [x] Mostrar uso gratuito e privacidade real. Permitir solicitar/cancelar exclusão ao administrador, com confirmação explícita e sem exclusão automática. A Administração consulta as solicitações pendentes.
+- [x] Adicionar resumo de questões no Início, indicadores, distribuição, estado vazio, atalhos de período e busca/filtro de concursos.
+- [x] Manter cabeçalho e botão Fechar fora da região rolável dos diálogos e personalizar barras de rolagem com CSS.
+- [x] Adicionar URLs distintas (?page=...) e caminhos clicáveis; restaurar links diretos e tratar Voltar/Avançar do navegador com proteção de anotações não salvas.
+- [x] Aprovar lint, testes e build remotos desta ampliação do PR #2. Execução aprovada de referência: https://github.com/felipeeliascs/central-de-estudos/actions/runs/46064278287. O PR registra também as verificações do commit final.
+- [ ] Homologar migração 013, upload e links assinados de foto no Storage real com contas fictícias. Nenhuma migração de produção aplicada. 001–012 são pré-requisitos.
+- [ ] Incorporar e publicar somente após confirmação.
+
+
+## Trilhas, menu da conta e ofensiva — 27/11/2026
+
+- [x] Manter Planejamento e Central de Prompts dentro da main, sem dialog; adicionar Trilhas com URL própria.
+- [x] Criar trilha semanal com linha do tempo, disponibilidade diária, estimativas, pré-requisitos e registro individual de conclusão. Reorganizar pendências preserva o histórico concluído.
+- [x] Priorizar incidência documentada da mesma banca e unidade, respeitando pré-requisitos; a urgência do conteúdo dependente antecipa sua base, sem atribuir a frequência do dependente ao pré-requisito. Sem dados suficientes, mostrar prioridade estimada e sequência revisável.
+- [x] Acrescentar o prompt Organizar trilha lógica de estudos, com contrato study_trail 1.0, UUIDs reais do contexto, importação, prévia, referências/ciclos validados e confirmação. Reimportar configuração não apaga progresso nem materiais.
+- [x] Trocar profile-trigger por menu da conta com identidade real, atalhos, modo noturno, ajuda, uso gratuito e saída, incluindo Escape, setas e clique externo.
+- [x] Calcular ofensiva atual e recorde com dias de tempo de estudo, questões ou revisões; deduplicar o dia em America/Sao_Paulo. Não contar páginas abertas, planejamentos nem estimativas como atividade.
+- [x] Aprovar lint, 78 testes em 25 arquivos e build no CI remoto. Referência: https://github.com/felipeeliascs/central-de-estudos/actions/runs/46068758751; o PR registra o check do commit final.
+- [ ] Homologar a migração 014 após 001–013, incluindo RLS/PostgREST e ofensiva com contas fictícias. Não há aplicação automática em produção.
+- [ ] Incorporar e publicar após confirmação. A versão publicada no Pages ainda pode exibir os diálogos antigos até a aprovação e implantação do PR #2.

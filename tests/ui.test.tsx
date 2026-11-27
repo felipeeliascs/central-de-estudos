@@ -9,6 +9,7 @@ import {
 import userEvent from "@testing-library/user-event";
 import App from "../src/App";
 beforeEach(() => {
+  history.replaceState(null, "", "/");
   localStorage.clear();
   HTMLDialogElement.prototype.showModal = function () {
     this.setAttribute("open", "");
@@ -57,6 +58,7 @@ it("cria, edita, ordena e remove materiais, preservando os dados após reabrir",
   );
   await screen.findByRole("heading", { name: "Resumo revisado" });
   view.unmount();
+  history.replaceState(null, "", "/");
   render(<App />);
   await user.click(await screen.findByRole("button", { name: "Continuar estudando" }));
   await screen.findByRole("heading", {
@@ -98,6 +100,7 @@ it("salva notas e checklist individual, mostra progresso e fallback do Gran", as
   await user.click(screen.getByRole("button", { name: "Salvar anotações" }));
   await screen.findByText(/Todas as anotações salvas/);
   view.unmount();
+  history.replaceState(null, "", "/");
   render(<App />);
   await user.click(await screen.findByRole("button", { name: "Continuar estudando" }));
   await screen.findByRole("heading", {

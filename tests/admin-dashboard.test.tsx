@@ -10,7 +10,22 @@ import userEvent from "@testing-library/user-event";
 import App from "../src/App";
 
 const mock = vi.hoisted(() => ({ rpc: vi.fn(), admin: false }));
-vi.mock("../src/repository", () => ({ supabase: { rpc: mock.rpc } }));
+vi.mock("../src/repository", () => ({
+  supabase: {
+    rpc: mock.rpc,
+    from: () => {
+      const response = { data: [], error: null };
+      const query = {
+        select: () => query,
+        eq: () => query,
+        order: () => query,
+        then: (resolve: (value: typeof response) => unknown) =>
+          Promise.resolve(response).then(resolve),
+      };
+      return query;
+    },
+  },
+}));
 vi.mock("../src/AuthGate", () => ({
   AuthGate: ({
     children,
@@ -35,6 +50,7 @@ vi.mock("../src/flashcard-data", () => ({ countDueReviews: async () => 0 }));
 const pending = "pending@example.test";
 
 beforeEach(() => {
+  history.replaceState(null, "", "/");
   mock.admin = false;
   mock.rpc.mockReset();
   mock.rpc.mockImplementation(async (name: string) => {
@@ -159,4 +175,21 @@ it("autoriza cadastro e pede confirmação antes de revogar uma autorização", 
     HTMLDialogElement.prototype.showModal = originalShow;
     HTMLDialogElement.prototype.close = originalClose;
   }
+});
+
+it("abre prompts pelo atalho administrativo na main e volta para Administração", async () => {
+  mock.admin = true;
+  const user = userEvent.setup();
+  render(<App />);
+  const main = screen.getByRole("main");
+  const nav = within(screen.getByRole("navigation", { name: "Módulos principais" }));
+  await user.click(await nav.findByRole("button", { name: "Administração" }));
+  await user.click(await within(main).findByRole("button", { name: "Modelos de prompts" }));
+  await within(main).findByRole("heading", { name: "Central de Prompts e Inteligência Artificial", level: 1 });
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(nav.getByRole("button", { name: "Central de Prompts" }).getAttribute("aria-current")).toBe("page");
+  expect(nav.getByRole("button", { name: "Administração" }).getAttribute("aria-current")).toBeNull();
+  await user.click(within(main).getByRole("button", { name: "Voltar" }));
+  await within(main).findByText("Pessoa administradora");
+  expect(nav.getByRole("button", { name: "Administração" }).getAttribute("aria-current")).toBe("page");
 });

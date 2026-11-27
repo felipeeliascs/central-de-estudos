@@ -37,6 +37,10 @@ const input = (topics: Topic[] = [subject()]): PlannerInputs => ({
 });
 
 describe("motor de planejamento", () => {
+  it("identifica corretamente a unidade de uma amostra de provas",()=>{
+    const source=input([subject({incidence:{rate:0.25,sample:40,source:"https://example.org/provas",measure:"exams"}})]);
+    expect(generatePlan(source,settings(),start).blocks.find(b=>b.kind==="new")?.reason).toContain("25% em 40 provas");
+  });
   it('distingue incidência documentada de prioridade estimada',()=>{
     const source=input([subject({priority:3,incidence:{rate:0.25,sample:40,source:'https://example.org/provas'}})]);
     expect(generatePlan(source,settings(),start).blocks.find(b=>b.kind==='new')?.reason).toMatch(/prioridade estimada.*incidência documentada: 25% em 40 questões/);

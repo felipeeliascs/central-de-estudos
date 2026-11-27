@@ -58,12 +58,10 @@ export function Modal({
           <X size={20} />
         </button>
       </div>
-      {error && (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      )}
-      {children}
+      <div className="dialog-scroll">
+        {error && <p className="error" role="alert">{error}</p>}
+        {children}
+      </div>
     </dialog>
   );
 }

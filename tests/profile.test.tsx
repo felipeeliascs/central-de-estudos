@@ -5,6 +5,7 @@ import { ProfilePage } from "../src/ProfilePage";
 
 const calls = vi.hoisted(() => ({
   getUser: vi.fn(),
+  rpc: vi.fn(),
   updateUser: vi.fn(),
   select: vi.fn(),
   update: vi.fn(),
@@ -14,6 +15,7 @@ const calls = vi.hoisted(() => ({
 
 vi.mock("../src/repository", () => ({
   supabase: {
+    rpc: calls.rpc,
     auth: { getUser: calls.getUser, updateUser: calls.updateUser },
     from: () => calls,
   },
@@ -21,6 +23,7 @@ vi.mock("../src/repository", () => ({
 
 beforeEach(() => {
   vi.resetAllMocks();
+  calls.rpc.mockResolvedValue({ data: null, error: null });
   calls.getUser.mockResolvedValue({
     data: { user: { id: "me", email: "user@example.test" } },
     error: null,
@@ -44,13 +47,13 @@ it("exibe o e-mail da sessão e salva o nome no perfil da própria conta", async
   const name = screen.getByLabelText<HTMLInputElement>("Nome de exibição");
   await user.clear(name);
   await user.type(name, "Nome atualizado");
-  await user.click(screen.getByRole("button", { name: "Salvar nome" }));
+  await user.click(screen.getByRole("button", { name: "Salvar dados" }));
   expect(await screen.findByRole("status")).toHaveProperty(
     "textContent",
-    "Nome atualizado.",
+    "Dados da conta atualizados.",
   );
   expect(calls.update).toHaveBeenCalledWith({
-    display_name: "Nome atualizado",
+    display_name: "Nome atualizado", username: "", phone: "",
   });
   expect(calls.eq).toHaveBeenLastCalledWith("user_id", "me");
 });
@@ -106,4 +109,34 @@ it("oferece saída no perfil e exibe falha recuperável", async () => {
   expect((await screen.findByRole("alert")).textContent).toContain("Falha ao sair");
   await user.click(screen.getByRole("button", { name: "Sair da conta" }));
   expect(logout).toHaveBeenCalledTimes(2);
+});
+
+it("salva usuário e telefone privados e registra solicitação confirmada de exclusão", async () => {
+  const user = userEvent.setup();
+  render(<ProfilePage userId="me" demo={false} onBack={vi.fn()} />);
+  await screen.findByText("user@example.test");
+  await user.click(screen.getByText("Dados da conta"));
+  await user.type(screen.getByLabelText("Usuário"), "estudante.teste");
+  await user.type(screen.getByLabelText("Telefone"), "11999999999");
+  await user.click(screen.getByRole("button", { name: "Salvar dados" }));
+  expect(calls.update).toHaveBeenCalledWith({ display_name: "Nome inicial", username: "estudante.teste", phone: "11999999999" });
+  await user.click(screen.getByText("Excluir minha conta"));
+  await user.click(screen.getByLabelText("Confirmo que desejo solicitar a exclusão da minha conta."));
+  await user.click(screen.getByRole("button", { name: "Solicitar exclusão ao administrador" }));
+  await screen.findByText(/Solicitação enviada ao administrador/);
+  expect(calls.rpc).toHaveBeenCalledWith("study_request_account_deletion", { request_reason: "" });
+  await user.click(screen.getByRole("button", { name: "Cancelar solicitação" }));
+  await screen.findByText("Solicitação cancelada.");
+  expect(calls.rpc).toHaveBeenCalledWith("study_cancel_account_deletion");
+});
+
+it("recusa foto com formato inválido antes de alterar o perfil", async () => {
+  const user = userEvent.setup({ applyAccept: false });
+  render(<ProfilePage userId="me" demo={false} onBack={vi.fn()} />);
+  await screen.findByText("user@example.test");
+  await user.click(screen.getByText("Foto e descrição"));
+  await user.upload(screen.getByLabelText("Foto do perfil"), new File(["imagem fictícia"], "foto.gif", { type: "image/gif" }));
+  await user.click(screen.getByRole("button", { name: "Salvar foto e descrição" }));
+  expect((await screen.findByRole("alert")).textContent).toContain("PNG, JPEG ou WebP de até 2 MB");
+  expect(calls.update).not.toHaveBeenCalled();
 });

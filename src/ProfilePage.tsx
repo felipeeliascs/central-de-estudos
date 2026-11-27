@@ -1,8 +1,9 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowLeft, ChevronDown, KeyRound, UserRound } from "lucide-react";
+import { ArrowLeft, Camera, ChevronDown, CreditCard, KeyRound, ShieldCheck, UserRound } from "lucide-react";
+import { AccountDeletion } from "./AccountDeletion";
 import { supabase } from "./repository";
 
-type Account = { email: string; name: string };
+type Account = { email: string; name: string; username?: string; phone?: string; bio?: string; avatar_path?: string; created_at?: string };
 
 const passwordErrors: Record<string, string> = {
   invalid_credentials: "A senha atual está incorreta.",
@@ -28,7 +29,16 @@ export function ProfilePage({
 }) {
   const [leaving, setLeaving] = useState(false);
   const [logoutError, setLogoutError] = useState("");
-  const [account, setAccount] = useState<Account | null>(null);
+  const [account, setAccount] = useState<Account | null>(() => {
+    if (!demo) return null;
+    try { return JSON.parse(localStorage.getItem("central-profile-demo:" + userId) ?? "null") ?? { email: "estudante@example.test", name: "Estudante fictício" }; }
+    catch { return { email: "estudante@example.test", name: "Estudante fictício" }; }
+  });
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoError, setPhotoError] = useState("");
+  const [photoStatus, setPhotoStatus] = useState("");
   const [loadError, setLoadError] = useState(false);
   const [retry, setRetry] = useState(0);
   const [savingName, setSavingName] = useState(false);
@@ -47,7 +57,7 @@ export function ProfilePage({
       db.auth.getUser(),
       db
         .from("study_profiles")
-        .select("display_name")
+        .select("display_name,username,phone,bio,avatar_path,created_at")
         .eq("user_id", userId)
         .single(),
     ])
@@ -64,7 +74,13 @@ export function ProfilePage({
         setAccount({
           email: identity.data.user.email ?? "",
           name: profile.data.display_name,
+          username: profile.data.username ?? "", phone: profile.data.phone ?? "", bio: profile.data.bio ?? "", avatar_path: profile.data.avatar_path ?? "", created_at: profile.data.created_at,
         });
+        if (profile.data.avatar_path) {
+          void db.storage.from("profile-photos").createSignedUrl(profile.data.avatar_path, 60).then(result => {
+            if (active && !result.error) setAvatarUrl(result.data?.signedUrl ?? "");
+          });
+        }
       })
       .catch(() => {
         if (active) setLoadError(true);
@@ -76,10 +92,17 @@ export function ProfilePage({
 
   async function saveName(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!supabase || !account || savingName) return;
+    if ((!supabase && !demo) || !account || savingName) return;
     const name = String(
       new FormData(event.currentTarget).get("display-name") ?? "",
     ).trim();
+    const fields = new FormData(event.currentTarget);
+    const username = String(fields.get("username") ?? "").trim().toLocaleLowerCase();
+    const phone = String(fields.get("phone") ?? "").trim();
+    if ((username && !/^[a-z0-9._-]{3,40}$/.test(username)) || phone.length > 30) {
+      setNameError("Use um usuário de 3 a 40 letras minúsculas, números, ponto, hífen ou sublinhado e telefone de até 30 caracteres.");
+      return;
+    }
     setNameError("");
     setNameStatus("");
     if (!name || name.length > 180) {
@@ -88,15 +111,15 @@ export function ProfilePage({
     }
     setSavingName(true);
     try {
-      const { error } = await supabase
-        .from("study_profiles")
-        .update({ display_name: name })
-        .eq("user_id", userId)
-        .select("display_name")
-        .single();
-      if (error) throw error;
-      setAccount({ ...account, name });
-      setNameStatus("Nome atualizado.");
+      if (!demo) {
+        const { error } = await supabase!.from("study_profiles")
+          .update({ display_name: name, username, phone }).eq("user_id", userId).select("display_name").single();
+        if (error) throw error;
+      }
+      const next = { ...account, name, username, phone };
+      setAccount(next);
+      if (demo) localStorage.setItem("central-profile-demo:" + userId, JSON.stringify(next));
+      setNameStatus("Dados da conta atualizados.");
     } catch {
       setNameError("Não foi possível salvar seu nome. Tente novamente.");
     } finally {
@@ -153,7 +176,50 @@ export function ProfilePage({
     }
   }
 
-  const name = demo ? "Modo demonstração" : account?.name || "Minha conta";
+  async function savePhoto(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!account) return;
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+    const bio = String(form.get("bio") ?? "").trim();
+    const file = photoFile;
+    setPhotoError(""); setPhotoStatus(""); setPhotoBusy(true);
+    let uploaded = "";
+    let committed = false;
+    try {
+      if (file?.size && (!["image/png", "image/jpeg", "image/webp"].includes(file.type) || file.size > 2 * 1024 * 1024)) throw new Error("Envie PNG, JPEG ou WebP de até 2 MB.");
+      if (bio.length > 1000) throw new Error("A descrição aceita até 1.000 caracteres.");
+      if (demo && file?.size) throw new Error("Upload de foto exige o ambiente conectado de teste.");
+      const bucket = !demo && file?.size ? supabase!.storage.from("profile-photos") : null;
+      if (bucket && file?.size) {
+        uploaded = userId + "/" + crypto.randomUUID() + "." + (file.type === "image/jpeg" ? "jpg" : file.type.split("/")[1]);
+        const upload = await bucket.upload(uploaded, file, { contentType: file.type, upsert: false });
+        if (upload.error) throw upload.error;
+      }
+      const next = { ...account, bio, avatar_path: uploaded || account.avatar_path || "" };
+      if (demo) localStorage.setItem("central-profile-demo:" + userId, JSON.stringify(next));
+      else {
+        const saved = await supabase!.from("study_profiles").update({ bio, avatar_path: next.avatar_path }).eq("user_id", userId).select("user_id").single();
+        if (saved.error) throw saved.error;
+        committed = true;
+        if (uploaded && bucket) {
+          const signed = await bucket.createSignedUrl(uploaded, 60);
+          if (!signed.error) setAvatarUrl(signed.data.signedUrl);
+          if (account.avatar_path) await bucket.remove([account.avatar_path]);
+        }
+      }
+      setAccount(next);
+      setPhotoFile(null);
+      const photoInput = formElement.elements.namedItem("photo") as HTMLInputElement | null;
+      if (photoInput) photoInput.value = "";
+      setPhotoStatus("Foto e descrição atualizadas.");
+    } catch (error) {
+      if (uploaded && !committed) await supabase!.storage.from("profile-photos").remove([uploaded]);
+      setPhotoError((error as Error).message || "Não foi possível salvar.");
+    } finally { setPhotoBusy(false); }
+  }
+
+  const name = account?.name || (demo ? "Modo demonstração" : "Minha conta");
   const initials = name
     .split(/\s+/)
     .slice(0, 2)
@@ -167,6 +233,7 @@ export function ProfilePage({
         <ArrowLeft size={16} aria-hidden="true" /> Voltar
       </button>
       <h1 id="profile-title">Meu perfil</h1>
+      <p className="page-description">Edite suas informações e personalize sua experiência.</p>
       {onLogout && (
         <div className="profile-feedback">
           <button className="secondary" disabled={leaving} onClick={async () => {
@@ -179,17 +246,18 @@ export function ProfilePage({
           {logoutError && <p role="alert">{logoutError}</p>}
         </div>
       )}
-      <div className="profile-identity">
+      <div className="profile-identity reference-profile">
         <span className="profile-initials" aria-hidden="true">
-          {initials}
+          {avatarUrl ? <img src={avatarUrl} alt="Foto do seu perfil" onError={() => setAvatarUrl("")} /> : initials}
         </span>
         <div>
           <h2>{name}</h2>
           {account?.email && <p>{account.email}</p>}
+          <span className="catalog-badge">Uso gratuito</span>
+          {account?.created_at && <small>Conta criada em {new Date(account.created_at).toLocaleDateString("pt-BR")}</small>}
           {demo && (
             <p>
-              Você está usando a demonstração. Entre com sua conta para editar o
-              perfil e a senha.
+              Dados fictícios: as edições de perfil ficam somente neste navegador. Foto e senha exigem uma conta de teste conectada.
             </p>
           )}
         </div>
@@ -218,7 +286,7 @@ export function ProfilePage({
               </span>
               <span>
                 <strong>Dados da conta</strong>
-                <small>Nome e e-mail</small>
+                <small>Nome, usuário, e-mail e telefone</small>
               </span>
               <ChevronDown
                 size={18}
@@ -238,12 +306,14 @@ export function ProfilePage({
                     required
                   />
                 </label>
+                <label>Usuário<input name="username" maxLength={40} pattern="[a-z0-9._-]{3,40}" defaultValue={account.username ?? ""} autoComplete="nickname" /></label>
+                <label>Telefone<input name="phone" type="tel" maxLength={30} defaultValue={account.phone ?? ""} autoComplete="tel" /></label>
                 <label>
                   E-mail da conta
                   <input value={account.email} autoComplete="email" readOnly />
                 </label>
                 <button className="primary">
-                  {savingName ? "Salvando…" : "Salvar nome"}
+                  {savingName ? "Salvando…" : "Salvar dados"}
                 </button>
               </fieldset>
               {nameError && (
@@ -274,7 +344,7 @@ export function ProfilePage({
               />
             </summary>
             <form className="profile-form" onSubmit={changePassword}>
-              <fieldset disabled={changingPassword}>
+              <fieldset disabled={changingPassword || demo}>
                 <label>
                   Senha atual
                   <input
@@ -326,6 +396,24 @@ export function ProfilePage({
               )}
             </form>
           </details>
+          <details>
+            <summary><span className="profile-section-icon"><Camera size={19} /></span><span><strong>Foto e descrição</strong><small>Sua identificação pessoal na Central</small></span><ChevronDown size={18} className="profile-chevron" /></summary>
+            <form className="profile-form" onSubmit={savePhoto}><fieldset disabled={photoBusy}>
+              <label>Foto do perfil<input name="photo" type="file" accept="image/png,image/jpeg,image/webp" onChange={event => setPhotoFile(event.target.files?.[0] ?? null)} /></label>
+              <small>PNG, JPEG ou WebP de até 2 MB. A foto permanece privada.</small>
+              <label>Descrição<textarea name="bio" maxLength={1000} rows={4} defaultValue={account.bio ?? ""} /></label>
+              <button className="primary">Salvar foto e descrição</button>
+            </fieldset>{photoError && <p role="alert">{photoError}</p>}{photoStatus && <p role="status">{photoStatus}</p>}</form>
+          </details>
+          <details>
+            <summary><span className="profile-section-icon"><ShieldCheck size={19} /></span><span><strong>Privacidade e rede</strong><small>Quem pode acessar seus dados</small></span><ChevronDown size={18} className="profile-chevron" /></summary>
+            <div className="profile-feedback"><p>Seu perfil, telefone, foto, anotações e histórico de estudo são privados. A Central não possui perfil público ou rede de seguidores.</p><p>Materiais só são compartilhados quando você escolhe destinatários na Biblioteca. Administradores gerenciam o catálogo e autorizações, sem acesso geral ao seu estudo.</p></div>
+          </details>
+          <details>
+            <summary><span className="profile-section-icon"><CreditCard size={19} /></span><span><strong>Minha assinatura</strong><small>Uso gratuito</small></span><ChevronDown size={18} className="profile-chevron" /></summary>
+            <div className="profile-feedback"><p>A Central não possui assinatura, cobrança ou pagamento integrado. O acesso a serviços externos segue as condições desses serviços.</p></div>
+          </details>
+          <AccountDeletion demo={demo} />
         </div>
       )}
     </section>

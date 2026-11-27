@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Node } from "./domain";
 import { safeUrl, steps } from "./domain";
-import { Modal } from "./Forms";
+import { ModulePage } from "./ModulePage";
 import {
   compareContest,
   maxBytes,
@@ -62,6 +62,8 @@ export function ContestPanel({
   refresh: () => Promise<void>;
   open: (id: string) => void;
 }) {
+  const [search, setSearch] = useState("");
+  const [scope, setScope] = useState<"all" | "mine">("all");
   const [videoPreview, setVideoPreview] = useState<ReturnType<typeof previewVideoBatch> | null>(null);
   const [edition, setEdition] = useState<Edition | null>(null);
   const [raw, setRaw] = useState("");
@@ -82,6 +84,11 @@ export function ContestPanel({
   const [first, setFirst] = useState("");
   const [second, setSecond] = useState("");
   const roots = nodes.filter((n) => n.kind === "contest");
+  const visibleRoots = roots.filter(n => {
+    const doc = documents[n.id];
+    return (scope === "all" || enrollments.some(e => e.contest_id === n.id && e.status === "active")) &&
+      [n.name, n.board, doc?.role, doc?.organization].filter(Boolean).join(" ").toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR").trim());
+  });
   const db = supabase!;
   function root(id: string): string {
     const n = nodes.find((n) => n.id === id);
@@ -260,8 +267,8 @@ export function ContestPanel({
     });
   }
   return (
-    <Modal
-      title={admin ? "Administração de concursos" : "Concursos disponíveis"}
+    <ModulePage
+      title="Meus concursos"
       close={close}
       busy={busy}
     >
@@ -385,21 +392,34 @@ export function ContestPanel({
                 </button>
               </div>
             )}
-            {!roots.length && <p>Nenhum concurso disponível.</p>}
-            {roots.map((r) => {
+            <p className="page-description">Organize seus objetivos e encontre editais por órgão, cargo ou banca.</p>
+            <div className="contest-toolbar">
+              <div className="segmented" aria-label="Filtro de concursos">
+                <button aria-pressed={scope === "all"} onClick={() => setScope("all")}>Catálogo</button>
+                <button aria-pressed={scope === "mine"} onClick={() => setScope("mine")}>Meus concursos</button>
+              </div>
+              <label className="contest-search">Buscar por concurso, banca, cargo ou órgão<input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Busque por concurso, banca, cargo…" /></label>
+            </div>
+            {!visibleRoots.length && <p className="chart-empty">Nenhum concurso encontrado para esta seleção.</p>}
+            <p className="muted">Remover dos meus concursos altera somente sua seleção e preserva materiais e progresso. Arquivar no catálogo é uma ação administrativa. Não há exclusão definitiva.</p>
+            <div className="contest-grid">
+            {visibleRoots.map((r) => {
               const enrolled = enrollments.some(
                 (e) => e.contest_id === r.id && e.status === "active",
               );
               return (
-                <article className="catalog-entry" key={r.id}>
+                <article className="catalog-entry contest-card" key={r.id}>
                   <h3>
                     {r.name}
                     {r.catalog_archived ? " · Arquivado" : ""}
                   </h3>
-                  {r.board && <p>{r.board}</p>}
-                  <p>Remover dos meus concursos altera somente sua seleção e preserva seus materiais e progresso. Arquivar no catálogo é uma ação administrativa para todos. A exclusão definitiva não está disponível.</p>
+                  <span className="catalog-badge">{r.catalog_archived ? "Arquivado" : enrolled ? "Selecionado para estudar" : "Disponível no catálogo"}</span>
+                  {documents[r.id]?.organization && <p>{documents[r.id].organization}</p>}
+                  {documents[r.id]?.role && <p>{documents[r.id].role}</p>}
+                  {r.board && <p>Banca: {r.board}</p>}
+
                   {documents[r.id] && (
-                    <PublishedOutline doc={documents[r.id]} />
+                    <details className="contest-outline"><summary>Consultar edital e fontes</summary><PublishedOutline doc={documents[r.id]} /></details>
                   )}
                   <div className="catalog-actions">
                     {!r.catalog_archived && (
@@ -464,6 +484,7 @@ export function ContestPanel({
                 </article>
               );
             })}
+            </div>
             {admin && (
               <>
                 <h3>Equivalências entre concursos</h3>
@@ -580,7 +601,7 @@ export function ContestPanel({
           </>
         )}
       </fieldset>
-    </Modal>
+    </ModulePage>
   );
 }
 

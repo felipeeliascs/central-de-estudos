@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Modal } from "./Forms";
+import { ModulePage } from "./ModulePage";
 import type { Snapshot } from "./domain";
 import {
   activityLabel,
@@ -220,7 +220,7 @@ export function PlannerPanel({
       });
   }
   return (
-    <Modal title="Planejamento adaptativo" close={close} busy={busy}>
+    <ModulePage title="Planejamento adaptativo" close={close} busy={busy}>
       {error && (
         <p role="alert" className="error">
           {error}
@@ -509,6 +509,6 @@ export function PlannerPanel({
             ))}
         </>
       )}
-    </Modal>
+    </ModulePage>
   );
 }

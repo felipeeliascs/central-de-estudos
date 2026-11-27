@@ -46,6 +46,8 @@ it("exige confirmação após a prévia antes de chamar a gravação", async () 
       refresh={refresh}
     />,
   );
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(screen.getByRole("region", { name: "Meus concursos" })).toBeTruthy();
   await user.click(screen.getByRole("button", { name: "Importar JSON" }));
   await user.click(screen.getByLabelText("Ou cole o JSON"));
   await user.paste(JSON.stringify(sample));
