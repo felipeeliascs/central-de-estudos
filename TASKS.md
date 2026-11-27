@@ -341,6 +341,6 @@ Diagnóstico de Aparecida: o prompt original de videoaulas tinha target none e s
 - [x] Adicionar resumo de questões no Início, indicadores, distribuição, estado vazio, atalhos de período e busca/filtro de concursos.
 - [x] Manter cabeçalho e botão Fechar fora da região rolável dos diálogos e personalizar barras de rolagem com CSS.
 - [x] Adicionar URLs distintas (?page=...) e caminhos clicáveis; restaurar links diretos e tratar Voltar/Avançar do navegador com proteção de anotações não salvas.
-- [ ] Concluir lint, testes e build remotos desta ampliação do PR #2.
+- [x] Aprovar lint, testes e build remotos desta ampliação do PR #2. Execução aprovada de referência: https://github.com/felipeeliascs/central-de-estudos/actions/runs/46064278287. O PR registra também as verificações do commit final.
 - [ ] Homologar migração 013, upload e links assinados de foto no Storage real com contas fictícias. Nenhuma migração de produção aplicada. 001–012 são pré-requisitos.
 - [ ] Incorporar e publicar somente após confirmação.

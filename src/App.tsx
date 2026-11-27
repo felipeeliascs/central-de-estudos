@@ -865,7 +865,7 @@ function Workspace({
                     </button>
                   </div>
                 )}
-                <HomePerformance user={repo.user} demo={repo.demo} open={() => setProductivityOpen(true)} />
+                <HomePerformance key={String(questionsOpen) + String(flashcardsOpen) + reloadOverview} user={repo.user} demo={repo.demo} open={() => setProductivityOpen(true)} />
                 <div className="home-grid">
                   <section className="home-card home-plan">
                     <div className="home-card-head">
@@ -963,15 +963,15 @@ function Workspace({
               </div>
             ) : (
               <>
-                <div className="breadcrumb">
-                  <span>Meus concursos</span>
+                <nav className="breadcrumb" aria-label="Caminho do edital">
+                  <a href={pageHref("catalog")} onClick={routeLink}>Meus concursos</a>
                   {chain.map((n) => (
                     <span key={n.id}>
                       <ChevronRight size={13} />
-                      <button onClick={() => navigate(n.id)}>{n.name}</button>
+                      <a href={pageHref("study", n.id)} onClick={routeLink} aria-current={n.id === selected ? "page" : undefined}>{n.name}</a>
                     </span>
                   ))}
-                </div>
+                </nav>
                 {repo.demo && (
                   <div className="demo-banner">
                     <span>

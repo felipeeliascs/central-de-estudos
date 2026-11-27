@@ -44,3 +44,15 @@ it("mantém o botão de fechar fora do conteúdo rolável do diálogo", () => {
   expect(screen.getByRole("button", { name: "Fechar" }).closest(".dialog-scroll")).toBeNull();
   expect(screen.getByText("Conteúdo extenso").closest(".dialog-scroll")).not.toBeNull();
 });
+
+it("oferece links distintos para concurso, disciplina e assunto no edital", async () => {
+  history.replaceState(null, "", "?page=study&item=demo-topic");
+  render(<App />);
+  await screen.findByRole("heading", { name: "Direitos e garantias fundamentais", level: 1 });
+  const path = within(screen.getByRole("navigation", { name: "Caminho do edital" }));
+  const hrefs = path.getAllByRole("link").map(link => link.getAttribute("href"));
+  expect(new Set(hrefs).size).toBe(hrefs.length);
+  expect(hrefs).toContain("/?page=catalog");
+  expect(hrefs).toContain("/?page=study&item=demo-discipline");
+  expect(hrefs).toContain("/?page=study&item=demo-topic");
+});

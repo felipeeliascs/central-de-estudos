@@ -129,3 +129,14 @@ it("salva usuário e telefone privados e registra solicitação confirmada de ex
   await screen.findByText("Solicitação cancelada.");
   expect(calls.rpc).toHaveBeenCalledWith("study_cancel_account_deletion");
 });
+
+it("recusa foto com formato inválido antes de alterar o perfil", async () => {
+  const user = userEvent.setup({ applyAccept: false });
+  render(<ProfilePage userId="me" demo={false} onBack={vi.fn()} />);
+  await screen.findByText("user@example.test");
+  await user.click(screen.getByText("Foto e descrição"));
+  await user.upload(screen.getByLabelText("Foto do perfil"), new File(["imagem fictícia"], "foto.gif", { type: "image/gif" }));
+  await user.click(screen.getByRole("button", { name: "Salvar foto e descrição" }));
+  expect((await screen.findByRole("alert")).textContent).toContain("PNG, JPEG ou WebP de até 2 MB");
+  expect(calls.update).not.toHaveBeenCalled();
+});
