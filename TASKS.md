@@ -315,7 +315,7 @@ A revisão preserva os painéis anteriores; a cobertura visual e de acessibilida
 - [x] Adicionar lote video_batch para edital existente com prévia, referências inválidas, duplicatas por vídeo/assunto e confirmação. RPC valida papel e edição, IDs, URLs, concorrência e preserva a projeção transacional existente.
 - [x] Atualizar prompt de videoaulas para o contrato importável e exigir o JSON existente com IDs externos.
 - [x] Reutilizar Raio-X no edital com unidade de amostra explícita (provas/questões), banca, período, fonte e denominador. Legados sem unidade não recebem percentuais.
-- [ ] Concluir CI remoto do PR: lint, testes e build. O resultado definitivo será registrado no PR.
+- [x] Executar lint, testes e build no GitHub Actions. Resultado e link da execução do commit final registrados no PR #1; as verificações são repetidas automaticamente a cada correção.
 - [ ] Homologar Supabase Auth real (saída, entrada de outra conta e duas abas), API/PostgREST/RLS, upload/Storage e dispositivos reais. Os testes deste PR usam Auth simulado e PostgreSQL/PGlite descartável no runner, sem credenciais de produção.
 - [ ] Após revisão e aprovação: reconciliar histórico do banco, ensaiar e aplicar 202611270012_video_incidence.sql (001–011 são pré-requisitos), incorporar o PR e disparar Pages manualmente.
 

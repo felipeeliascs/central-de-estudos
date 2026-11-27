@@ -12,8 +12,9 @@ export function SyllabusIncidence({ nodes, root, user, demo }: { nodes: Node[]; 
       .catch(() => { if (active) setError(true); });
     return () => { active = false; };
   }, [user, demo]);
+  const ids = new Set([root, ...descendants(nodes, root).map(node => node.id)]);
   const topics = nodes.filter(n => (n.kind === "topic" || n.kind === "subtopic") &&
-    (n.id === root || descendants(nodes, root).some(child => child.id === n.id)));
+    ids.has(n.id));
   if (!topics.length) return null;
   return <section aria-label="Incidência histórica por assunto">
     <h2>Incidência histórica</h2>

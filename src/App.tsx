@@ -828,7 +828,8 @@ function Workspace({
                   <div>
                     <div className="eyebrow">UM ASSUNTO DE CADA VEZ</div>
                     <h1>{node?.name || "Seu ambiente de estudos"}</h1>
-                    <p>                {isTopic
+                    <p>
+                      {isTopic
                         ? "Reúna o que importa. Estude no seu ritmo."
                         : "Organize seu edital e transforme cada etapa em progresso."}
                     </p>
