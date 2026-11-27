@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "type": "video_batch",
+  "contest_id": "exemplo-concurso-ficticio",
+  "resources": [
+    {
+      "id": "video-lote-01",
+      "item": "a01",
+      "kind": "video",
+      "title": "Videoaula fictícia para testar vínculo",
+      "url": "https://www.youtube.com/watch?v=abcdefghijl"
+    }
+  ]
+}

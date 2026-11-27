@@ -13,6 +13,7 @@ import {
   type Source,
   type SyllabusItem,
 } from "./contest-schema";
+import { previewVideoBatch } from "./video-batch";
 import { supabase } from "./repository";
 
 type Edition = {
@@ -61,6 +62,7 @@ export function ContestPanel({
   refresh: () => Promise<void>;
   open: (id: string) => void;
 }) {
+  const [videoPreview, setVideoPreview] = useState<ReturnType<typeof previewVideoBatch> | null>(null);
   const [edition, setEdition] = useState<Edition | null>(null);
   const [raw, setRaw] = useState("");
   const [importing, setImporting] = useState(startImport);
@@ -148,6 +150,7 @@ export function ContestPanel({
   }
   function reset() {
     setEdition(null);
+    setVideoPreview(null);
     setPreview(null);
     setImporting(false);
     setRaw("");
@@ -202,6 +205,23 @@ export function ContestPanel({
   }
   function importPreview() {
     void run(async () => {
+      const input = JSON.parse(raw.replace(/^\uFEFF/, ""));
+      if (input?.type === "video_batch") {
+        let chosen = target;
+        if (!chosen) {
+          const lookup = await db.from("study_catalog").select("contest_id").eq("external_id", input.contest_id).maybeSingle();
+          if (lookup.error) throw new Error(lookup.error.message);
+          chosen = lookup.data?.contest_id ?? "";
+        }
+        if (!chosen) throw new Error("Selecione um edital já cadastrado.");
+        const base = await read(chosen);
+        const result = previewVideoBatch(raw, base);
+        setVideoPreview(result);
+        setEdition({ doc: result.doc, base, target: chosen, mode: "import" });
+        setPreview(result.rows.map(row => ({ id: row.id, name: row.title + " → " + row.item, status: row.status })));
+        return;
+      }
+      setVideoPreview(null);
       const doc = parseContest(raw);
       let chosen = target || null;
       if (!chosen) {
@@ -222,9 +242,11 @@ export function ContestPanel({
     });
   }
   function commit() {
-    if (!edition) return;
+    if (!edition || (videoPreview && !videoPreview.valid)) return;
     void run(async () => {
-      const result = await db.rpc("study_apply_catalog", {
+      const result = videoPreview ? await db.rpc("study_apply_video_batch", {
+        batch: videoPreview.batch, expected: edition.base, target: edition.target, request_id: newId(),
+      }) : await db.rpc("study_apply_catalog", {
         doc: edition.doc,
         expected: edition.base,
         target: edition.target,
@@ -273,7 +295,7 @@ export function ContestPanel({
               <button className="secondary" onClick={() => setPreview(null)}>
                 Voltar
               </button>
-              <button className="primary" onClick={commit}>
+              <button className="primary" disabled={!!videoPreview && !videoPreview.valid} onClick={commit}>
                 Confirmar e salvar
               </button>
             </div>
@@ -287,7 +309,8 @@ export function ContestPanel({
           />
         ) : importing ? (
           <>
-            <h3>Importar concurso</h3>
+            <h3>Importar concurso ou lote de videoaulas</h3>
+            <p>Para videoaulas, use type: video_batch e o ID externo de um edital existente. A prévia mostra vínculos, duplicatas e referências inválidas. Nenhuma aula é gravada antes da confirmação.</p>
             <label>
               Atualizar concurso existente
               <select
@@ -374,6 +397,7 @@ export function ContestPanel({
                     {r.catalog_archived ? " · Arquivado" : ""}
                   </h3>
                   {r.board && <p>{r.board}</p>}
+                  <p>Remover dos meus concursos altera somente sua seleção e preserva seus materiais e progresso. Arquivar no catálogo é uma ação administrativa para todos. A exclusão definitiva não está disponível.</p>
                   {documents[r.id] && (
                     <PublishedOutline doc={documents[r.id]} />
                   )}
@@ -396,12 +420,12 @@ export function ContestPanel({
                                 );
                               if (result.error)
                                 throw new Error(result.error.message);
-                              await lists();
+                              await Promise.all([lists(), refresh()]);
                             })
                           }
                         >
                           {enrolled
-                            ? "Desmarcar concurso"
+                            ? "Remover dos meus concursos"
                             : "Selecionar concurso"}
                         </button>
                         <button
@@ -428,7 +452,7 @@ export function ContestPanel({
                                 duplicate: "Duplicar",
                                 archive: r.catalog_archived
                                   ? "Reativar"
-                                  : "Arquivar",
+                                  : "Arquivar no catálogo",
                                 export: "Exportar JSON",
                               }[mode]
                             }

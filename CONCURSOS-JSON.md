@@ -32,3 +32,38 @@ O arquivo é um objeto JSON UTF-8 de até 512 KiB. São aceitos exatamente `sche
 **Duplicar** cria outro concurso com ID próprio e copia a estrutura e os recursos cadastrados no catálogo. A cópia começa fora do catálogo de estudantes. **Equivalências** exige selecionar dois assuntos de concursos diferentes e confirmar a associação. O vínculo é consultável e pode ser removido, preservando os históricos individuais. Nesta etapa a associação registra equivalência de conteúdo. Reaproveitamento automático de evidências entre editais permanece pendente.
 
 Os exemplos `examples/concurso-ficticio.json` e `examples/retificacao-ficticia.json` são inteiramente fictícios. Importe o primeiro, importe novamente para observar a idempotência e então use o segundo para observar edição, inclusão e arquivamento.
+
+## Lote de videoaulas para edital existente
+
+Em **Importar JSON**, escolha o edital de destino ou deixe identificar pelo ID externo do lote. Use o contrato abaixo; não reenvie items nem o edital inteiro. O exemplo completo é examples/videoaulas-ficticias.json, compatível com examples/concurso-ficticio.json. São referências fictícias para teste, sem comprovação de conteúdo do vídeo.
+
+```json
+{
+  "schema_version": "1.0",
+  "type": "video_batch",
+  "contest_id": "exemplo-concurso-ficticio",
+  "resources": [{
+    "id": "aula-id-estavel",
+    "item": "a01",
+    "kind": "video",
+    "title": "Videoaula fictícia",
+    "url": "https://www.youtube.com/watch?v=abcdefghijl"
+  }]
+}
+```
+
+O lote usa até 512 KiB e 2.000 entradas. Cada aula segue os campos de video em resources do contrato 1.0, sem archived. contest_id é o id externo do documento exportado; item é o ID externo exato de assunto ou subassunto, não o UUID da biblioteca, nome ou número de posição. O prompt **Pesquisar videoaulas gratuitas** inclui o edital atual para usar esses IDs. O concurso e todos os ancestrais do assunto precisam estar ativos.
+
+A prévia mostra título, assunto/ID, novas aulas, duplicatas e referências inválidas. Erros impedem confirmar o lote inteiro. Reimportar a mesma combinação de vídeo do YouTube e assunto preserva o recurso existente, mesmo com outro ID ou formato de URL equivalente. Um ID existente com outro vídeo ou assunto é recusado; IDs repetidos dentro do lote também são erros. O mesmo vídeo pode ser vinculado a assuntos distintos. Metadados de duplicatas e aulas arquivadas devem ser revisados no editor do catálogo.
+
+A migração 202611270012_video_incidence.sql adiciona a RPC que valida permissões no banco e reaproveita study_apply_catalog em transação, sem apagar materiais, checklist, anotações ou progresso. Outra edição após a prévia exige gerar nova prévia. A reimportação sem novidades não cria material nem recibo adicional.
+
+**Seleção e arquivamento:** “Remover dos meus concursos” pausa somente a seleção do usuário; o concurso sai de sua navegação e pode ser selecionado novamente no catálogo. “Arquivar no catálogo” exige administrador com edição e afeta a disponibilidade geral. A prévia e confirmação de salvamento continuam obrigatórias. Não existe exclusão definitiva na interface; authenticated não pode executar DELETE em study_nodes.
+
+**Aparecida / AVANÇASP:** confirmou-se que o prompt anterior gerava texto (target none) e que o importador aceitava apenas contest 1.0 com resources no documento completo. A projeção correta converte resources[].item em UUID via item_map e grava section Videoaulas/kind youtube. Essa incompatibilidade é uma lacuna confirmada, mas não comprova a causa do caso relatado. Sem JSONs originais, snapshot do edital e recibo da operação não é possível determinar se as aulas foram persistidas ou se apontavam para IDs errados. Nenhum dado de produção foi usado ou alterado nesta investigação.
+
+## Incidência histórica
+
+O edital reutiliza os registros do Raio-X. Cada percentual informa se mede **provas com o assunto / provas analisadas** ou **questões do assunto / questões analisadas**, além de banca, período, fonte e tamanho da amostra. A migração acrescenta measure (exams/questions); registros antigos ficam sem unidade, sem inventar classificação. Devem ser revisados no Raio-X antes de exibir percentuais. Ausência de evidência completa mostra “Sem dados de incidência”; falha de consulta aparece como erro. Frequência histórica não é probabilidade da próxima prova. Prioridade estimada do planejamento permanece separada.
+
+Antes da publicação, ensaie a migração em homologação e valide Auth e API real com contas fictícias. O CI exercita banco descartável com PGlite e mocks de Auth, sem validar SMTP, PostgREST, Storage ou sincronização real.

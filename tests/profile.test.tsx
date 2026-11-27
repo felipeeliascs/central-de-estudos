@@ -97,3 +97,13 @@ it("valida a confirmação, informa quando a senha atual falha e só anuncia suc
   );
   expect([old.value, next.value, confirmation.value]).toEqual(["", "", ""]);
 });
+
+it("oferece saída no perfil e exibe falha recuperável", async () => {
+  const user = userEvent.setup();
+  const logout = vi.fn().mockRejectedValueOnce(new Error("Falha ao sair")).mockResolvedValue(undefined);
+  render(<ProfilePage userId="me" demo={false} onBack={vi.fn()} onLogout={logout} />);
+  await user.click(screen.getByRole("button", { name: "Sair da conta" }));
+  expect((await screen.findByRole("alert")).textContent).toContain("Falha ao sair");
+  await user.click(screen.getByRole("button", { name: "Sair da conta" }));
+  expect(logout).toHaveBeenCalledTimes(2);
+});

@@ -7,6 +7,7 @@ export type Due = { card_id: string; due: string };
 export type Card = { id: string; deck_id: string; archived: boolean };
 export type Deck = { id: string; topic_id: string; archived: boolean };
 export type Incidence = {
+  measure?: "exams" | "questions" | null;
   topic_id: string;
   board: string;
   sample: number;
@@ -101,7 +102,7 @@ export function productivityStore(user: string, demo: boolean) {
         list<Deck>("study_decks", "id,topic_id,archived"),
         list<Incidence>(
           "study_historical_incidence",
-          "topic_id,board,sample,occurrences,source_url,period_start,period_end",
+          "topic_id,board,sample,occurrences,source_url,period_start,period_end,measure",
           ["topic_id", "board"],
         ),
         list<Answer>(
@@ -195,4 +196,9 @@ export function productivityStore(user: string, demo: boolean) {
       if (r.error) throw new Error(r.error.message);
     },
   };
+}
+
+export async function readHistoricalIncidence(user: string, demo: boolean): Promise<Incidence[]> {
+  return demo ? local(user).incidence : list<Incidence>(
+    "study_historical_incidence", "topic_id,board,sample,occurrences,source_url,period_start,period_end,measure", ["topic_id", "board"]);
 }

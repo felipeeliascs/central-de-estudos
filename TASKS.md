@@ -1,6 +1,6 @@
 # Central de Estudos — roteiro em onze etapas
 
-> Status vigente: auditoria local da primeira versão em [AUDITORIA.md](AUDITORIA.md). Resultados de cada etapa abaixo são históricos. A validação em Supabase e a publicação continuam pendentes.
+> Status vigente: auditoria local da primeira versão em [AUDITORIA.md](AUDITORIA.md). Resultados de cada etapa abaixo são históricos. Consulte também a seção de continuidade em nuvem ao final; as pendências históricas não comprovam o estado atual da publicação.
 
 Reconstruído em 25/11/2026. A conversa recuperada menciona um roteiro de onze etapas, mas não devolveu sua lista original. **A sequência abaixo é uma proposta nova**, organizada para cobrir os requisitos confirmados em `SPEC.md`.
 
@@ -306,3 +306,17 @@ A revisão preserva os painéis anteriores; a cobertura visual e de acessibilida
 - [x] Reunir atalhos para gestão de concursos, editais, modelos de prompts e Raio-X. Os dados pessoais de estudo continuam protegidos pelas regras existentes.
 - [x] Verificar 42 testes em 16 arquivos, lint e build. PostgreSQL local verifica privilégios, isolamento, autorização e revogação.
 - [ ] Aplicar a migração 011 no Supabase e publicar após aprovação. Administração de contas já criadas e atribuição de papéis seguem no painel do Supabase.
+
+## Continuidade em nuvem — 27/11/2026
+
+- [x] Partir da main 7db85717bb425e79285079c926ba6c7d52eaed9a e ler os contratos e a implementação.
+- [x] Oferecer saída textual no menu e no perfil; impedir restauração tardia da sessão encerrada. Cobertura simulada de saída de estudante/administrador e entrada de outra conta.
+- [x] Diferenciar remoção da seleção pessoal de arquivamento administrativo. A navegação respeita a seleção; materiais e progresso são preservados. Exclusão definitiva não é oferecida e DELETE de nós é revogado para authenticated.
+- [x] Adicionar lote video_batch para edital existente com prévia, referências inválidas, duplicatas por vídeo/assunto e confirmação. RPC valida papel e edição, IDs, URLs, concorrência e preserva a projeção transacional existente.
+- [x] Atualizar prompt de videoaulas para o contrato importável e exigir o JSON existente com IDs externos.
+- [x] Reutilizar Raio-X no edital com unidade de amostra explícita (provas/questões), banca, período, fonte e denominador. Legados sem unidade não recebem percentuais.
+- [x] Executar lint, testes e build no GitHub Actions. Resultado e link da execução do commit final registrados no PR #1; as verificações são repetidas automaticamente a cada correção.
+- [ ] Homologar Supabase Auth real (saída, entrada de outra conta e duas abas), API/PostgREST/RLS, upload/Storage e dispositivos reais. Os testes deste PR usam Auth simulado e PostgreSQL/PGlite descartável no runner, sem credenciais de produção.
+- [ ] Após revisão e aprovação: reconciliar histórico do banco, ensaiar e aplicar 202611270012_video_incidence.sql (001–011 são pré-requisitos), incorporar o PR e disparar Pages manualmente.
+
+Diagnóstico de Aparecida: o prompt original de videoaulas tinha target none e saída textual, incompatível com o importador contest 1.0. O caminho válido do importador grava recursos video como materiais youtube/Videoaulas e converte item (ID externo) no UUID do assunto via item_map. Não foram fornecidos JSONs originais nem recibos/snapshot do caso “Concurso Público 01/2026 - Prefeitura Municipal de Aparecida”, banca AVANÇASP. Não foi consultado o banco de produção. Não é possível confirmar se houve gravação, falha de importação ou ID incorreto naquele caso. A validação usa exclusivamente exemplos fictícios. Ver CONCURSOS-JSON.md.
