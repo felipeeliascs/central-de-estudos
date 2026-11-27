@@ -56,3 +56,17 @@ it("oferece links distintos para concurso, disciplina e assunto no edital", asyn
   expect(hrefs).toContain("/?page=study&item=demo-discipline");
   expect(hrefs).toContain("/?page=study&item=demo-topic");
 });
+
+it("pede uma única confirmação ao abrir o perfil pelo menu com anotação não salva", async () => {
+  const user = userEvent.setup();
+  render(<App />);
+  await user.click(await screen.findByRole("button", { name: "Continuar estudando" }));
+  await user.click(await screen.findByRole("tab", { name: "Anotações" }));
+  await user.type(screen.getByRole("textbox", { name: "Anotações pessoais · somente você" }), "Rascunho fictício");
+  const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
+  await user.click(screen.getByRole("button", { name: "Abrir menu da conta" }));
+  await user.click(await screen.findByRole("menuitem", { name: "Configurações do perfil" }));
+  await screen.findByRole("heading", { name: "Meu perfil", level: 1 });
+  expect(confirm).toHaveBeenCalledTimes(1);
+  confirm.mockRestore();
+});

@@ -238,8 +238,9 @@ function Workspace({
       (m) => !m.catalog_archived && !hidden.has(m.topic_id),
     ),
   };
-  async function openCatalog() {
-    if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
+  async function openCatalog(confirmed = false) {
+    if (!confirmed && dirty && !window.confirm("Sair sem salvar as anotações?")) return;
+    setDirty(false);
     if (!supabase || repo.demo) {
       setCatalogOpen(true);
       return;
@@ -539,7 +540,7 @@ function Workspace({
                 [
                   "Meus concursos",
                   FolderOpen,
-                  () => void openCatalog(),
+                  () => void openCatalog(true),
                 ],
                 ["Estudar", BookOpen, () => setHome(false)],
                 ["Planejamento", CalendarDays, () => setPlannerOpen(true)],
@@ -702,11 +703,11 @@ function Workspace({
                 await logout();
               }}
               navigate={target => {
+                if (target === "profile") { openProfile(); return; }
+                if (target === "catalog") { void openCatalog(); return; }
                 if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
                 setDirty(false);
                 if (target === "questions") { openModule(null); setQuestionsOpen(true); return; }
-                if (target === "profile") { openProfile(); return; }
-                if (target === "catalog") { void openCatalog(); return; }
                 if (target === "study") { openModule(null); setAccountPage(null); setHome(false); return; }
                 setAccountPage(null); openModule(target);
               }}
