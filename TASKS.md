@@ -357,3 +357,21 @@ Diagnóstico de Aparecida: o prompt original de videoaulas tinha target none e s
 - [x] Aprovar lint, 78 testes em 25 arquivos e build no CI remoto. Referência: https://github.com/felipeeliascs/central-de-estudos/actions/runs/46068758751; o PR registra o check do commit final.
 - [ ] Homologar a migração 014 após 001–013, incluindo RLS/PostgREST e ofensiva com contas fictícias. Não há aplicação automática em produção.
 - [ ] Incorporar e publicar após confirmação. A versão publicada no Pages ainda pode exibir os diálogos antigos até a aprovação e implantação do PR #2.
+
+## Correção do fluxo de importação e cobertura — 27/11/2026
+
+Esta seção atualiza o estado do ambiente; as listas anteriores são registros históricos.
+- [x] Conferir main b0a225f, ausência de AGENTS.md remoto e preservar a cópia local de prévia sem Git.
+- [x] Unificar análise de upload/colagem, traduzir sintaxe com posição quando disponível, preservar entrada e manter validação estrita.
+- [x] Manter limite de 180 caracteres, corrigir índice de recurso no erro do lote e explicitar limites nos prompts.
+- [x] Destacar erros primeiro, identificar aula/ID/campo e resumir bloqueios junto à confirmação, distinguindo duplicatas válidas.
+- [x] Adicionar quantidade fixa ou cobertura completa por todos os assuntos/subassuntos ativos, inclusive pais, com IDs externos exatos e novo ID ao trocar vídeo.
+- [x] Corrigir IDs/nomes/rótulos dos três controles da importação e cobrir foco por teclado.
+- [x] Preparar reprodução sintética de 31 vínculos com conflito de Planejamento Reverso, testes de UI e transação/idempotência/preservação no banco descartável.
+- [x] Confirmar somente por leitura componentes 012–014 instalados e publicação anterior no workflow 43; não alterar produção nesta tarefa.
+- [x] Documentar aviso de CSP não reproduzido, busca estática e falta de origem/linha/pilha no Chrome original, sem adicionar unsafe-eval.
+- [ ] Validar o arquivo original corrigido quando for disponibilizado; nesta tarefa foi fornecido somente o texto do pedido.
+- [ ] Homologar Auth/PostgREST real com contas fictícias e ambiente separado quando disponível.
+- [ ] Após revisão, obter autorização específica para merge e Pages. Nenhuma migração nova é necessária.
+
+Resultados das verificações em nuvem e commit final são registrados no PR desta branch. Detalhes em IMPORTACAO-DIAGNOSTICO.md.

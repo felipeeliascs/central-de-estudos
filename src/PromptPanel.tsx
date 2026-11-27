@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { ModulePage } from "./ModulePage";
 import { productivityStore } from "./productivity-data";
 import { supabase } from "./repository";
@@ -29,6 +29,7 @@ export function PromptPanel({
   startTrail?: boolean;
   openImporter: (target: "contest" | "cards" | "questions") => void;
 }) {
+  const promptId = useId();
   const [custom, setCustom] = useState<PromptTemplate[]>([]);
   const [id, setId] = useState(startTrail ? "trilhas" : templates[0].id);
   const [admin, setAdmin] = useState(false);
@@ -430,7 +431,7 @@ export function PromptPanel({
             </label>
             {selected.id === "videos" && <label>
               Cobertura das videoaulas
-              <select id="video-coverage" name="video-coverage" value={videoMode} onChange={e => setVideoMode(e.target.value as "fixed" | "complete")}>
+              <select id={`${promptId}-video-coverage`} name="video-coverage" value={videoMode} onChange={e => setVideoMode(e.target.value as "fixed" | "complete")}>
                 <option value="fixed">Quantidade fixa</option>
                 <option value="complete">Cobertura completa do edital</option>
               </select>

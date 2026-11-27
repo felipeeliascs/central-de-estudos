@@ -53,7 +53,11 @@ export async function exerciseVideoIncidence(db: PGlite, a: string, b: string) {
   const fullBefore=await fullRead();
   await expect(fullApply(conflictingVideoBatch,fullBefore)).rejects.toThrow(/outro vínculo/);
   expect(await fullRead()).toEqual(fullBefore);
-  const countMaterials=async()=>(await db.query<{n:number}>("select count(*)::int n from public.study_catalog_resources where contest_id=$1",[fullId])).rows[0].n;
+  const countMaterials=async()=>{
+    await db.exec("reset role"); // Inspect the private mapping as the disposable DB operator only.
+    try { return (await db.query<{n:number}>("select count(*)::int n from public.study_catalog_resources where contest_id=$1",[fullId])).rows[0].n; }
+    finally { await account(a); }
+  };
   const countReceipts=async()=>(await db.query<{n:number}>("select count(*)::int n from public.study_imports where summary->>'name'=$1",[videoBase.name])).rows[0].n;
   expect(await countMaterials()).toBe(1);
   const beforeReceipts=await countReceipts();

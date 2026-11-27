@@ -67,3 +67,13 @@ A migração 202611270012_video_incidence.sql adiciona a RPC que valida permiss�
 O edital reutiliza os registros do Raio-X. Cada percentual informa se mede **provas com o assunto / provas analisadas** ou **questões do assunto / questões analisadas**, além de banca, período, fonte e tamanho da amostra. A migração acrescenta measure (exams/questions); registros antigos ficam sem unidade, sem inventar classificação. Devem ser revisados no Raio-X antes de exibir percentuais. Ausência de evidência completa mostra “Sem dados de incidência”; falha de consulta aparece como erro. Frequência histórica não é probabilidade da próxima prova. Prioridade estimada do planejamento permanece separada.
 
 Antes da publicação, ensaie a migração em homologação e valide Auth e API real com contas fictícias. O CI exercita banco descartável com PGlite e mocks de Auth, sem validar SMTP, PostgREST, Storage ou sincronização real.
+
+## Correção de entradas e cobertura de videoaulas
+
+Upload e colagem usam a mesma análise estrita. Envie somente o objeto JSON, sem cercas de código, introdução ou texto depois dele. Sintaxe inválida mostra motivo em português e linha/coluna quando disponíveis. Erros de contrato indicam o campo, como $.resources[29].title. Mantenha cada title entre 1 e 180 caracteres, sem truncamento automático; coloque detalhes em text.
+
+Na prévia de videoaulas, erros aparecem primeiro e a quantidade é exibida perto de Confirmar e salvar. Use o link ao primeiro erro ou Voltar e corrigir JSON; o texto e o destino são preservados. Duplicata válida não bloqueia a confirmação. Se o mesmo ID já identifica outro vídeo ou vínculo, atribua um novo ID ao novo recurso. Reaproveitar o mesmo vídeo no mesmo assunto preserva o ID e os materiais existentes.
+
+No prompt Pesquisar videoaulas gratuitas, escolha Quantidade fixa ou Cobertura completa do edital. Cobertura completa usa todos os topic e subtopic ativos do JSON atual, incluindo pais com filhos; não é limitada por disciplina/assunto selecionado nem envia quantidade fixa. A meta e cada ID elegível são exibidos no prompt. Solicite apenas URLs verificadas e revise as lacunas; uma meta não permite inventar aulas. O contrato continua video_batch 1.0, com contest_id e item externos exatos.
+
+Veja evidências, testes e limites em [IMPORTACAO-DIAGNOSTICO.md](IMPORTACAO-DIAGNOSTICO.md).
