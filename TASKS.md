@@ -331,3 +331,16 @@ Diagnóstico de Aparecida: o prompt original de videoaulas tinha target none e s
 - [x] Preservar os diálogos de formulários e confirmações específicas.
 - [x] Aprovar lint, 58 testes em 20 arquivos e build no GitHub Actions do PR #2. A falha inicial de tipagem nos seletores dos testes foi corrigida. Execução aprovada: https://github.com/felipeeliascs/central-de-estudos/actions/runs/46062660302.
 - [ ] Incorporar e publicar após confirmação. Não há migração nova de banco nesta mudança.
+
+
+## Perfil e páginas de referência — 27/11/2026
+
+- [x] Adaptar perfil, cartões de concursos e painel de desempenho às referências fornecidas, preservando a identidade real da conta e sem inventar plano pago, vagas, cursos ou assinatura.
+- [x] Adicionar nome, usuário, telefone, descrição e foto privada. A foto aceita PNG/JPEG/WebP de até 2 MB; o e-mail de autenticação permanece somente leitura.
+- [x] Mostrar uso gratuito e privacidade real. Permitir solicitar/cancelar exclusão ao administrador, com confirmação explícita e sem exclusão automática. A Administração consulta as solicitações pendentes.
+- [x] Adicionar resumo de questões no Início, indicadores, distribuição, estado vazio, atalhos de período e busca/filtro de concursos.
+- [x] Manter cabeçalho e botão Fechar fora da região rolável dos diálogos e personalizar barras de rolagem com CSS.
+- [x] Adicionar URLs distintas (?page=...) e caminhos clicáveis; restaurar links diretos e tratar Voltar/Avançar do navegador com proteção de anotações não salvas.
+- [ ] Concluir lint, testes e build remotos desta ampliação do PR #2.
+- [ ] Homologar migração 013, upload e links assinados de foto no Storage real com contas fictícias. Nenhuma migração de produção aplicada. 001–012 são pré-requisitos.
+- [ ] Incorporar e publicar somente após confirmação.

@@ -202,3 +202,12 @@ export async function readHistoricalIncidence(user: string, demo: boolean): Prom
   return demo ? local(user).incidence : list<Incidence>(
     "study_historical_incidence", "topic_id,board,sample,occurrences,source_url,period_start,period_end,measure", ["topic_id", "board"]);
 }
+
+export async function readPractice(user: string, demo: boolean): Promise<{ results: ExternalResult[]; answers: Answer[] }> {
+  if (demo) return { results: local(user).results, answers: demoQuestionResults(user) };
+  const [results, answers] = await Promise.all([
+    list<ExternalResult>("study_external_results", "id,topic_id,provider,answered,correct,recorded_at,source_url,notes,result_kind"),
+    list<Answer>("study_answers", "correct,created_at,study_questions(topic_id)"),
+  ]);
+  return { results, answers };
+}

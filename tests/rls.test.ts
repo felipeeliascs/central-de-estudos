@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { PGlite } from "@electric-sql/pglite";
 import { expect, it } from "vitest";
 import { exerciseModel } from "./model-checks";
+import { exerciseProfileRequests } from "./profile-requests-sql";
 import { exerciseVideoIncidence } from "./video-incidence-sql";
 import { exerciseCatalog } from "./catalog-checks";
 import { exerciseFlashcards } from "./flash-sql-checks";
@@ -408,6 +409,9 @@ it("executa a migração e verifica isolamento no PostgreSQL com duas contas, le
     await db.exec("reset role");
     await db.exec(readFileSync(new URL("../supabase/migrations/202611270012_video_incidence.sql", import.meta.url), "utf8"));
     await exerciseVideoIncidence(db, a, b);
+    await db.exec("reset role");
+    await db.exec(readFileSync(new URL("../supabase/migrations/202611270013_profile_requests.sql", import.meta.url), "utf8"));
+    await exerciseProfileRequests(db, a, b);
     await db.exec("reset role;set role anon;");
     await expect(
       db.query("select public.study_admin_overview()"),

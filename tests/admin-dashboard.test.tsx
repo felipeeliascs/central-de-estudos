@@ -50,6 +50,7 @@ vi.mock("../src/flashcard-data", () => ({ countDueReviews: async () => 0 }));
 const pending = "pending@example.test";
 
 beforeEach(() => {
+  history.replaceState(null, "", "/");
   mock.admin = false;
   mock.rpc.mockReset();
   mock.rpc.mockImplementation(async (name: string) => {

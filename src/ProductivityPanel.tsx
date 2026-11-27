@@ -1,3 +1,4 @@
+import { PracticeDashboard } from "./PerformanceOverview";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { incidenceSummary } from "./incidence";
 import { ModulePage } from "./ModulePage";
@@ -484,7 +485,8 @@ export function ProductivityPanel({
   }));
   const max = Math.max(1, ...byDay.map((d) => d.seconds));
   return (
-    <ModulePage title="Desempenho" close={close} busy={busy}>
+    <ModulePage title="Meu desempenho" close={close} busy={busy}>
+      <p className="page-description">Acompanhe sua evolução nas questões e identifique pontos de atenção.</p>
       <nav className="catalog-actions" aria-label="Módulos de produtividade">
         {(
           [
@@ -841,6 +843,10 @@ export function ProductivityPanel({
           </ul>
         </>
       )}
+      {view === "dashboard" && <nav className="period-shortcuts" aria-label="Período do desempenho">
+        {([["Hoje", 0], ["7 dias", 6], ["15 dias", 14], ["30 dias", 29]] as const).map(([label, days]) => <button key={label} className="secondary" aria-pressed={from === addDays(today, -days) && to === today} onClick={() => { setFrom(addDays(today, -days)); setTo(today); }}>{label}</button>)}
+        <button className="secondary" aria-pressed={from === "0001-01-01"} onClick={() => { setFrom("0001-01-01"); setTo(today); }}>Desde o início</button>
+      </nav>}
       {(view === "dashboard" || view === "incidence") && (
         <div className="catalog-fields">
           <label>
@@ -900,6 +906,12 @@ export function ProductivityPanel({
       )}
       {view === "dashboard" && data && (
         <>
+          <PracticeDashboard points={Array.from(new Set([...results.map(r => localDay(new Date(r.recorded_at))), ...answers.map(a => localDay(new Date(a.created_at)))])).sort().map(day => ({
+            day,
+            answered: results.filter(r => localDay(new Date(r.recorded_at)) === day).reduce((sum, r) => sum + r.answered, 0) + answers.filter(a => localDay(new Date(a.created_at)) === day).length,
+            correct: results.filter(r => localDay(new Date(r.recorded_at)) === day).reduce((sum, r) => sum + r.correct, 0) + answers.filter(a => localDay(new Date(a.created_at)) === day && a.correct).length,
+          }))} />
+          <details className="performance-details"><summary>Tempo de estudo, revisões e indicadores detalhados</summary>
           <div className="overview-grid">
             <div className="catalog-entry">
               Horas líquidas no período
@@ -943,7 +955,8 @@ export function ProductivityPanel({
               </strong>
             </div>
           </div>
-          <h3>Evolução nos últimos sete dias</h3>
+          </details>
+          <h3>Evolução do tempo nos últimos sete dias</h3>
           <div
             className="productivity-chart"
             role="img"

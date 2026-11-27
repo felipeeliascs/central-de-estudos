@@ -1,3 +1,4 @@
+import { AdminDeletionRequests } from "./AccountDeletion";
 import { useEffect, useState, type FormEvent } from "react";
 import {
   ArrowLeft,
@@ -175,6 +176,7 @@ export function AdminDashboard({
       {loading && <p role="status">Carregando administração…</p>}
       {directory && (
         <>
+          <AdminDeletionRequests />
           <dl className="admin-metrics">
             <div>
               <dt>Contas</dt>

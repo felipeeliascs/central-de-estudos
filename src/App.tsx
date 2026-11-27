@@ -56,6 +56,8 @@ import {
 } from "./Forms";
 import { AuthGate } from "./AuthGate";
 import { SyllabusIncidence } from "./SyllabusIncidence";
+import { HomePerformance } from "./PerformanceOverview";
+import { pageHref, readRoute, type Page, type Route } from "./page-navigation";
 import { ModulePage } from "./ModulePage";
 import { ProfilePage } from "./ProfilePage";
 import { AdminDashboard } from "./AdminDashboard";
@@ -107,9 +109,9 @@ function Workspace({
   repo: Repository;
   logout: () => Promise<void>;
 }) {
-  const [home, setHome] = useState(true);
+  const [home, setHome] = useState(() => readRoute().page === "home");
   const [accountPage, setAccountPage] = useState<"profile" | "admin" | null>(
-    null,
+    readRoute().page === "profile" ? "profile" : readRoute().page === "admin" ? "admin" : null,
   );
   const [incidenceOpen, setIncidenceOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -118,7 +120,10 @@ function Workspace({
   );
   const [online, setOnline] = useState(navigator.onLine);
   type Module = "catalog" | "planner" | "prompts" | "productivity";
-  const [modulePage, setModulePage] = useState<Module | null>(null);
+  const [modulePage, setModulePage] = useState<Module | null>(() => {
+    const page = readRoute().page;
+    return ["catalog", "planner", "prompts", "productivity"].includes(page) ? page as Module : null;
+  });
   const plannerOpen = modulePage === "planner";
   const catalogOpen = modulePage === "catalog";
   const promptsOpen = modulePage === "prompts";
@@ -244,7 +249,7 @@ function Workspace({
     setMobile(false);
   }
   const [members, setMembers] = useState<Member[]>([]);
-  const [selected, setSelected] = useState("");
+  const [selected, setSelected] = useState(() => readRoute().item);
   const [section, setSection] = useState<Section>("Videoaulas");
   const [search, setSearch] = useState("");
   const [busy, setBusy] = useState(false);
@@ -291,6 +296,7 @@ function Workspace({
           setMembers(ms);
           setEnrolled(activeEnrollments);
           setSelected(
+            (next.nodes.some(n => n.id === readRoute().item) ? readRoute().item : "") ||
             next.nodes.find((n) => n.kind === "topic")?.id ||
               next.nodes.find((n) => n.kind === "contest")?.id ||
               "",
@@ -354,7 +360,7 @@ function Workspace({
           m.contest_id === (n.kind === "contest" ? n.id : chain[0]?.id),
       ));
   function openProfile() {
-    if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
+    if (dirty && !window.confirm("Sair sem salvar as anotações?")) return false;
     setDirty(false);
     setMobile(false);
     openModule(null);
@@ -376,6 +382,41 @@ function Workspace({
     document.getElementById("conteudo")?.focus();
   }, [modulePage, accountPage, home, selected]);
 
+  const currentPage: Page = modulePage ?? accountPage ?? (home ? "home" : "study");
+  const [previousHref, setPreviousHref] = useState("");
+  function followRoute(route: Route) {
+    if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
+    setDirty(false);
+    setMobile(false);
+    openModule(null);
+    setAccountPage(null);
+    setHome(route.page === "home");
+    if (route.page === "profile" || route.page === "admin") setAccountPage(route.page);
+    if (["catalog", "planner", "prompts", "productivity"].includes(route.page)) openModule(route.page as Module);
+    if (route.page === "study" && route.item) setSelected(route.item);
+    return true;
+  }
+  useEffect(() => {
+    const target = pageHref(currentPage, selected);
+    if (location.pathname + location.search !== target) {
+      setPreviousHref(location.pathname + location.search);
+      history.pushState(null, "", target);
+    }
+  }, [currentPage, selected]);
+  useEffect(() => {
+    const pop = () => {
+      if (!followRoute(readRoute())) history.pushState(null, "", pageHref(currentPage, selected));
+    };
+    window.addEventListener("popstate", pop);
+    return () => window.removeEventListener("popstate", pop);
+    // The current unsaved-note guard is needed when browser history changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dirty, currentPage, selected]);
+  function routeLink(event: React.MouseEvent<HTMLAnchorElement>) {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    followRoute(readRoute(new URL(event.currentTarget.href).search));
+  }
   function changeSection(s: Section) {
     if (dirty && !window.confirm("Há anotações não salvas. Sair sem salvar?"))
       return;
@@ -659,6 +700,11 @@ function Workspace({
                 não está disponível; alterações podem não ser salvas.
               </div>
             )}
+            <nav className="page-breadcrumbs" aria-label="Caminho da página">
+              <a href={pageHref("home")} onClick={routeLink}>Início</a>
+              {currentPage !== "home" && <><ChevronRight size={14} aria-hidden="true" /><a href={pageHref(currentPage, selected)} onClick={routeLink} aria-current="page">{{ study: "Estudar", profile: "Meu perfil", admin: "Administração", catalog: "Meus concursos", planner: "Planejamento", prompts: "Central de Prompts", productivity: "Meu desempenho", home: "Início" }[currentPage]}</a></>}
+              {previousHref && <a className="previous-page" href={previousHref} onClick={routeLink}>← Página anterior</a>}
+            </nav>
             {modulePage ? (
               <>
         {promptsOpen && (
@@ -817,6 +863,7 @@ function Workspace({
                     </button>
                   </div>
                 )}
+                <HomePerformance user={repo.user} demo={repo.demo} open={() => setProductivityOpen(true)} />
                 <div className="home-grid">
                   <section className="home-card home-plan">
                     <div className="home-card-head">

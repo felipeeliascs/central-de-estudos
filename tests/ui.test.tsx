@@ -9,6 +9,7 @@ import {
 import userEvent from "@testing-library/user-event";
 import App from "../src/App";
 beforeEach(() => {
+  history.replaceState(null, "", "/");
   localStorage.clear();
   HTMLDialogElement.prototype.showModal = function () {
     this.setAttribute("open", "");

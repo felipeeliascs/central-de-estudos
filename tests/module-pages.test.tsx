@@ -5,6 +5,7 @@ import App from "../src/App";
 
 beforeEach(() => {
   localStorage.clear();
+  history.replaceState(null, "", "/");
   HTMLDialogElement.prototype.showModal = vi.fn();
   HTMLDialogElement.prototype.close = vi.fn();
 });
@@ -20,7 +21,7 @@ it("abre os quatro módulos na mesma main e mantém o menu acessível", async ()
     ["Meus concursos", "Meus concursos"],
     ["Planejamento", "Planejamento adaptativo"],
     ["Central de Prompts", "Central de Prompts e Inteligência Artificial"],
-    ["Desempenho", "Desempenho"],
+    ["Desempenho", "Meu desempenho"],
   ]) {
     await user.click(nav.getByRole("button", { name: menu }));
     await within(main).findByRole("heading", { name: title, level: 1 });
@@ -36,7 +37,7 @@ it("abre os quatro módulos na mesma main e mantém o menu acessível", async ()
   await within(main).findByText(/Horas líquidas no período/);
   await user.click(nav.getByRole("button", { name: "Início" }));
   await within(main).findByRole("heading", { name: "Plano de hoje" });
-  expect(screen.queryByRole("heading", { name: "Desempenho" })).toBeNull();
+  expect(screen.queryByRole("heading", { name: "Meu desempenho" })).toBeNull();
 });
 
 it("abre atalhos do Início, volta e entra no edital pela página de concursos", async () => {
