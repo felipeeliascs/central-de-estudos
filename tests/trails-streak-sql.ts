@@ -6,7 +6,7 @@ export async function exerciseTrailsStreak(db:PGlite,a:string,b:string,otherTopi
   await account(a);
   for (const [id,parent,kind,name] of [[root,null,"contest","Trilha fictícia"],[discipline,root,"discipline","Disciplina"],[t1,discipline,"topic","Base"],[t2,discipline,"topic","Avançado"]])
     await db.query("insert into public.study_nodes(id,parent_id,kind,name,owner_id) values($1,$2,$3,$4,$5)",[id,parent,kind,name,a]);
-  const state={version:1,config:{minutes:[60,60,60,60,60,0,0],measure:"questions",topics:[{topic_id:t1,requires:[],minutes:30,estimated_priority:"medium"},{topic_id:t2,requires:[t1],minutes:30,estimated_priority:"high"}]},weeks:[]};
+  const state={version:1,config:{minutes:[60,60,60,60,60,0,0],measure:"questions",topics:[{topic_id:t1,requires:[],minutes:30,estimated_priority:"medium"},{topic_id:t2,requires:[t1],minutes:30,estimated_priority:"high"}]},weeks:[{week:"2026-11-23",sessions:[{id:"sessao-ficticia",topic_id:t1,day:"2026-11-27",minutes:30,done:false,reason:"Fictício"}],warnings:[]}]};
   await db.query("insert into public.study_trails(user_id,contest_id,revision,state) values($1,$2,1,$3::jsonb)",[a,root,JSON.stringify(state)]);
   await account(b);
   expect((await db.query("select * from public.study_trails where contest_id=$1",[root])).rows).toHaveLength(0);
@@ -19,7 +19,9 @@ export async function exerciseTrailsStreak(db:PGlite,a:string,b:string,otherTopi
   await expect(db.query("update public.study_trails set revision=2,state=$1::jsonb where contest_id=$2",[JSON.stringify(invalid),root])).rejects.toThrow(/Pré-requisito/);
   await expect(db.query("update public.study_trails set revision=3 where contest_id=$1",[root])).rejects.toThrow(/revisão/);
   expect((await db.query<{revision:number}>("select revision from public.study_trails where contest_id=$1",[root])).rows[0].revision).toBe(1);
-  await db.query("update public.study_trails set revision=2 where contest_id=$1 and revision=1",[root]);
+  const concluded={...state,weeks:state.weeks.map(w=>({...w,sessions:w.sessions.map(s=>({...s,done:true,done_at:new Date().toISOString()}))}))};
+  await db.query("update public.study_trails set revision=2,state=$2::jsonb where contest_id=$1 and revision=1",[root,JSON.stringify(concluded)]);
+  expect((await db.query<{state:{weeks:{sessions:{done:boolean}[]}[]}}>("select state from public.study_trails where contest_id=$1",[root])).rows[0].state.weeks[0].sessions[0].done).toBe(true);
   expect((await db.query("update public.study_trails set revision=2 where contest_id=$1 and revision=1 returning user_id",[root])).rows).toHaveLength(0);
 
   const c="cccccccc-cccc-4ccc-8ccc-ccccccccccc9";
@@ -29,7 +31,7 @@ export async function exerciseTrailsStreak(db:PGlite,a:string,b:string,otherTopi
   await db.query("insert into public.study_members(contest_id,user_id,role) values($1,$2,'reader')",[root,c]);
   await account(c);
   const streak=async()=>(await db.query<{value:{current:number;best:number;studied_today:boolean}}>("select public.study_activity_streak() as value")).rows[0].value;
-  await db.query("insert into public.study_trails(user_id,contest_id,revision,state) values($1,$2,1,$3::jsonb)",[c,root,JSON.stringify(state)]);
+  await db.query("insert into public.study_trails(user_id,contest_id,revision,state) values($1,$2,1,$3::jsonb)",[c,root,JSON.stringify(concluded)]);
   expect((await streak()).current).toBe(0);
   await db.query("insert into public.study_sessions(user_id,topic_id,started_at,ended_at,seconds,client_event_id) values($1,$2,now()-interval '1 day 1 minute',now()-interval '1 day',60,gen_random_uuid()),($1,$2,now()-interval '2 days 1 minute',now()-interval '2 days',60,gen_random_uuid())",[c,t1]);
   expect(await streak()).toMatchObject({current:2,best:2,studied_today:false});

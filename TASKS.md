@@ -354,6 +354,6 @@ Diagnóstico de Aparecida: o prompt original de videoaulas tinha target none e s
 - [x] Acrescentar o prompt Organizar trilha lógica de estudos, com contrato study_trail 1.0, UUIDs reais do contexto, importação, prévia, referências/ciclos validados e confirmação. Reimportar configuração não apaga progresso nem materiais.
 - [x] Trocar profile-trigger por menu da conta com identidade real, atalhos, modo noturno, ajuda, uso gratuito e saída, incluindo Escape, setas e clique externo.
 - [x] Calcular ofensiva atual e recorde com dias de tempo de estudo, questões ou revisões; deduplicar o dia em America/Sao_Paulo. Não contar páginas abertas, planejamentos nem estimativas como atividade.
-- [ ] Concluir lint, testes e build no CI remoto.
+- [x] Aprovar lint, 78 testes em 25 arquivos e build no CI remoto. Referência: https://github.com/felipeeliascs/central-de-estudos/actions/runs/46068758751; o PR registra o check do commit final.
 - [ ] Homologar a migração 014 após 001–013, incluindo RLS/PostgREST e ofensiva com contas fictícias. Não há aplicação automática em produção.
 - [ ] Incorporar e publicar após confirmação. A versão publicada no Pages ainda pode exibir os diálogos antigos até a aprovação e implantação do PR #2.
