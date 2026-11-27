@@ -1,3 +1,5 @@
+import { History, Archive, Trash2 } from "lucide-react";
+import { CollapsibleSection } from "./CollapsibleSection";
 import { parseImportJson } from "./import-json";
 import { useEffect, useId, useState } from "react";
 import type { Node } from "./domain";
@@ -27,6 +29,7 @@ type Enrollment = { contest_id: string; status: string };
 type Link = { first_topic: string; second_topic: string };
 type Receipt = {
   id: string;
+  kind: string;
   created_at: string;
   summary: { name: string; version: number; items: number; resources: number };
 };
@@ -64,6 +67,8 @@ export function ContestPanel({
   open: (id: string) => void;
 }) {
   const importId = useId();
+  const [deletion, setDeletion] = useState<{ target: string; doc: ContestDocument; canDelete: boolean; reason: string } | null>(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [search, setSearch] = useState("");
   const [scope, setScope] = useState<"all" | "mine">("all");
   const [videoPreview, setVideoPreview] = useState<ReturnType<typeof previewVideoBatch> | null>(null);
@@ -111,7 +116,7 @@ export function ContestPanel({
       admin
         ? db
             .from("study_imports")
-            .select("id,created_at,summary")
+            .select("id,kind,created_at,summary")
             .like("kind", "contest:%")
             .order("created_at", { ascending: false })
             .limit(30)
@@ -159,6 +164,8 @@ export function ContestPanel({
     return result.data as ContestDocument;
   }
   function reset() {
+    setDeletion(null);
+    setDeleteConfirmation("");
     setEdition(null);
     setVideoPreview(null);
     setPreview(null);
@@ -252,6 +259,35 @@ export function ContestPanel({
       });
     });
   }
+  function reviewDeletion(rootId: string) {
+    void run(async () => {
+      const doc = await read(rootId);
+      const status = await db.rpc("study_contest_deletion_status", { target: rootId });
+      if (status.error) {
+        if (status.error.code === "PGRST202" || status.error.code === "42883")
+          throw new Error("A exclusão definitiva depende da migração 015, ainda não habilitada neste ambiente. Você pode arquivar o concurso no catálogo.");
+        throw new Error(status.error.message);
+      }
+      if (!status.data || typeof status.data.can_delete !== "boolean" || typeof status.data.reason !== "string")
+        throw new Error("Não foi possível verificar os vínculos do concurso. Tente novamente.");
+      setDeletion({ target: rootId, doc, canDelete: status.data.can_delete, reason: status.data.reason });
+      setDeleteConfirmation("");
+    });
+  }
+  function deleteContest() {
+    if (!deletion?.canDelete || deleteConfirmation !== deletion.doc.id) return;
+    void run(async () => {
+      const result = await db.rpc("study_delete_contest", { target: deletion.target, expected: deletion.doc, confirmed_external_id: deleteConfirmation });
+      if (result.error) {
+        // A reference may have been created after the preview. Keep archiving available.
+        setDeletion({ ...deletion, canDelete: false, reason: "Não foi possível excluir. Reabra a verificação ou arquive o concurso para preservar os dados." });
+        throw new Error(result.error.message);
+      }
+      reset();
+      setMessage("Concurso excluído. O histórico de operações foi preservado.");
+      await Promise.all([refresh(), lists()]);
+    });
+  }
   function commit() {
     if (!edition || (videoPreview && !videoPreview.valid)) return;
     void run(async () => {
@@ -287,7 +323,23 @@ export function ContestPanel({
             {message}
           </p>
         )}
-        {preview && edition ? (
+        {deletion ? (
+          <section className="catalog-deletion" aria-label="Excluir concurso importado">
+            <h3>Excluir concurso importado</h3>
+            <p><strong>{deletion.doc.name}</strong></p>
+            <p role="status">{deletion.reason}</p>
+            <p>Arquivar é reversível e preserva materiais, seleções e progresso. A exclusão definitiva não pode ser desfeita e remove este edital e seus recursos importados para todas as contas.</p>
+            {deletion.canDelete && <label htmlFor={`${importId}-delete`}>
+              Digite o ID externo para confirmar: {deletion.doc.id}
+              <input id={`${importId}-delete`} name="delete-contest-confirmation" autoComplete="off" value={deleteConfirmation} onChange={e => setDeleteConfirmation(e.target.value)} />
+            </label>}
+            <div className="form-actions">
+              <button type="button" className="secondary" onClick={() => setDeletion(null)}>Cancelar exclusão</button>
+              <button type="button" className="secondary" onClick={() => edit(deletion.target, "archive")}>{deletion.doc.archived ? "Reativar no catálogo" : "Arquivar no catálogo"}</button>
+              <button type="button" className="primary contest-delete-button" disabled={!deletion.canDelete || deleteConfirmation !== deletion.doc.id} onClick={deleteContest}>Excluir definitivamente</button>
+            </div>
+          </section>
+        ) : preview && edition ? (
           <>
             <h3>Prévia de alterações</h3>
             <p>
@@ -420,7 +472,7 @@ export function ContestPanel({
               <label className="contest-search">Buscar por concurso, banca, cargo ou órgão<input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Busque por concurso, banca, cargo…" /></label>
             </div>
             {!visibleRoots.length && <p className="chart-empty">Nenhum concurso encontrado para esta seleção.</p>}
-            <p className="muted">Remover dos meus concursos altera somente sua seleção e preserva materiais e progresso. Arquivar no catálogo é uma ação administrativa. Não há exclusão definitiva.</p>
+            <p className="muted">Remover dos meus concursos altera somente sua seleção e preserva materiais e progresso. Arquivar no catálogo é uma ação administrativa. A exclusão definitiva exige confirmação e só é permitida sem dados de estudo vinculados.</p>
             <div className="contest-grid">
             {visibleRoots.map((r) => {
               const enrolled = enrollments.some(
@@ -478,7 +530,7 @@ export function ContestPanel({
                     {admin && editable.has(r.id) && (
                       <>
                         {(
-                          ["manual", "duplicate", "archive", "export"] as const
+                          ["manual", "duplicate", "export"] as const
                         ).map((mode) => (
                           <button
                             className="text-button"
@@ -489,9 +541,6 @@ export function ContestPanel({
                               {
                                 manual: "Editar",
                                 duplicate: "Duplicar",
-                                archive: r.catalog_archived
-                                  ? "Reativar"
-                                  : "Arquivar no catálogo",
                                 export: "Exportar JSON",
                               }[mode]
                             }
@@ -500,6 +549,12 @@ export function ContestPanel({
                       </>
                     )}
                   </div>
+                  {admin && editable.has(r.id) && (
+                    <div className="contest-management" aria-label="Gerenciar concurso">
+                      <button type="button" className="secondary" onClick={() => edit(r.id, "archive")}><Archive size={16} aria-hidden="true" />{r.catalog_archived ? "Reativar no catálogo" : "Arquivar no catálogo"}</button>
+                      <button type="button" className="text-button contest-delete-button" onClick={() => reviewDeletion(r.id)}><Trash2 size={16} aria-hidden="true" />Excluir concurso importado</button>
+                    </div>
+                  )}
                 </article>
               );
             })}
@@ -600,21 +655,23 @@ export function ContestPanel({
               </ul>
             )}
             {admin && (
-              <>
-                <h3>Histórico de operações</h3>
+              <CollapsibleSection title="Histórico de operações" description="Acompanhe as últimas importações e alterações do catálogo." meta={`${receipts.length} recentes`} icon={<History size={21} />}>
                 {receipts.length ? (
-                  <ul>
-                    {receipts.map((r) => (
-                      <li key={r.id}>
-                        {new Date(r.created_at).toLocaleString("pt-BR")} ·{" "}
-                        {r.summary.name} · edital {r.summary.version} ·{" "}
-                        {r.summary.items} itens e {r.summary.resources} recursos
+                  <ol className="operation-timeline">
+                    {receipts.map(r => (
+                      <li key={r.id} className="operation-card">
+                        <span className="operation-marker" aria-hidden="true"><History size={17} /></span>
+                        <div className="operation-copy">
+                          <time dateTime={r.created_at}>{new Date(r.created_at).toLocaleString("pt-BR")}</time>
+                          <h3>{r.summary.name}</h3>
+                          <div className="operation-tags"><span>{{ "contest:import": "Importação", "contest:manual": "Edição", "contest:duplicate": "Duplicação", "contest:delete": "Exclusão" }[r.kind] ?? "Alteração"}</span><span>Edital {r.summary.version}</span><span>{r.summary.items} itens</span><span>{r.summary.resources} recursos</span></div>
+                        </div>
                       </li>
                     ))}
-                  </ul>
-                ) : (
-                  <p>Nenhuma operação registrada.</p>
-                )}
+                  </ol>
+                ) : <p className="section-empty">Nenhuma operação registrada. Suas próximas importações aparecerão aqui.</p>}
+              </CollapsibleSection>
+            )}
               </>
             )}
           </>

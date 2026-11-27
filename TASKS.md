@@ -375,3 +375,13 @@ Esta seção atualiza o estado do ambiente; as listas anteriores são registros 
 - [ ] Após revisão, obter autorização específica para merge e Pages. Nenhuma migração nova é necessária.
 
 Resultados das verificações em nuvem e commit final são registrados no PR desta branch. Detalhes em IMPORTACAO-DIAGNOSTICO.md.
+
+## Gestão de concursos e seções recolhíveis — 27/11/2026
+
+- [x] Reunir Arquivar/Reativar e Excluir concurso importado nos cartões, distinguindo remoção pessoal e ações do catálogo.
+- [x] Exigir prévia, ID externo digitado e confirmação para exclusão definitiva. Oferecer arquivamento quando houver dados vinculados; o servidor revalida todas as contas e a versão do edital.
+- [x] Preparar migração 015 com RPCs administrativas, bloqueio por estudos, referências pessoais e planos, gravação transacional e preservação dos recibos. DELETE direto permanece revogado.
+- [x] Apresentar Histórico de operações em cartões com data, tipo e indicadores, recolhido por padrão com Exibir/Esconder.
+- [x] Usar o mesmo painel na Incidência histórica do edital, mantendo amostra, fonte, período e aviso sobre frequência.
+- [x] Acrescentar testes de teclado, confirmação, permissões, bloqueio e rollback com banco descartável. Resultados finais no PR.
+- [ ] Após autorização específica, aplicar 202611270015_catalog_deletion.sql em produção e publicar a interface. Sem a migração, o botão orienta arquivar e não executa exclusão.

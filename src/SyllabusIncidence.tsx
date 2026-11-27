@@ -1,3 +1,5 @@
+import { ChartNoAxesCombined } from "lucide-react";
+import { CollapsibleSection } from "./CollapsibleSection";
 import { useEffect, useState } from "react";
 import { descendants, type Node } from "./domain";
 import { readHistoricalIncidence, type Incidence } from "./productivity-data";
@@ -16,14 +18,13 @@ export function SyllabusIncidence({ nodes, root, user, demo }: { nodes: Node[]; 
   const topics = nodes.filter(n => (n.kind === "topic" || n.kind === "subtopic") &&
     ids.has(n.id));
   if (!topics.length) return null;
-  return <section aria-label="Incidência histórica por assunto">
-    <h2>Incidência histórica</h2>
+  return <CollapsibleSection title="Incidência histórica" description="Consulte a frequência documentada dos assuntos deste edital." meta={`${topics.length} ${topics.length === 1 ? "assunto" : "assuntos"}`} icon={<ChartNoAxesCombined size={21} />}>
     <p>Frequência observada na amostra documentada. Não representa probabilidade da próxima prova. A prioridade estimada do planejamento é separada.</p>
     {error ? <p role="alert">Não foi possível consultar incidência. Tente recarregar os dados.</p> : rows === null ?
-      <p role="status">Consultando incidência…</p> : <ul>{topics.map(topic => {
+      <p role="status">Consultando incidência…</p> : <ul className="incidence-cards">{topics.map(topic => {
         const evidence = rows.filter(r => r.topic_id === topic.id && incidenceSummary(r));
-        return <li key={topic.id}><strong>{topic.name}</strong> · {evidence.length ? <ul>{evidence.map(r =>
+        return <li className="incidence-card" key={topic.id}><strong>{topic.name}</strong> · {evidence.length ? <ul>{evidence.map(r =>
           <li key={r.board}>{incidenceSummary(r)} · <a href={r.source_url} target="_blank" rel="noreferrer">Fonte da amostra</a></li>)}</ul> : "Sem dados de incidência"}</li>;
       })}</ul>}
-  </section>;
+  </CollapsibleSection>;
 }
