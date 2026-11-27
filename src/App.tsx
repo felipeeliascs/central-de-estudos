@@ -55,6 +55,7 @@ import {
   ShareForm,
 } from "./Forms";
 import { AuthGate } from "./AuthGate";
+import { SyllabusIncidence } from "./SyllabusIncidence";
 import { ProfilePage } from "./ProfilePage";
 import { AdminDashboard } from "./AdminDashboard";
 import { YouTube } from "./YouTube";
@@ -171,6 +172,7 @@ function Workspace({
     reloadOverview,
   ]);
   const [snapshot, setData] = useState<Snapshot>(empty);
+  const [enrolled, setEnrolled] = useState<Set<string>>(new Set());
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [productivityOpen, setProductivityOpen] = useState(false);
   const [questionsOpen, setQuestionsOpen] = useState(false);
@@ -196,7 +198,7 @@ function Workspace({
   }, [repo.demo, repo.user]);
   const hidden = new Set(
     snapshot.nodes
-      .filter((n) => n.catalog_archived)
+      .filter((n) => n.catalog_archived || (!repo.demo && n.kind === "contest" && n.catalog_key && !enrolled.has(n.id)))
       .flatMap((n) => [
         n.id,
         ...descendants(snapshot.nodes, n.id).map((child) => child.id),
@@ -244,21 +246,30 @@ function Workspace({
     material: Material;
   } | null>(null);
   const [dirty, setDirty] = useState(false);
+  async function enrollmentIds() {
+    if (repo.demo || !supabase) return new Set<string>();
+    const result = await supabase.from("study_enrollments").select("contest_id").eq("user_id", repo.user).eq("status", "active");
+    if (result.error) throw new Error(result.error.message);
+    return new Set<string>((result.data ?? []).map(row => row.contest_id));
+  }
   async function refresh() {
-    const [next, nextMembers] = await Promise.all([
+    const [next, nextMembers, activeEnrollments] = await Promise.all([
       repo.load(),
       repo.members(),
+      enrollmentIds(),
     ]);
     setData(next);
     setMembers(nextMembers);
+    setEnrolled(activeEnrollments);
   }
   useEffect(() => {
     let active = true;
-    Promise.all([repo.load(), repo.members()])
-      .then(([next, ms]) => {
+    Promise.all([repo.load(), repo.members(), enrollmentIds()])
+      .then(([next, ms, activeEnrollments]) => {
         if (active) {
           setData(next);
           setMembers(ms);
+          setEnrolled(activeEnrollments);
           setSelected(
             next.nodes.find((n) => n.kind === "topic")?.id ||
               next.nodes.find((n) => n.kind === "contest")?.id ||
@@ -275,6 +286,8 @@ function Workspace({
     return () => {
       active = false;
     };
+    // Repository identity changes on account switches.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [repo]);
   useEffect(() => {
     if (!dirty) return;
@@ -559,7 +572,7 @@ function Workspace({
                 }}
                 aria-label="Sair"
               >
-                <LogOut size={18} />
+                <LogOut size={18} /><span>Sair</span>
               </button>
             )}
           </div>
@@ -628,6 +641,7 @@ function Workspace({
               <ProfilePage
                 userId={repo.user}
                 demo={repo.demo}
+                onLogout={logout}
                 onBack={() => setAccountPage(null)}
               />
             ) : home ? (
@@ -814,6 +828,7 @@ function Workspace({
                   <div>
                     <div className="eyebrow">UM ASSUNTO DE CADA VEZ</div>
                     <h1>{node?.name || "Seu ambiente de estudos"}</h1>
+                    {node && <SyllabusIncidence key={node.id + String(productivityOpen)} nodes={data.nodes} root={node.id} user={repo.user} demo={repo.demo} />}
                     <p>
                       {isTopic
                         ? "Reúna o que importa. Estude no seu ritmo."

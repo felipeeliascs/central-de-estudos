@@ -19,11 +19,15 @@ export function ProfilePage({
   userId,
   demo,
   onBack,
+  onLogout,
 }: {
   userId: string;
   demo: boolean;
   onBack: () => void;
+  onLogout?: () => Promise<void>;
 }) {
+  const [leaving, setLeaving] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
   const [account, setAccount] = useState<Account | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [retry, setRetry] = useState(0);
@@ -163,6 +167,18 @@ export function ProfilePage({
         <ArrowLeft size={16} aria-hidden="true" /> Voltar
       </button>
       <h1 id="profile-title">Meu perfil</h1>
+      {onLogout && (
+        <div className="profile-feedback">
+          <button className="secondary" disabled={leaving} onClick={async () => {
+            setLeaving(true);
+            setLogoutError("");
+            try { await onLogout(); }
+            catch (error) { setLogoutError((error as Error).message); }
+            finally { setLeaving(false); }
+          }}>{leaving ? "Saindo…" : "Sair da conta"}</button>
+          {logoutError && <p role="alert">{logoutError}</p>}
+        </div>
+      )}
       <div className="profile-identity">
         <span className="profile-initials" aria-hidden="true">
           {initials}

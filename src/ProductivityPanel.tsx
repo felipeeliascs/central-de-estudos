@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { incidenceSummary } from "./incidence";
 import { Modal } from "./Forms";
 import { safeUrl, type Snapshot, type Node } from "./domain";
 import { readPlan, plannerInputs } from "./planner-data";
@@ -106,6 +107,7 @@ export function ProductivityPanel({
   const [resultDay, setResultDay] = useState(todayInBrazil());
   const [resultId, setResultId] = useState(() => crypto.randomUUID());
   const [board, setBoard] = useState("");
+  const [measure, setMeasure] = useState<"exams" | "questions">("exams");
   const [sample, setSample] = useState(0);
   const [occurrences, setOccurrences] = useState(0);
   const [sourceUrl, setSourceUrl] = useState("");
@@ -357,6 +359,7 @@ export function ProductivityPanel({
         throw new Error("Preencha assunto, banca, período e amostra válidos.");
       const value: Incidence = {
         topic_id: topic,
+        measure,
         board: board.trim(),
         sample,
         occurrences,
@@ -1041,7 +1044,7 @@ export function ProductivityPanel({
         <>
           <p>
             Registros com período, fonte e amostra. A lista usa a interseção com
-            o período selecionado.
+            o período selecionado. Frequência histórica não é probabilidade da próxima prova.
           </p>
           <ul>
             {data?.incidence
@@ -1053,13 +1056,8 @@ export function ProductivityPanel({
               )
               .map((i) => (
                 <li key={i.topic_id + i.board}>
-                  {name(i.topic_id)} · {i.board} · {i.occurrences}/{i.sample} (
-                  {Math.round((i.occurrences / i.sample) * 100)}%) ·{" "}
-                  {i.period_start ?? "início não informado"} a{" "}
-                  {i.period_end ?? "fim não informado"} ·{" "}
-                  <a href={i.source_url} target="_blank" rel="noreferrer">
-                    Fonte
-                  </a>
+                  {name(i.topic_id)} · {incidenceSummary(i) ?? "Sem dados de incidência"}
+                  {incidenceSummary(i) && <> · <a href={i.source_url} target="_blank" rel="noreferrer">Fonte da amostra</a></>}
                 </li>
               ))}
           </ul>
@@ -1093,6 +1091,13 @@ export function ProductivityPanel({
                       value={periodEnd}
                       onChange={(e) => setPeriodEnd(e.target.value)}
                     />
+                  </label>
+                  <label>
+                    Unidade da amostra
+                    <select value={measure} onChange={e => setMeasure(e.target.value as "exams" | "questions")}>
+                      <option value="exams">Provas: provas com o assunto / provas analisadas</option>
+                      <option value="questions">Questões: questões do assunto / questões analisadas</option>
+                    </select>
                   </label>
                   <label>
                     Amostra

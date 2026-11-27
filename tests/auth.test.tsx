@@ -140,3 +140,24 @@ it("mostra falha de login sem abrir a conta e aceita nova tentativa", async () =
   act(() => state.event!("SIGNED_IN", { user: { id: "user-a" } }));
   await screen.findByText("Conta: user-a");
 });
+
+it.each(["estudante", "administrador"])("sai como %s e entra com outra conta no mesmo navegador", async (role) => {
+  const u = userEvent.setup();
+  state.auth.getSession.mockResolvedValue({ data: { session: { user: { id: role } } }, error: null });
+  gate();
+  await screen.findByText("Conta: " + role);
+  await u.click(screen.getByRole("button", { name: "Sair da conta" }));
+  await screen.findByRole("button", { name: "Entrar" });
+  act(() => state.event!("SIGNED_IN", { user: { id: "outra-conta" } }));
+  await screen.findByText("Conta: outra-conta");
+  expect(screen.queryByText("Conta: " + role)).toBeNull();
+});
+it("não restaura uma resposta antiga de getSession após SIGNED_OUT", async () => {
+  let restore!: (value: unknown) => void;
+  state.auth.getSession.mockReturnValue(new Promise(resolve => { restore = resolve; }));
+  gate();
+  act(() => state.event!("SIGNED_OUT", null));
+  await act(async () => restore({ data: { session: { user: { id: "sessao-antiga" } } }, error: null }));
+  expect(screen.queryByText("Conta: sessao-antiga")).toBeNull();
+  await screen.findByRole("button", { name: "Entrar" });
+});

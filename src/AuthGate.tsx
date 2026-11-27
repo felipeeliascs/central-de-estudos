@@ -32,9 +32,11 @@ export function AuthGate({
   useEffect(() => {
     if (!supabase) return;
     let active = true;
+    let authChanged = false;
     const { data: listener } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!active) return;
+        authChanged = true;
         setUser(session?.user.id || null);
         setLoading(false);
         if (event === "PASSWORD_RECOVERY") {
@@ -51,7 +53,7 @@ export function AuthGate({
     supabase.auth
       .getSession()
       .then(({ data, error }) => {
-        if (active) {
+        if (active && !authChanged) {
           setUser(data.session?.user.id || null);
           setLoading(false);
           if (error)
@@ -87,6 +89,10 @@ export function AuthGate({
     if (error)
       throw new Error("Não foi possível encerrar a sessão. Tente novamente.");
     setUser(null);
+    setMode("login");
+    setError("");
+    setMessage("");
+    history.replaceState(null, "", location.pathname);
   }
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();

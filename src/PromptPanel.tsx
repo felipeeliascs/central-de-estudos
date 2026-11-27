@@ -10,7 +10,7 @@ import {
 } from "./prompts";
 import { contractExamples } from "./prompt-contracts";
 import type { Node } from "./domain";
-import type { ContestDocument } from "./contest-schema";
+import { parseContest, type ContestDocument } from "./contest-schema";
 
 export function PromptPanel({
   nodes,
@@ -131,7 +131,7 @@ export function PromptPanel({
     role,
     discipline: nodes.find((n) => n.id === discipline)?.name ?? "",
     topic: nodes.find((n) => n.id === topic)?.name ?? "",
-    topicId: topic,
+    topicId: selected.id === "videos" ? (nodes.find(n => n.id === topic)?.catalog_key ?? "") : topic,
     author,
     work,
     quantity,
@@ -141,6 +141,7 @@ export function PromptPanel({
   };
   async function copy() {
     try {
+      if (selected.id === "videos") parseContest(existing);
       if (selected.target === "questions" && !topic)
         throw new Error("Selecione um assunto para preencher o identificador.");
       if (selected.id === "desempenho" && !performance.trim())
@@ -437,7 +438,7 @@ export function PromptPanel({
               </select>
             </label>
           </div>
-          {selected.id === "retificacao" && (
+          {(selected.id === "retificacao" || selected.id === "videos") && (
             <label>
               JSON atual do concurso
               <textarea
