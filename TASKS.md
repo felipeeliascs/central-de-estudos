@@ -329,5 +329,5 @@ Diagnóstico de Aparecida: o prompt original de videoaulas tinha target none e s
 - [x] Adaptar atalhos do Início, Administração, importadores e resultados externos à navegação por página. Desempenho abre no dashboard.
 - [x] Exibir Meus concursos também na demonstração, com acesso aos editais fictícios.
 - [x] Preservar os diálogos de formulários e confirmações específicas.
-- [ ] Concluir lint, testes e build no CI remoto do novo PR.
+- [x] Aprovar lint, 58 testes em 20 arquivos e build no GitHub Actions do PR #2. A falha inicial de tipagem nos seletores dos testes foi corrigida. Execução aprovada: https://github.com/felipeeliascs/central-de-estudos/actions/runs/46062660302.
 - [ ] Incorporar e publicar após confirmação. Não há migração nova de banco nesta mudança.
