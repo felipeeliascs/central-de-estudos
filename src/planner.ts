@@ -41,7 +41,7 @@ export type Topic = {
   video: boolean;
   reading: boolean;
   cards: boolean;
-  incidence?: { rate: number; source: string; sample: number };
+  incidence?: { rate: number; source: string; sample: number; measure?: "questions" | "exams" };
 };
 export type Block = {
   id: string;
@@ -262,7 +262,7 @@ export function generatePlan(
     if (difficulty) reasons.push(`dificuldade individual: ${difficulty}/3`);
     if (incidence)
       reasons.push(
-        `incidência documentada: ${Math.round(incidence.rate * 100)}% em ${incidence.sample} questões (${incidence.source})`,
+        `incidência documentada: ${Math.round(incidence.rate * 100)}% em ${incidence.sample} ${incidence.measure === "exams" ? "provas" : "questões"} (${incidence.source})`,
       );
     if (group.length > 1) reasons.push("conteúdo comum confirmado");
     const reason = reasons.join(" · ");

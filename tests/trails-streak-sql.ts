@@ -4,7 +4,8 @@ export async function exerciseTrailsStreak(db:PGlite,a:string,b:string,otherTopi
   const root="eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1",discipline="eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee2",t1="eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee3",t2="eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee4";
   const account=(id:string)=>db.exec("reset role;set role authenticated;set request.jwt.claim.sub='"+id+"'");
   await account(a);
-  await db.query("insert into public.study_nodes(id,parent_id,kind,name,owner_id) values($1,null,'contest','Trilha fictícia',$5),($2,$1,'discipline','Disciplina',$5),($3,$2,'topic','Base',$5),($4,$2,'topic','Avançado',$5)",[root,discipline,t1,t2,a]);
+  for (const [id,parent,kind,name] of [[root,null,"contest","Trilha fictícia"],[discipline,root,"discipline","Disciplina"],[t1,discipline,"topic","Base"],[t2,discipline,"topic","Avançado"]])
+    await db.query("insert into public.study_nodes(id,parent_id,kind,name,owner_id) values($1,$2,$3,$4,$5)",[id,parent,kind,name,a]);
   const state={version:1,config:{minutes:[60,60,60,60,60,0,0],measure:"questions",topics:[{topic_id:t1,requires:[],minutes:30,estimated_priority:"medium"},{topic_id:t2,requires:[t1],minutes:30,estimated_priority:"high"}]},weeks:[]};
   await db.query("insert into public.study_trails(user_id,contest_id,revision,state) values($1,$2,1,$3::jsonb)",[a,root,JSON.stringify(state)]);
   await account(b);

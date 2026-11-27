@@ -297,6 +297,7 @@ export async function plannerInputs(
         ? {
             rate: evidence.occurrences / evidence.sample,
             sample: evidence.sample,
+            measure: evidence.measure ?? undefined,
             source: evidence.source_url,
           }
         : undefined,
