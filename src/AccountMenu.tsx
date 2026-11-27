@@ -79,7 +79,7 @@ export function AccountMenu({ user, demo, theme, toggleTheme, navigate, logout, 
       <a role="menuitem" href="https://github.com/felipeeliascs/central-de-estudos/blob/main/README.md" target="_blank" rel="noreferrer"><HelpCircle size={18}/>Central de Ajuda</a>
       <button role="menuitem" onClick={()=>go("profile")}><UserRound size={18}/>Minha conta · uso gratuito</button>
       {error && <p role="alert" className="error">{error}</p>}
-      <button role="menuitem" disabled={busy} onClick={async()=>{setBusy(true);setError("");try{await logout();setOpen(false);}catch(e){setError((e as Error).message);}finally{setBusy(false);}}><LogOut size={18}/>{busy?"Saindo…":"Sair"}</button>
+      <button role="menuitem" disabled={busy} onClick={async()=>{setBusy(true);setError("");try{await logout();setOpen(false);}catch(e){setError((e as Error).message);}finally{setBusy(false);}}}><LogOut size={18}/>{busy?"Saindo…":"Sair"}</button>
     </div>}
   </div>;
 }
