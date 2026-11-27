@@ -3,8 +3,8 @@ import {contractExamples,contracts} from '../src/prompt-contracts';
 import {parseContest} from '../src/contest-schema';
 import {parseDeck} from '../src/flashcards';
 import {importQuestions} from '../src/questions';
-import {buildPrompt,templates,type Context} from '../src/prompts';
-const context:Context={contest:'Concurso fictício',board:'Banca fictícia',role:'Cargo',discipline:'Disciplina',topic:'Assunto',topicId:'UUID_DO_ASSUNTO',author:'Autor',work:'Obra',quantity:5,difficulty:'Média',existing:'{"id":"id-estavel"}',performance:'{"questoes":10,"acertos":7}'};
+import {buildPrompt,videoCoverage,templates,type Context} from '../src/prompts';
+const context:Context={contest:'Concurso fictício',board:'Banca fictícia',role:'Cargo',discipline:'Disciplina',topic:'Assunto',topicId:'UUID_DO_ASSUNTO',author:'Autor',work:'Obra',quantity:5,difficulty:'Média',existing:JSON.stringify({...contractExamples.contest,id:'id-estavel'}),performance:'{"questoes":10,"acertos":7}'};
 it('usa exemplos reais dos contratos que passam pelos três importadores',()=>{
  expect(parseContest(JSON.stringify(contractExamples.contest)).type).toBe('contest');
  expect(parseDeck(JSON.stringify(contractExamples.cards)).cards).toHaveLength(1);
@@ -24,4 +24,32 @@ it("gera prompt importável de Trilhas com UUIDs e sem inventar incidência",()=
  expect(text).toContain("assunto-uuid");
  expect(text).toContain("concurso-uuid");
  expect(text).toContain("Não estime probabilidade da próxima prova");
+});
+
+import { videoBase, validVideoBatch } from "./video-fixture";
+import { previewVideoBatch } from "../src/video-batch";
+it("cobre 14 assuntos e 17 subassuntos com IDs externos, sem quantidade fixa",()=>{
+ const coverage=videoCoverage(videoBase);
+ expect(coverage).toHaveLength(31);
+ expect(coverage.filter(x=>x.kind==="topic")).toHaveLength(14);
+ expect(coverage.filter(x=>x.kind==="subtopic")).toHaveLength(17);
+ const template=templates.find(t=>t.id==="videos")!;
+ const full=buildPrompt(template,{...context,existing:JSON.stringify(videoBase),videoMode:"complete"});
+ expect(full).not.toContain('"quantidade"');
+ expect(full).toContain("31 IDs elegíveis");
+ for(const item of coverage) expect(full).toContain('"item": "'+item.item+'"');
+ expect(full).toContain('contest_id: "'+videoBase.id+'"');
+ expect(full).toContain("1 a 180");
+ expect(full).toContain("novo ID único");
+ expect(full).toContain("URLs reais verificadas");
+ expect(full).not.toContain("UUID_DO_ASSUNTO");
+ expect(previewVideoBatch(JSON.stringify(validVideoBatch),videoBase).valid).toBe(true);
+ const fixed=buildPrompt(template,{...context,existing:JSON.stringify(videoBase),videoMode:"fixed"});
+ expect(fixed).toContain('"quantidade": 5');
+ expect(fixed).not.toContain("meta de pelo menos");
+});
+it("não conta descendentes arquivados na cobertura e valida o JSON de contexto",()=>{
+ const archived={...videoBase,items:videoBase.items.map(i=>({...i,archived:i.id==="disciplina"}))};
+ expect(videoCoverage(archived)).toEqual([]);
+ expect(()=>buildPrompt(templates.find(t=>t.id==="videos")!,{...context,existing:"texto"})).toThrow(/sintaxe JSON/);
 });

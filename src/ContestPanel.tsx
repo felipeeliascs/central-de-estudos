@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { parseImportJson } from "./import-json";
+import { useEffect, useId, useState } from "react";
 import type { Node } from "./domain";
 import { safeUrl, steps } from "./domain";
 import { ModulePage } from "./ModulePage";
@@ -62,6 +63,7 @@ export function ContestPanel({
   refresh: () => Promise<void>;
   open: (id: string) => void;
 }) {
+  const importId = useId();
   const [search, setSearch] = useState("");
   const [scope, setScope] = useState<"all" | "mine">("all");
   const [videoPreview, setVideoPreview] = useState<ReturnType<typeof previewVideoBatch> | null>(null);
@@ -89,6 +91,7 @@ export function ContestPanel({
     return (scope === "all" || enrollments.some(e => e.contest_id === n.id && e.status === "active")) &&
       [n.name, n.board, doc?.role, doc?.organization].filter(Boolean).join(" ").toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR").trim());
   });
+  const videoErrors = videoPreview?.rows.filter(row => row.error) ?? [];
   const db = supabase!;
   function root(id: string): string {
     const n = nodes.find((n) => n.id === id);
@@ -212,11 +215,12 @@ export function ContestPanel({
   }
   function importPreview() {
     void run(async () => {
-      const input = JSON.parse(raw.replace(/^\uFEFF/, ""));
-      if (input?.type === "video_batch") {
+      const input = parseImportJson(raw);
+      if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("$: esperado objeto JSON de concurso ou lote de videoaulas.");
+      if ("type" in input && input.type === "video_batch") {
         let chosen = target;
         if (!chosen) {
-          const lookup = await db.from("study_catalog").select("contest_id").eq("external_id", input.contest_id).maybeSingle();
+          const lookup = await db.from("study_catalog").select("contest_id").eq("external_id", ("contest_id" in input ? input.contest_id : undefined)).maybeSingle();
           if (lookup.error) throw new Error(lookup.error.message);
           chosen = lookup.data?.contest_id ?? "";
         }
@@ -290,19 +294,31 @@ export function ContestPanel({
               Confira a identificação e as alterações antes de salvar. O
               histórico de estudo é preservado.
             </p>
-            <ul>
-              {preview.map((row, i) => (
-                <li key={`${row.id}-${i}`}>
-                  <strong>{row.status}</strong> · {row.name}{" "}
-                  <small>({row.id})</small>
-                </li>
-              ))}
-            </ul>
+            {videoPreview ? (
+              <>
+                <p role="status">{videoPreview.rows.length} vínculos na prévia · {videoPreview.rows.filter(row => !row.error && row.status.startsWith("Nova")).length} novas aulas · {videoPreview.rows.filter(row => !row.error && row.status.startsWith("Duplicata")).length} duplicatas preservadas · {videoErrors.length} erros.</p>
+                {videoErrors.length > 0 && <p className="error" role="alert">Corrija {videoErrors.length} {videoErrors.length === 1 ? "aula com erro" : "aulas com erro"} antes de salvar. Os erros aparecem primeiro. <a href={`#${importId}-video-${videoPreview.rows.findIndex(row => row.error)}`}>Ir ao primeiro erro</a></p>}
+                <ul className="import-preview" aria-label="Vínculos das videoaulas">
+                  {[true, false].flatMap(hasError => videoPreview.rows.map((row, i) => row.error === hasError && (
+                    <li id={`${importId}-video-${i}`} tabIndex={-1} className={row.error ? "import-row-error" : ""} key={i}>
+                      <strong>{row.error ? "Erro · " : ""}{row.status}</strong>
+                      <p>{row.title} → {row.item}</p>
+                      <small>Recurso: {row.id} · Campo: $.resources[{i}]</small>
+                    </li>
+                  )))}
+                </ul>
+              </>
+            ) : <ul>{preview.map((row, i) => (
+              <li key={`${row.id}-${i}`}><strong>{row.status}</strong> · {row.name} <small>({row.id})</small></li>
+            ))}</ul>}
+            <p id={`${importId}-confirmation`} role="status">
+              {videoErrors.length ? `${videoErrors.length} ${videoErrors.length === 1 ? "erro impede" : "erros impedem"} salvar. Volte e corrija as aulas destacadas; nenhum recurso foi gravado.` : "Prévia válida. Confira os vínculos antes de confirmar."}
+            </p>
             <div className="form-actions">
-              <button className="secondary" onClick={() => setPreview(null)}>
-                Voltar
+              <button className="secondary" onClick={() => { setPreview(null); if (edition.mode === "import") { setEdition(null); setVideoPreview(null); } }}>
+                {edition.mode === "import" ? "Voltar e corrigir JSON" : "Voltar"}
               </button>
-              <button className="primary" disabled={!!videoPreview && !videoPreview.valid} onClick={commit}>
+              <button className="primary" aria-describedby={`${importId}-confirmation`} disabled={!!videoPreview && !videoPreview.valid} onClick={commit}>
                 Confirmar e salvar
               </button>
             </div>
@@ -318,9 +334,10 @@ export function ContestPanel({
           <>
             <h3>Importar concurso ou lote de videoaulas</h3>
             <p>Para videoaulas, use type: video_batch e o ID externo de um edital existente. A prévia mostra vínculos, duplicatas e referências inválidas. Nenhuma aula é gravada antes da confirmação.</p>
-            <label>
+            <label htmlFor={`${importId}-target`}>
               Atualizar concurso existente
               <select
+                id={`${importId}-target`} name="contest-target"
                 value={target}
                 onChange={(e) => setTarget(e.target.value)}
               >
@@ -334,9 +351,10 @@ export function ContestPanel({
                   ))}
               </select>
             </label>
-            <label>
+            <label htmlFor={`${importId}-file`}>
               Arquivo JSON
               <input
+                id={`${importId}-file`} name="contest-json-file"
                 type="file"
                 accept=".json,application/json"
                 onChange={(e) => {
@@ -350,9 +368,10 @@ export function ContestPanel({
                 }}
               />
             </label>
-            <label>
+            <label htmlFor={`${importId}-raw`}>
               Ou cole o JSON
               <textarea
+                id={`${importId}-raw`} name="contest-json-text" spellCheck={false}
                 rows={13}
                 value={raw}
                 onChange={(e) => setRaw(e.target.value)}

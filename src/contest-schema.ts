@@ -1,3 +1,4 @@
+import { parseImportJson } from "./import-json";
 import { safeUrl, steps, youtubeId } from "./domain";
 
 export type Source = { title: string; url: string };
@@ -61,7 +62,7 @@ export function newContest(): ContestDocument {
     resources: [],
   };
 }
-export const maxBytes = 512 * 1024;
+export { maxImportBytes as maxBytes } from "./import-json";
 type RecordValue = Record<string, unknown>;
 
 function invalid(path: string, message: string): never {
@@ -156,14 +157,7 @@ function metadata(value: RecordValue, path: string) {
   optional(value, "sources", path, sources);
 }
 export function parseContest(raw: string): ContestDocument {
-  if (new TextEncoder().encode(raw).length > maxBytes)
-    invalid("$", "limite de 512 KiB");
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(raw.replace(/^\uFEFF/, ""));
-  } catch {
-    return invalid("$", "sintaxe JSON inválida");
-  }
+  const parsed = parseImportJson(raw);
   const doc = object(
     parsed,
     "$",
@@ -352,4 +346,4 @@ function same(a: unknown, b: unknown): boolean {
 }
 
 export const promptContract =
-  "contest 1.0: campos obrigatórios schema_version, type, id, name, notice{version}, items[], resources[]. IDs de texto: letras minúsculas, números, ponto, hífen ou sublinhado, até 80 caracteres. Cada item exige id, parent, kind e name. discipline tem parent null; topic aponta para discipline; subtopic aponta para topic. Recursos exigem id, item, kind e title; item aponta para assunto ou subassunto. Bibliografia exige author; video, legislation e external_questions exigem url HTTPS; material exige text ou url. Opcionais no concurso: organization, role, board, exam_date, listed, archived, questions, weight, sources. Em notice: url, published_on. Em item: archived, questions, weight, priority (low/medium/high), minutes, checklist (índices únicos 0–4), sources. Em recurso: author, edition, url, text, archived, sources. sources contém objetos title e url. Datas AAAA-MM-DD. Omita campos desconhecidos. Não inclua campos extras.";
+  "contest 1.0: campos obrigatórios schema_version, type, id, name, notice{version}, items[], resources[]. IDs de texto: letras minúsculas, números, ponto, hífen ou sublinhado, até 80 caracteres. Cada item exige id, parent, kind e name. discipline tem parent null; topic aponta para discipline; subtopic aponta para topic. Textos como name, title, author, edition e sources[].title devem ter de 1 a 180 caracteres; text aceita até 100.000 e URLs até 2.000. Recursos exigem id, item, kind e title; item aponta para assunto ou subassunto. Bibliografia exige author; video, legislation e external_questions exigem url HTTPS; material exige text ou url. Opcionais no concurso: organization, role, board, exam_date, listed, archived, questions, weight, sources. Em notice: url, published_on. Em item: archived, questions, weight, priority (low/medium/high), minutes, checklist (índices únicos 0–4), sources. Em recurso: author, edition, url, text, archived, sources. sources contém objetos title e url. Datas AAAA-MM-DD. Omita campos desconhecidos. Não inclua campos extras.";
