@@ -40,6 +40,8 @@ begin
   end if;
   if batch is null or jsonb_typeof(batch) is distinct from 'object' or octet_length(batch::text)>1048576
     or batch - array['schema_version','type','contest_id','resources'] <> '{}'::jsonb
+    or jsonb_typeof(batch->'schema_version') is distinct from 'string'
+    or jsonb_typeof(batch->'contest_id') is distinct from 'string'
     or batch->>'schema_version' is distinct from '1.0' or batch->>'type' is distinct from 'video_batch'
     or jsonb_typeof(batch->'resources') is distinct from 'array' or request_id is null then
     raise exception 'Lote inválido';

@@ -828,9 +828,7 @@ function Workspace({
                   <div>
                     <div className="eyebrow">UM ASSUNTO DE CADA VEZ</div>
                     <h1>{node?.name || "Seu ambiente de estudos"}</h1>
-                    {node && <SyllabusIncidence key={node.id + String(productivityOpen)} nodes={data.nodes} root={node.id} user={repo.user} demo={repo.demo} />}
-                    <p>
-                      {isTopic
+                    <p>                {isTopic
                         ? "Reúna o que importa. Estude no seu ritmo."
                         : "Organize seu edital e transforme cada etapa em progresso."}
                     </p>
@@ -884,6 +882,7 @@ function Workspace({
                     )}
                   </div>
                 </div>
+                {node && <SyllabusIncidence key={node.id + String(productivityOpen)} nodes={data.nodes} root={node.id} user={repo.user} demo={repo.demo} />}
                 {node && (
                   <div className="summary-grid">
                     <section className="summary-card">

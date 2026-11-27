@@ -1,3 +1,5 @@
+import { incidenceSummary } from "./incidence";
+import type { Incidence } from "./productivity-data";
 import type { ContestDocument } from "./contest-schema";
 import { demoFlash } from "./flashcard-data";
 import { demoQuestionResults } from "./question-data";
@@ -155,15 +157,9 @@ export async function plannerInputs(
           "study_decks",
           "id,topic_id,archived",
         ),
-        rows<{
-          topic_id: string;
-          board: string;
-          sample: number;
-          occurrences: number;
-          source_url: string;
-        }>(
+        rows<Incidence>(
           "study_historical_incidence",
-          "topic_id,board,sample,occurrences,source_url",
+          "topic_id,board,sample,occurrences,source_url,period_start,period_end,measure",
           ["topic_id", "board"],
         ),
         rows<{ topic_id: string; duration_minutes: number | null }>(
@@ -263,7 +259,7 @@ export async function plannerInputs(
     );
     const score = scores.get(node.id);
     const evidence = incidence.find(
-      (i) => i.topic_id === node.id && i.board === root.board,
+      (i) => i.topic_id === node.id && i.board === root.board && incidenceSummary(i) !== null,
     );
     topics.push({
       id: node.id,

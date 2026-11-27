@@ -26,8 +26,10 @@ export async function exerciseVideoIncidence(db: PGlite, a: string, b: string) {
   await apply(batch,base);
   const updated = await read();
   expect(updated.resources).toHaveLength(base.resources.length+1);
+  await db.exec("reset role"); // Inspect the private projection only as the disposable test operator.
   const linked = (await db.query<{ topic_id: string; section: string }>("select m.topic_id,m.section from public.study_catalog_resources r join public.study_materials m on m.id=r.material_id where r.contest_id=$1 and r.external_id=$2", [id,batch.resources[0].id])).rows;
   expect(linked).toEqual([{ topic_id: topic, section: "Videoaulas" }]);
+  await account(a);
   await apply(batch,updated);
   await apply({ ...batch, resources: [{ ...batch.resources[0], id: "outro-id", url: "https://youtu.be/abcdefghijl?t=10" }] },updated);
   expect(await read()).toEqual(updated);
