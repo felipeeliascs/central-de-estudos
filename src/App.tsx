@@ -386,6 +386,7 @@ function Workspace({
   const [previousHref, setPreviousHref] = useState("");
   const displayedHref = useRef(pageHref(currentPage, selected));
   function followRoute(route: Route) {
+    if (route.page === currentPage && (route.page !== "study" || !route.item || route.item === selected)) return true;
     if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
     setDirty(false);
     setMobile(false);

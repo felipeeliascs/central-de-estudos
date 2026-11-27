@@ -401,6 +401,7 @@ export function ContestPanel({
               <label className="contest-search">Buscar por concurso, banca, cargo ou órgão<input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Busque por concurso, banca, cargo…" /></label>
             </div>
             {!visibleRoots.length && <p className="chart-empty">Nenhum concurso encontrado para esta seleção.</p>}
+            <p className="muted">Remover dos meus concursos altera somente sua seleção e preserva materiais e progresso. Arquivar no catálogo é uma ação administrativa. Não há exclusão definitiva.</p>
             <div className="contest-grid">
             {visibleRoots.map((r) => {
               const enrolled = enrollments.some(
@@ -412,11 +413,11 @@ export function ContestPanel({
                     {r.name}
                     {r.catalog_archived ? " · Arquivado" : ""}
                   </h3>
-                  <span className="catalog-badge">{enrolled ? "Selecionado para estudar" : "Disponível no catálogo"}</span>
+                  <span className="catalog-badge">{r.catalog_archived ? "Arquivado" : enrolled ? "Selecionado para estudar" : "Disponível no catálogo"}</span>
                   {documents[r.id]?.organization && <p>{documents[r.id].organization}</p>}
                   {documents[r.id]?.role && <p>{documents[r.id].role}</p>}
                   {r.board && <p>Banca: {r.board}</p>}
-                  <p>Remover dos meus concursos altera somente sua seleção e preserva seus materiais e progresso. Arquivar no catálogo é uma ação administrativa para todos. A exclusão definitiva não está disponível.</p>
+
                   {documents[r.id] && (
                     <details className="contest-outline"><summary>Consultar edital e fontes</summary><PublishedOutline doc={documents[r.id]} /></details>
                   )}
