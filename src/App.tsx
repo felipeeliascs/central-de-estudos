@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
@@ -384,6 +384,7 @@ function Workspace({
 
   const currentPage: Page = modulePage ?? accountPage ?? (home ? "home" : "study");
   const [previousHref, setPreviousHref] = useState("");
+  const displayedHref = useRef(pageHref(currentPage, selected));
   function followRoute(route: Route) {
     if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
     setDirty(false);
@@ -398,10 +399,11 @@ function Workspace({
   }
   useEffect(() => {
     const target = pageHref(currentPage, selected);
-    if (location.pathname + location.search !== target) {
-      setPreviousHref(location.pathname + location.search);
-      history.pushState(null, "", target);
+    if (displayedHref.current !== target) {
+      setPreviousHref(displayedHref.current);
+      displayedHref.current = target;
     }
+    if (location.pathname + location.search !== target) history.pushState(null, "", target);
   }, [currentPage, selected]);
   useEffect(() => {
     const pop = () => {
