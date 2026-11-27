@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Modal } from "./Forms";
+import { ModulePage } from "./ModulePage";
 import { productivityStore } from "./productivity-data";
 import { supabase } from "./repository";
 import {
@@ -219,7 +219,7 @@ export function PromptPanel({
     }
   }
   return (
-    <Modal
+    <ModulePage
       title="Central de Prompts e Inteligência Artificial"
       close={close}
       busy={busy}
@@ -541,6 +541,6 @@ export function PromptPanel({
           </details>
         </>
       )}
-    </Modal>
+    </ModulePage>
   );
 }

@@ -49,7 +49,7 @@ it("registra uma sessão manual e um resultado externo e os mostra no dashboard"
   );
   await screen.findByText("Resultado manual salvo.");
   await user.click(screen.getByRole("button", { name: "Dashboard" }));
-  const dialog = screen.getByRole("dialog");
+  const dialog = screen.getByRole("region", { name: "Desempenho" });
   expect(within(dialog).getByText(/Acertos 7/).textContent).toContain(
     "Erros 3",
   );

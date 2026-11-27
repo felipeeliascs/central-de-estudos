@@ -56,6 +56,7 @@ import {
 } from "./Forms";
 import { AuthGate } from "./AuthGate";
 import { SyllabusIncidence } from "./SyllabusIncidence";
+import { ModulePage } from "./ModulePage";
 import { ProfilePage } from "./ProfilePage";
 import { AdminDashboard } from "./AdminDashboard";
 import { YouTube } from "./YouTube";
@@ -116,7 +117,29 @@ function Workspace({
     () => localStorage.getItem("central-theme") || "light",
   );
   const [online, setOnline] = useState(navigator.onLine);
-  const [plannerOpen, setPlannerOpen] = useState(false);
+  type Module = "catalog" | "planner" | "prompts" | "productivity";
+  const [modulePage, setModulePage] = useState<Module | null>(null);
+  const plannerOpen = modulePage === "planner";
+  const catalogOpen = modulePage === "catalog";
+  const promptsOpen = modulePage === "prompts";
+  const productivityOpen = modulePage === "productivity";
+  function openModule(page: Module | null) {
+    setModulePage(page);
+    if (page !== "productivity") {
+      setExternalMock(false);
+      setIncidenceOpen(false);
+    }
+    if (page) {
+      setAccountPage(null);
+      setMobile(false);
+    }
+  }
+  const setPlannerOpen = (open: boolean) => openModule(open ? "planner" : null);
+  const setCatalogOpen = (open: boolean) => openModule(open ? "catalog" : null);
+  const setPromptsOpen = (open: boolean) => openModule(open ? "prompts" : null);
+  const setProductivityOpen = (open: boolean) => {
+    openModule(open ? "productivity" : null);
+  };
   const [flashcardsOpen, setFlashcardsOpen] = useState(false);
   const [todayBlocks, setTodayBlocks] = useState<Block[]>([]);
   const [dueCount, setDueCount] = useState<number | null>(null);
@@ -137,7 +160,7 @@ function Workspace({
     };
   }, []);
   useEffect(() => {
-    if (!home || plannerOpen || flashcardsOpen || (!online && !repo.demo))
+    if (!home || modulePage || flashcardsOpen || (!online && !repo.demo))
       return;
     let active = true;
     setOverviewLoading(true);
@@ -164,7 +187,7 @@ function Workspace({
     };
   }, [
     home,
-    plannerOpen,
+    modulePage,
     flashcardsOpen,
     online,
     repo.user,
@@ -173,10 +196,7 @@ function Workspace({
   ]);
   const [snapshot, setData] = useState<Snapshot>(empty);
   const [enrolled, setEnrolled] = useState<Set<string>>(new Set());
-  const [catalogOpen, setCatalogOpen] = useState(false);
-  const [productivityOpen, setProductivityOpen] = useState(false);
   const [questionsOpen, setQuestionsOpen] = useState(false);
-  const [promptsOpen, setPromptsOpen] = useState(false);
   const [importTarget, setImportTarget] = useState<
     "contest" | "cards" | "questions" | null
   >(null);
@@ -213,7 +233,10 @@ function Workspace({
   };
   async function openCatalog() {
     if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
-    if (!supabase || repo.demo) return;
+    if (!supabase || repo.demo) {
+      setCatalogOpen(true);
+      return;
+    }
     const result = await supabase.rpc("study_catalog_admin");
     if (result.error) {
       setError(result.error.message);
@@ -337,6 +360,7 @@ function Workspace({
     if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
     setDirty(false);
     setMobile(false);
+    openModule(null);
     setAccountPage("profile");
   }
 
@@ -345,11 +369,16 @@ function Workspace({
       return;
     setDirty(false);
     setSelected(id);
+    openModule(null);
     setAccountPage(null);
     setHome(false);
     setMobile(false);
     setError("");
   }
+  useEffect(() => {
+    document.getElementById("conteudo")?.focus();
+  }, [modulePage, accountPage, home, selected]);
+
   function changeSection(s: Section) {
     if (dirty && !window.confirm("Há anotações não salvas. Sair sem salvar?"))
       return;
@@ -432,6 +461,7 @@ function Workspace({
               if (!dirty || window.confirm("Sair sem salvar as anotações?")) {
                 setDirty(false);
                 setHome(true);
+                openModule(null);
                 setAccountPage(null);
                 setMobile(false);
               }
@@ -463,10 +493,7 @@ function Workspace({
                 [
                   "Meus concursos",
                   FolderOpen,
-                  () => {
-                    if (repo.demo) setHome(false);
-                    else void openCatalog();
-                  },
+                  () => void openCatalog(),
                 ],
                 ["Estudar", BookOpen, () => setHome(false)],
                 ["Planejamento", CalendarDays, () => setPlannerOpen(true)],
@@ -492,7 +519,11 @@ function Workspace({
               ] as const
             ).map(([label, Icon, action]) => {
               const current =
-                (label === "Início" && home && !accountPage) ||
+                (label === "Início" && home && !accountPage && !modulePage) ||
+                (label === "Meus concursos" && catalogOpen) ||
+                (label === "Planejamento" && plannerOpen) ||
+                (label === "Central de Prompts" && promptsOpen) ||
+                (label === "Desempenho" && productivityOpen) ||
                 (label === "Meu perfil" && accountPage === "profile") ||
                 (label === "Administração" && accountPage === "admin");
               return (
@@ -509,6 +540,8 @@ function Workspace({
                       return;
                     setDirty(false);
                     setAccountPage(null);
+                    openModule(null);
+                    setImportTarget(null);
                     action();
                     setMobile(false);
                   }}
@@ -590,7 +623,9 @@ function Workspace({
                 <Menu />
               </button>
               <span>
-                {accountPage === "admin"
+                {modulePage
+                  ? { catalog: "Meus concursos", planner: "Planejamento", prompts: "Central de Prompts", productivity: "Desempenho" }[modulePage]
+                  : accountPage === "admin"
                   ? "Administração"
                   : accountPage === "profile"
                     ? "Conta"
@@ -627,7 +662,104 @@ function Workspace({
                 não está disponível; alterações podem não ser salvas.
               </div>
             )}
-            {accountPage === "admin" && catalogAdmin ? (
+            {modulePage ? (
+              <>
+        {promptsOpen && (
+          <Suspense fallback={<p role="status">Carregando prompts…</p>}>
+            <PromptPanel
+              nodes={data.nodes}
+              user={repo.user}
+              demo={repo.demo}
+              close={() => setPromptsOpen(false)}
+              openImporter={(target) => {
+                setPromptsOpen(false);
+                setImportTarget(target);
+                if (target === "contest") void openCatalog();
+                if (target === "questions") setQuestionsOpen(true);
+                if (target === "cards") setFlashcardsOpen(true);
+              }}
+            />
+          </Suspense>
+        )}
+        {productivityOpen && (
+          <Suspense fallback={<p role="status">Carregando estatísticas…</p>}>
+            <ProductivityPanel
+              startDashboard={!externalMock && !incidenceOpen}
+              externalMock={externalMock}
+              startIncidence={incidenceOpen}
+              snapshot={snapshot}
+              user={repo.user}
+              demo={repo.demo}
+              close={() => {
+                setProductivityOpen(false);
+                setExternalMock(false);
+                setIncidenceOpen(false);
+              }}
+            />
+          </Suspense>
+        )}
+        {plannerOpen && (
+          <Suspense fallback={<p role="status">Carregando planejamento…</p>}>
+            <PlannerPanel
+              snapshot={snapshot}
+              user={repo.user}
+              demo={repo.demo}
+              close={() => setPlannerOpen(false)}
+              openReviews={() => {
+                setPlannerOpen(false);
+                setFlashcardsOpen(true);
+              }}
+            />
+          </Suspense>
+        )}
+        {catalogOpen && (
+          <Suspense fallback={<p role="status">Carregando catálogo…</p>}>
+            {repo.demo ? (
+              <ModulePage title="Meus concursos" close={() => setCatalogOpen(false)}>
+                <p>Dados fictícios salvos neste navegador. O catálogo compartilhado exige conexão com Supabase.</p>
+                <button className="secondary" onClick={() => setNodeForm({})}>Adicionar concurso</button>
+                <div className="overview-grid">
+                  {snapshot.nodes.filter(n => n.kind === "contest").map(n => (
+                    <article className="catalog-entry" key={n.id}>
+                      <h2>{n.name}</h2>
+                      <button className="secondary" onClick={() => navigate(n.id)}>Abrir edital de {n.name}</button>
+                    </article>
+                  ))}
+                </div>
+              </ModulePage>
+            ) : <ContestPanel
+              startImport={importTarget === "contest" && catalogAdmin}
+              nodes={snapshot.nodes}
+              editable={
+                new Set([
+                  ...snapshot.nodes
+                    .filter(
+                      (n) => n.kind === "contest" && n.owner_id === repo.user,
+                    )
+                    .map((n) => n.id),
+                  ...members
+                    .filter(
+                      (m) => m.user_id === repo.user && m.role === "editor",
+                    )
+                    .map((m) => m.contest_id),
+                ])
+              }
+              user={repo.user}
+              admin={catalogAdmin}
+              close={() => {
+                setCatalogOpen(false);
+                setImportTarget(null);
+              }}
+              refresh={refresh}
+              open={(id) => {
+                navigate(id);
+                setCatalogOpen(false);
+              }}
+            />}
+          </Suspense>
+        )}
+              </>
+            ) : accountPage === "admin" && catalogAdmin ? (
               <AdminDashboard
                 onBack={() => setAccountPage(null)}
                 onCatalog={() => void openCatalog()}
@@ -1262,23 +1394,7 @@ function Workspace({
             </footer>
           </main>
         </div>
-        {promptsOpen && (
-          <Suspense fallback={<p role="status">Carregando prompts…</p>}>
-            <PromptPanel
-              nodes={data.nodes}
-              user={repo.user}
-              demo={repo.demo}
-              close={() => setPromptsOpen(false)}
-              openImporter={(target) => {
-                setPromptsOpen(false);
-                setImportTarget(target);
-                if (target === "contest") void openCatalog();
-                if (target === "questions") setQuestionsOpen(true);
-                if (target === "cards") setFlashcardsOpen(true);
-              }}
-            />
-          </Suspense>
-        )}
+
         {questionsOpen && (
           <Suspense fallback={<p role="status">Carregando questões…</p>}>
             <QuestionsPanel
@@ -1298,22 +1414,7 @@ function Workspace({
             />
           </Suspense>
         )}
-        {productivityOpen && (
-          <Suspense fallback={<p role="status">Carregando estatísticas…</p>}>
-            <ProductivityPanel
-              externalMock={externalMock}
-              startIncidence={incidenceOpen}
-              snapshot={snapshot}
-              user={repo.user}
-              demo={repo.demo}
-              close={() => {
-                setProductivityOpen(false);
-                setExternalMock(false);
-                setIncidenceOpen(false);
-              }}
-            />
-          </Suspense>
-        )}
+
         {flashcardsOpen && (
           <Suspense fallback={<p role="status">Carregando flashcards…</p>}>
             <FlashcardPanel
@@ -1328,53 +1429,8 @@ function Workspace({
             />
           </Suspense>
         )}
-        {plannerOpen && (
-          <Suspense fallback={<p role="status">Carregando planejamento…</p>}>
-            <PlannerPanel
-              snapshot={snapshot}
-              user={repo.user}
-              demo={repo.demo}
-              close={() => setPlannerOpen(false)}
-              openReviews={() => {
-                setPlannerOpen(false);
-                setFlashcardsOpen(true);
-              }}
-            />
-          </Suspense>
-        )}
-        {catalogOpen && (
-          <Suspense fallback={<p role="status">Carregando catálogo…</p>}>
-            <ContestPanel
-              startImport={importTarget === "contest" && catalogAdmin}
-              nodes={snapshot.nodes}
-              editable={
-                new Set([
-                  ...snapshot.nodes
-                    .filter(
-                      (n) => n.kind === "contest" && n.owner_id === repo.user,
-                    )
-                    .map((n) => n.id),
-                  ...members
-                    .filter(
-                      (m) => m.user_id === repo.user && m.role === "editor",
-                    )
-                    .map((m) => m.contest_id),
-                ])
-              }
-              user={repo.user}
-              admin={catalogAdmin}
-              close={() => {
-                setCatalogOpen(false);
-                setImportTarget(null);
-              }}
-              refresh={refresh}
-              open={(id) => {
-                navigate(id);
-                setCatalogOpen(false);
-              }}
-            />
-          </Suspense>
-        )}
+
+
         {materialForm && isTopic && (
           <MaterialForm
             initial={materialForm === "new" ? undefined : materialForm}

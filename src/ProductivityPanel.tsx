@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { incidenceSummary } from "./incidence";
-import { Modal } from "./Forms";
+import { ModulePage } from "./ModulePage";
 import { safeUrl, type Snapshot, type Node } from "./domain";
 import { readPlan, plannerInputs } from "./planner-data";
 import {
@@ -58,6 +58,7 @@ export function ProductivityPanel({
   close,
   externalMock = false,
   startIncidence = false,
+  startDashboard = false,
 }: {
   snapshot: Snapshot;
   user: string;
@@ -65,10 +66,11 @@ export function ProductivityPanel({
   close: () => void;
   externalMock?: boolean;
   startIncidence?: boolean;
+  startDashboard?: boolean;
 }) {
   const [view, setView] = useState<
     "timer" | "dashboard" | "results" | "incidence"
-  >(startIncidence ? "incidence" : externalMock ? "results" : "timer");
+  >(startIncidence ? "incidence" : externalMock ? "results" : startDashboard ? "dashboard" : "timer");
   const [resultKind, setResultKind] = useState<"practice" | "mock">(
     externalMock ? "mock" : "practice",
   );
@@ -482,7 +484,7 @@ export function ProductivityPanel({
   }));
   const max = Math.max(1, ...byDay.map((d) => d.seconds));
   return (
-    <Modal title="Estudos e estatísticas" close={close} busy={busy}>
+    <ModulePage title="Desempenho" close={close} busy={busy}>
       <nav className="catalog-actions" aria-label="Módulos de produtividade">
         {(
           [
@@ -1138,6 +1140,6 @@ export function ProductivityPanel({
           )}
         </>
       )}
-    </Modal>
+    </ModulePage>
   );
 }

@@ -320,3 +320,14 @@ A revisão preserva os painéis anteriores; a cobertura visual e de acessibilida
 - [ ] Após revisão e aprovação: reconciliar histórico do banco, ensaiar e aplicar 202611270012_video_incidence.sql (001–011 são pré-requisitos), incorporar o PR e disparar Pages manualmente.
 
 Diagnóstico de Aparecida: o prompt original de videoaulas tinha target none e saída textual, incompatível com o importador contest 1.0. O caminho válido do importador grava recursos video como materiais youtube/Videoaulas e converte item (ID externo) no UUID do assunto via item_map. Não foram fornecidos JSONs originais nem recibos/snapshot do caso “Concurso Público 01/2026 - Prefeitura Municipal de Aparecida”, banca AVANÇASP. Não foi consultado o banco de produção. Não é possível confirmar se houve gravação, falha de importação ou ID incorreto naquele caso. A validação usa exclusivamente exemplos fictícios. Ver CONCURSOS-JSON.md.
+
+
+## Módulos na área principal — 27/11/2026
+
+- [x] Renderizar Meus concursos, Planejamento, Central de Prompts e Desempenho dentro de main#conteudo.workspace, sem dialog, sobreposição ou bloqueio do restante da interface.
+- [x] Centralizar a seleção do módulo, preservar o menu lateral, marcar a página ativa e direcionar o foco para a main após navegar.
+- [x] Adaptar atalhos do Início, Administração, importadores e resultados externos à navegação por página. Desempenho abre no dashboard.
+- [x] Exibir Meus concursos também na demonstração, com acesso aos editais fictícios.
+- [x] Preservar os diálogos de formulários e confirmações específicas.
+- [ ] Concluir lint, testes e build no CI remoto do novo PR.
+- [ ] Incorporar e publicar após confirmação. Não há migração nova de banco nesta mudança.

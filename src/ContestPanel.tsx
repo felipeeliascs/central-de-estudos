@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Node } from "./domain";
 import { safeUrl, steps } from "./domain";
-import { Modal } from "./Forms";
+import { ModulePage } from "./ModulePage";
 import {
   compareContest,
   maxBytes,
@@ -260,8 +260,8 @@ export function ContestPanel({
     });
   }
   return (
-    <Modal
-      title={admin ? "Administração de concursos" : "Concursos disponíveis"}
+    <ModulePage
+      title="Meus concursos"
       close={close}
       busy={busy}
     >
@@ -580,7 +580,7 @@ export function ContestPanel({
           </>
         )}
       </fieldset>
-    </Modal>
+    </ModulePage>
   );
 }
 
