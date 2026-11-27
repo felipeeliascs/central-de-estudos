@@ -29,7 +29,7 @@ language sql stable security definer set search_path='' as $$
  or exists(select 1 from public.study_bibliographies where topic_id in (select id from nodes)
    and id not in (select bibliography_id from managed where bibliography_id is not null))
  -- Adaptive plans persist UUID references inside JSON rather than FKs. Be conservative.
- or exists(select 1 from public.study_adaptive_plans p cross join nodes n where strpos(p.state::text,n.id::text)>0);
+ or exists(select 1 from public.study_adaptive_plans p cross join nodes n where strpos(lower(p.state::text),n.id::text)>0);
 $$;
 revoke all on function public.study_contest_delete_blocked(uuid) from public,anon,authenticated;
 

@@ -672,8 +672,6 @@ export function ContestPanel({
                 ) : <p className="section-empty">Nenhuma operação registrada. Suas próximas importações aparecerão aqui.</p>}
               </CollapsibleSection>
             )}
-              </>
-            )}
           </>
         )}
       </fieldset>
