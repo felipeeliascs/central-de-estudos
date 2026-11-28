@@ -144,9 +144,10 @@ export function reviewQueue(
   };
 }
 
-function object(raw: unknown): Record<string, unknown> {
+function object(raw: unknown, keys?: string[]): Record<string, unknown> {
   if (!raw || typeof raw !== "object" || Array.isArray(raw))
     throw new Error("Esperava um objeto JSON.");
+  if (keys) for (const key of Object.keys(raw)) if (!keys.includes(key)) throw new Error("Campo desconhecido: " + key + ". Revise o contrato antes de importar.");
   return raw as Record<string, unknown>;
 }
 function required(value: unknown, label: string, max: number) {
@@ -196,10 +197,10 @@ export function validateCard(raw: unknown): CardContent {
 export function parseDeck(raw: string) {
   if (new TextEncoder().encode(raw).length > 1024 * 1024)
     throw new Error("Limite de 1 MiB por arquivo.");
-  const doc = object(parseImportJson(raw,1024*1024));
+  const doc = object(parseImportJson(raw,1024*1024), ["schema_version","type","deck","cards"]);
   if (doc.schema_version !== "1.0" || doc.type !== "flashcard_deck")
     throw new Error("Use o contrato flashcard_deck, versão 1.0.");
-  const deck = object(doc.deck);
+  const deck = object(doc.deck, ["title","author"]);
   if (!Array.isArray(doc.cards) || doc.cards.length > 500)
     throw new Error("Informe até 500 cartões.");
   return {
@@ -207,7 +208,8 @@ export function parseDeck(raw: string) {
     author: deck.author ? required(deck.author, "Autor", 180) : "",
     cards: doc.cards.map((card, i) => {
       try {
-        return validateCard(card);
+        object(card, ["front","back","front_image","back_image","choices","correct_choice"]);
+      return validateCard(card);
       } catch (e) {
         throw new Error(`Cartão ${i + 1}: ${(e as Error).message}`);
       }
