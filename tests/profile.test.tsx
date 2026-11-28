@@ -23,7 +23,7 @@ vi.mock("../src/repository", () => ({
 
 beforeEach(() => {
   vi.resetAllMocks();
-  calls.rpc.mockResolvedValue({ data: null, error: null });
+  calls.rpc.mockImplementation(async (name: string) => ({ data: name === "study_my_billing_summary" ? { access: "free", charging_enabled: false, integration: "not_configured", subscription: null } : null, error: null }));
   calls.getUser.mockResolvedValue({
     data: { user: { id: "me", email: "user@example.test" } },
     error: null,

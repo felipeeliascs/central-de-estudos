@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
-import { readFile, mkdir, mkdtemp, rm } from "node:fs/promises";
+import { readFile, writeFile, mkdir, mkdtemp, rm } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
 import { once } from "node:events";
 const root = resolve("dist");
@@ -142,6 +142,9 @@ try {
         windowsVirtualKeyCode: virtualKey,
       }),
     );
+  const runtimeErrors=[];
+  socket.addEventListener("message",e=>{ const event=JSON.parse(e.data); if(event.method==="Runtime.exceptionThrown") runtimeErrors.push(event.params.exceptionDetails.exception?.description ?? event.params.exceptionDetails.text); if(event.method==="Runtime.consoleAPICalled" && event.params.type==="error") runtimeErrors.push(event.params.args.map(a=>a.value ?? a.description).join(" ")); });
+  await call("Runtime.enable");
   await call("Network.enable");
   await call("Page.navigate", { url: base });
   await until("!!document.querySelector('.home-page')");
@@ -194,7 +197,7 @@ try {
     );
     assert.equal(
       await evaluate("!!document.querySelector('.profile-form')"),
-      false,
+      true,
     );
     await evaluate("document.querySelector('.profile-back').click()");
     await until("!!document.querySelector('.home-intro')");
@@ -209,8 +212,38 @@ try {
     );
     await evaluate("document.querySelector('.brand').click()");
     await until("!!document.querySelector('.home-page')");
-    console.log(`OK: ${width}x${height}, início, navegação, estudo e Enter.`);
+    for (const [page,title] of [["catalog","Meus concursos"],["notice&item=demo-contest","Abrir Edital"],["library","Biblioteca"],["planner","Plano de Estudos"],["productivity","Meu desempenho"]]) {
+      await evaluate(`history.pushState(null,"","?page=${page}");window.dispatchEvent(new PopStateEvent("popstate"))`);
+      await until(`document.querySelector("main h1")?.textContent===${JSON.stringify(title)}`);
+      await until("!document.body.innerText.includes('Carregando dados')");
+      assert.equal(await evaluate("document.querySelectorAll('main').length"),1);
+      assert.equal(await evaluate("!!document.querySelector('dialog[open]')"),false);
+      assert.equal(await evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"),true,`Overflow: ${page} at ${width}`);
+      if(page==="notice&item=demo-contest") {
+        await until("!!document.querySelector('.notice-tree')");
+        await evaluate("document.querySelector('.notice-tree details').open=true");
+        assert.equal(await evaluate("!!document.querySelector('.bottom-checklist')"),false);
+      }
+      if(page==="library") {
+        await until("!!document.querySelector('.library-row')");
+        await evaluate("document.querySelector('.library-row').open=true");
+        assert.equal(await evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"),true);
+      }
+      if(page==="productivity") {
+        await until("document.querySelectorAll('.collapsible-trigger').length>=4");
+        assert.equal(await evaluate("[...document.querySelectorAll('.collapsible-trigger')].every(b=>b.getAttribute('aria-expanded')==='false')"),true);
+        await evaluate("document.querySelector('.collapsible-trigger').click()");
+        await evaluate("document.querySelector('.collapsible-trigger').click()");
+      }
+      const shot=await call("Page.captureScreenshot",{format:"png",captureBeyondViewport:false});
+      await writeFile(resolve(scratch,`ui-${width}-${page.split("&")[0]}.png`),Buffer.from(shot.data,"base64"));
+    }
+    await evaluate('history.pushState(null,"","?page=home");window.dispatchEvent(new PopStateEvent("popstate"))');
+    await until("!!document.querySelector('.home-page')");
+    console.log(`OK: ${width}x${height}, início, perfil, edital, biblioteca, plano, desempenho, navegação e Enter.`);
   }
+  assert.deepEqual(runtimeErrors,[],"Erros de runtime/console no navegador");
+  await writeFile(resolve(scratch,"ui-report.json"),JSON.stringify({viewports:[1440,768,390],pages:["home","profile","study","catalog","notice","library","planner","productivity"],runtimeErrors},null,2));
   await evaluate("document.querySelector('.theme-toggle').click()");
   assert.equal(
     await evaluate("document.documentElement.dataset.theme"),
