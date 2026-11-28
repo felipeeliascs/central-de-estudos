@@ -59,8 +59,8 @@ export function referenceChoices(type:ImportType,path:string,document:unknown,co
   if((type==="questions"||type==="study_trail") && (/\.topic_id$/.test(path)||/\.requires\[\d+\]$/.test(path))) {
     const nodes=context.nodes;
     if(!nodes) return null;
-    const root=(node:Node)=>{let n:Node | undefined=node;const seen=new Set<string>();while(n?.parent_id&&!seen.has(n.id)){seen.add(n.id);n=nodes.find(p=>p.id===n!.parent_id);}return n?.id;};
-    return nodes.filter(n=>["topic","subtopic"].includes(n.kind)&&!n.catalog_archived&&(!context.contestUuid||type!=="study_trail"||root(n)===context.contestUuid)).map(n=>({value:n.id,label:n.name+" · "+n.id}));
+    const root=(node:Node)=>{let n:Node | undefined=node;const seen=new Set<string>();while(n){if(n.catalog_archived||seen.has(n.id))return undefined;seen.add(n.id);if(!n.parent_id)return n.id;n=nodes.find(p=>p.id===n!.parent_id);}return undefined;};
+    return nodes.filter(n=>["topic","subtopic"].includes(n.kind)&&!!root(n)&&(!context.contestUuid||type!=="study_trail"||root(n)===context.contestUuid)).map(n=>({value:n.id,label:n.name+" · "+n.id}));
   }
   return null;
 }
@@ -232,7 +232,7 @@ export function contextInstructions(type:ImportType,context:ImportContext) {
   return [contractInstructions(type),context.contest?"Concurso de destino (ID externo): "+context.contest.id+"\nBanca: "+(context.contest.board??"não informada"):"",
     context.contestUuid?"UUID do concurso (somente Trilhas): "+context.contestUuid:"",
     "IDs externos de assuntos/subassuntos elegíveis:",...eligibleContextItems(context).map(i=>i.id+" · "+i.name),
-    "UUIDs de assuntos disponíveis (somente Questões/Trilhas):",...(context.nodes??[]).filter(n=>["topic","subtopic"].includes(n.kind)&&!n.catalog_archived).map(n=>n.id+" · "+n.name),
+    "UUIDs de assuntos disponíveis (somente Questões/Trilhas):",...((type==="questions"||type==="study_trail")?(referenceChoices(type,"$.topics[0].topic_id",{},context)??[]).map(n=>n.value+" · "+n.label):[]),
     data?"JSON atual do edital, preserve IDs e vínculos:\n"+JSON.stringify(data,null,2):"",
     "Forneça os documentos à IA externa. Omita dados desconhecidos e indique a ausência de anexos na análise; não invente conteúdo programático."].filter(Boolean).join("\n");
 }

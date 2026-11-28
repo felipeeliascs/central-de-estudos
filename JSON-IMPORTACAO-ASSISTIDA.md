@@ -36,11 +36,11 @@ Evidências por página do PDF recebido:
 | 2 | Cargo PEB II — Professor de Matemática. |
 | 11 | Grupo 6, prova em 06/12/2026 às 13h; 25 questões, cinco alternativas, até duas horas; remissão ao Anexo II. |
 | 13 | Cada questão vale 0,4 ponto; pontuação total 10. Isso não foi tratado como peso de disciplina. |
-| 16 | Edital datado de 29/10/2026. |
+| 16 | Edital datado de 29/10/2026; assinatura não comprova a data de publicação. |
 
 **O Anexo II não está nas 16 páginas recebidas.** Não foi possível extrair disciplinas, assuntos, subassuntos, distribuição por disciplina ou bibliografia. Não se pode validar o cadastro completo do edital a partir deste arquivo.
 
-O fixture `examples/roseira-ps-02-2026-matematica-parcial.json` contém apenas os metadados comprovados. `items` e `resources` estão vazios e `listed:false`. Os horários, alternativas e pontuação acima ficam neste relatório, pois o contrato atual não possui campos correspondentes. Não foi inventado link da página específica do concurso a partir do portal geral da organizadora.
+O fixture `examples/roseira-ps-02-2026-matematica-parcial.json` contém apenas os metadados comprovados. `items` e `resources` estão vazios e `listed:false`. Os horários, alternativas e pontuação acima ficam neste relatório, pois o contrato atual não possui campos correspondentes. A data de assinatura foi registrada somente neste relatório; `notice.published_on` foi omitido por não haver comprovação da publicação. Não foi inventado link da página específica do concurso a partir do portal geral da organizadora.
 
 A prévia exige confirmação explícita de cadastro parcial antes de salvar. Os testes React simulam arquivo e colagem, correção na tabela e nova confirmação. O teste PostgreSQL aplica o fixture, reimporta sem duplicar, verifica ausência de conteúdo inventado, recusa escrita por estudante e testa disponibilização/seleção apenas com contas fictícias. Os demais testes de vínculos, materiais e progresso usam dados sintéticos identificados, sem atribuí-los a Roseira.
 

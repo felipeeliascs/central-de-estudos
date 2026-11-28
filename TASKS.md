@@ -424,7 +424,7 @@ Contrato e instruções em INCIDENCIA-JSON.md. URLs e contagens dos testes são 
 - [x] Permitir correções por campo, identificação de tipo, download e normalização explícita de uma cerca exata.
 - [x] Invalidar prévias após edição e preservar validações finais/RPCs.
 - [x] Preparar simulação parcial de Roseira — Professor de Matemática, sem inventar Anexo II.
-- [ ] Registrar resultado final de lint, testes, build e Chrome na nuvem.
+- [x] Validar lint, testes, build e Chrome (1440/768/390 px) no GitHub Actions; resultado final vinculado no PR.
 - [ ] Validar Anexo II completo e fluxos Auth/Storage em homologação.
 
 Consulte [decisões, simulação do edital e limitações](JSON-IMPORTACAO-ASSISTIDA.md). Nenhuma nova migração é necessária.
