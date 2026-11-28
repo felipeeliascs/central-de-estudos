@@ -29,7 +29,9 @@ Fonte fornecida: `PGUA2501_224_20261104091333.pdf.pdf`, **123 páginas**, SHA-25
 | Data da prova | **Prevista** para 21/02/2027, a confirmar na convocação | 22 |
 | Avaliação | Acertos × 100 / total de questões; habilitação a partir de 50 pontos | 27 |
 | Títulos | Até 4 pontos: doutorado 2,5 e mestrado 1,5 | 27 |
-| Assinatura | 03/11/2026; não comprova data de publicação | 33 |
+| Assinatura | 03/11/2026; não comprova data de publicação | 34 |
+| Atribuições do cargo | Texto do Coordenador Pedagógico, sem funções de outros cargos | 38 |
+| Cronograma geral | Datas previstas, incluindo eventos “A definir” sem data inventada | 121 |
 | Conteúdo geral | Português, Matemática e Informática aplicáveis ao cargo | 52 |
 | Conteúdo específico | Somente o bloco de Coordenador Pedagógico | 56–57 |
 | Bibliografia | 75 referências do cargo; para antes de Diretor de Escola | 57–61 |
@@ -62,7 +64,7 @@ A ficha usa a Biblioteca já existente. O contrato de concurso não tem campos e
 | Caderno de erros | Conversão idempotente de um erro em cartão privado | SQL |
 | Flashcards/revisão | Importação, revelar verso, avaliação, estado FSRS e idempotência de envio | React + SQL |
 | Sessões e desempenho | Sessão fictícia de 30 min, resultado externo 10/8, indicadores e ofensiva sem contar planejamento | React + SQL |
-| Plano de Estudos | Disponibilidade fictícia, limites diários, persistência e abertura contextual do conteúdo/materiais | motor, SQL e Chrome |
+| Plano de Estudos | Data e distribuição no adaptador conectado, disponibilidade fictícia, limites diários, persistência e abertura contextual do conteúdo/materiais | adaptador/motor, SQL e Chrome |
 | Trilhas | Configuração, pré-requisitos, geração semanal, persistência e ausência de incidência inventada | motor, UI, SQL e Chrome |
 | Prompts / videoaulas | Todos os 175 IDs elegíveis no contexto; lote de URL **sintética de QA**, reimportação e preservação das 75 referências | contratos e suite existente |
 | Incidência histórica | Nenhuma evidência criada a partir do edital; lacunas não viram zeros, amostra ou percentual real | contrato e SQL |

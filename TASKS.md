@@ -436,7 +436,7 @@ Consulte [decisões, simulação do edital e limitações](JSON-IMPORTACAO-ASSIS
 - [x] Preservar informações não estruturadas em ficha textual library_batch; distinguir data prevista de prova e data de assinatura/publicação.
 - [x] Preparar jornada de administrador e estudante com questões, materiais, revisão, planejamento e dados pessoais fictícios.
 - [x] Executar o cadastro integral, idempotência e preservação de dados em PostgreSQL isolado; testar UI administrativa e de estudante.
-- [ ] Concluir lint, suite completa, build, Chrome em 1440/768/390 px e inspeção das capturas; resultado final no PR.
+- [x] Validar lint, suite completa, build e Chrome em 1440/768/390 px; capturas inspecionadas. O PR registra a execução do commit final.
 - [ ] Homologar Auth/PostgREST/upload real e links assinados quando houver ambiente integrado separado.
 - [ ] Cadastrar/disponibilizar em produção somente após revisão e autorização específica; esta tarefa é uma simulação.
 
