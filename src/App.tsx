@@ -459,6 +459,11 @@ function Workspace({
   const p = node
     ? progress(data.nodes, data.checks, node.id, repo.user)
     : { done: 0, total: 0, percent: 0 };
+  const materialScope = new Set([selected, ...descendants(data.nodes, selected).map(n => n.id)]);
+  const availableMaterialCount = data.materials.filter(m =>
+    appliesTo(m, selected, snapshot.nodes, snapshot.materialLinks, repo.user) ||
+    linkedNodes(m, snapshot.materialLinks, repo.user).some(id => materialScope.has(id)),
+  ).length;
   const list = data.materials
     .filter((m) => appliesTo(m,selected,snapshot.nodes,snapshot.materialLinks,repo.user) && m.section === section)
     .sort((a, b) => a.position - b.position || a.id.localeCompare(b.id));
@@ -1160,14 +1165,7 @@ function Workspace({
                         <span>Materiais disponíveis</span>
                         <strong>
                           {
-                            data.materials.filter((m) =>
-                              linkedNodes(m,snapshot.materialLinks,repo.user).some(id => [
-                                selected,
-                                ...descendants(data.nodes, selected).map(
-                                  (n) => n.id,
-                                ),
-                              ].includes(id)),
-                            ).length
+                            availableMaterialCount
                           }
                         </strong>
                         <small>Seu acervo e materiais autorizados</small>
