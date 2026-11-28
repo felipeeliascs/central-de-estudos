@@ -1,3 +1,4 @@
+import { equivalentEvidenceIds } from "./equivalences";
 import { CollapsibleSection } from "./CollapsibleSection";
 import { PracticeDashboard } from "./PerformanceOverview";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
@@ -455,7 +456,7 @@ export function ProductivityPanel({
           .slice(0, 5)
       : [];
   function evidence(id: string): Evidence {
-    const evidenceTopics = new Set([id,...(source?.equivalences ?? []).filter(pair=>pair.includes(id)).flatMap(pair=>pair)]);
+    const evidenceTopics = equivalentEvidenceIds(id,source?.equivalences ?? []);
     const ss = (data?.sessions ?? []).filter((s) => evidenceTopics.has(s.topic_id));
     const rr = (data?.results ?? []).filter((r) => evidenceTopics.has(r.topic_id));
     const aa = (data?.answers ?? []).filter(

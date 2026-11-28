@@ -1,3 +1,4 @@
+import { fullEquivalencePairs } from "./equivalences";
 import { appliesTo } from "./library";
 import { incidenceSummary } from "./incidence";
 import type { Incidence } from "./productivity-data";
@@ -307,6 +308,6 @@ export async function plannerInputs(
   return {
     contests,
     topics,
-    equivalences: links.filter(l => l.coverage === "full" && !!l.review_notes?.trim()).map((l) => [l.first_topic, l.second_topic]),
+    equivalences: fullEquivalencePairs(links),
   };
 }

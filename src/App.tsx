@@ -1785,7 +1785,7 @@ function MaterialCard({
               disabled={disabled}
               onClick={() => move(-1)}
             >
-              <ArrowUp size={16} />
+              <ArrowUp size={16} /> Mover para cima
             </button>
             <button
               className="icon"
@@ -1793,7 +1793,7 @@ function MaterialCard({
               disabled={disabled}
               onClick={() => move(1)}
             >
-              <ArrowDown size={16} />
+              <ArrowDown size={16} /> Mover para baixo
             </button></>}
             <button
               className="icon"
