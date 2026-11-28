@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "type": "contest",
+  "id": "roseira-ps-02-2026-peb-ii-matematica",
+  "name": "Processo Seletivo Simplificado 02/2026 — PEB II — Professor de Matemática",
+  "organization": "Prefeitura Municipal de Roseira",
+  "role": "PEB II — Professor de Matemática",
+  "board": "NetEduc Concursos",
+  "exam_date": "2026-12-06",
+  "questions": 25,
+  "listed": false,
+  "notice": {
+    "version": 1
+  },
+  "items": [],
+  "resources": []
+}

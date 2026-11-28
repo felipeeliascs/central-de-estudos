@@ -33,9 +33,9 @@ export function jsonSyntaxMessage(error: unknown, source: string): string {
   return `$: sintaxe JSON inválida${position}. ${reason}`;
 }
 
-export function parseImportJson(raw: string): unknown {
-  if (new TextEncoder().encode(raw).length > maxImportBytes)
-    throw new Error("$: limite de 512 KiB");
+export function parseImportJson(raw: string, limitBytes = maxImportBytes): unknown {
+  if (new TextEncoder().encode(raw).length > limitBytes)
+    throw new Error("$: limite de " + (limitBytes === 1048576 ? "1 MiB" : limitBytes / 1024 + " KiB"));
   // A UTF-8 BOM is a file encoding marker, not arbitrary content to extract.
   const source = raw.replace(/^\uFEFF/, "");
   try {

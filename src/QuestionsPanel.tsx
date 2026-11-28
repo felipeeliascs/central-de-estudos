@@ -1,3 +1,4 @@
+import { JsonImportWorkbench } from "./JsonImportWorkbench";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Modal } from "./Forms";
 import { safeUrl, type Node } from "./domain";
@@ -665,6 +666,7 @@ export function QuestionsPanel({
               }}
             />
           </label>
+          <JsonImportWorkbench raw={raw} onChange={value => {setRaw(value);setBatch(null);setAuthorized(false);setError("");}} accepted={["questions"]} context={{nodes}} disabled={busy}/>
           <details>
             <summary>Identificadores dos assuntos</summary>
             <ul>

@@ -42,7 +42,7 @@ it("mantém texto inválido e destaca índice do erro sem salvar parcialmente",a
  const bad={...incidenceBatch,entries:incidenceBatch.entries.map((e,i)=>i===29?{...e,occurrences:21}:e)};
  await user.paste(JSON.stringify(bad));
  await user.click(screen.getByRole("button",{name:"Gerar prévia da incidência"}));
- await screen.findByText(/entries\[29\].occurrences/);
+ await screen.findByText(/entries\[29\]\.occurrences: use um inteiro/);
  expect((screen.getByRole("button",{name:"Confirmar e salvar incidência"}) as HTMLButtonElement).disabled).toBe(true);
  await user.click(screen.getByRole("button",{name:"Voltar e corrigir JSON"}));
  expect((screen.getByLabelText("Ou cole o JSON de incidência") as HTMLTextAreaElement).value).toBe(JSON.stringify(bad));

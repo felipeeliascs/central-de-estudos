@@ -1,3 +1,4 @@
+import { JsonImportWorkbench } from "./JsonImportWorkbench";
 import { useId, useState } from "react";
 import { supabase } from "./repository";
 import type { Node } from "./domain";
@@ -19,6 +20,7 @@ export function IncidenceImporter({nodes,onSaved}:{nodes:Node[];onSaved:()=>Prom
   setBusy(true);setError("");setMessage("");
   try {await action();} catch(e) {setError((e as Error).message);} finally {setBusy(false);}
  }
+ function changeRaw(value:string) { setRaw(value); setPreview(null); setReviewed(false); setError(""); }
  function generate() {
   void run(async()=>{
    if(!target) throw new Error("Selecione o concurso de destino.");
@@ -29,8 +31,9 @@ export function IncidenceImporter({nodes,onSaved}:{nodes:Node[];onSaved:()=>Prom
    }
    if(!result.data?.doc||!result.data.itemMap||!Array.isArray(result.data.expected)) throw new Error("Não foi possível obter o edital e a incidência atual.");
    const ctx={target,...result.data} as IncidenceImportContext;
+   setContext(ctx);
    const next=previewIncidenceBatch(raw,ctx);
-   setContext(ctx);setPreview(next);setReviewed(false);
+   setPreview(next);setReviewed(false);
   });
  }
  function save() {
@@ -49,6 +52,7 @@ export function IncidenceImporter({nodes,onSaved}:{nodes:Node[];onSaved:()=>Prom
   <p>Use o prompt “Calcular incidência por assunto · JSON”. Revise fontes e contagens antes de confirmar; a plataforma não verifica o conteúdo das fontes automaticamente.</p>
   {error&&<p role="alert" className="error">{error}</p>}
   {message&&<p role="status" className="success">{message}</p>}
+  <JsonImportWorkbench raw={raw} onChange={changeRaw} accepted={["incidence_batch"]} context={{contest:context?.doc,incidence:context}} disabled={busy}/>
   <fieldset disabled={busy}>
   {preview?<>
    <h4>Prévia da incidência</h4>
@@ -63,11 +67,11 @@ export function IncidenceImporter({nodes,onSaved}:{nodes:Node[];onSaved:()=>Prom
    <p>Atualizações substituem a evidência desta banca para o assunto. Duplicatas, assuntos sem evidência e assuntos omitidos preservam os registros anteriores. Frequência histórica não é probabilidade da próxima prova.</p>
    <label className="check-label" htmlFor={`${id}-reviewed`}><input id={`${id}-reviewed`} name="incidence-reviewed" type="checkbox" checked={reviewed} onChange={e=>setReviewed(e.target.checked)}/>Conferi as fontes, a unidade, o período e as contagens da amostra.</label>
    <p id={`${id}-status`} role="status">{errors?`${errors} erros impedem salvar; nenhuma evidência foi gravada.`:!preview.valid?"Nenhuma evidência válida para importar.":preview.changes===0?"Nenhuma alteração: as evidências já estão cadastradas.":"Confira as atualizações e confirme a revisão das fontes para salvar."}</p>
-   <div className="form-actions"><button type="button" className="secondary" onClick={()=>{setPreview(null);setContext(null);setReviewed(false);}}>Voltar e corrigir JSON</button><button type="button" className="primary" aria-describedby={`${id}-status`} disabled={!preview.valid||!reviewed||preview.changes===0} onClick={save}>Confirmar e salvar incidência</button></div>
+   <div className="form-actions"><button type="button" className="secondary" onClick={()=>{setPreview(null);setReviewed(false);}}>Voltar e corrigir JSON</button><button type="button" className="primary" aria-describedby={`${id}-status`} disabled={!preview.valid||!reviewed||preview.changes===0} onClick={save}>Confirmar e salvar incidência</button></div>
   </>:<>
-   <label htmlFor={`${id}-target`}>Concurso de destino da incidência<select id={`${id}-target`} name="incidence-target" value={target} onChange={e=>setTarget(e.target.value)}><option value="">Selecione</option>{nodes.filter(n=>n.kind==="contest"&&!n.catalog_archived).map(n=><option value={n.id} key={n.id}>{n.name}</option>)}</select></label>
-   <label htmlFor={`${id}-file`}>Arquivo JSON de incidência<input id={`${id}-file`} name="incidence-file" type="file" accept=".json,application/json" onChange={e=>{const file=e.target.files?.[0];if(file)void run(async()=>{if(file.size>maxImportBytes)throw new Error("$: limite de 512 KiB");setRaw(await file.text());});}}/></label>
-   <label htmlFor={`${id}-raw`}>Ou cole o JSON de incidência<textarea id={`${id}-raw`} name="incidence-json" spellCheck={false} rows={12} value={raw} onChange={e=>setRaw(e.target.value)}/></label>
+   <label htmlFor={`${id}-target`}>Concurso de destino da incidência<select id={`${id}-target`} name="incidence-target" value={target} onChange={e=>{setTarget(e.target.value);setContext(null);setPreview(null);setReviewed(false);}}><option value="">Selecione</option>{nodes.filter(n=>n.kind==="contest"&&!n.catalog_archived).map(n=><option value={n.id} key={n.id}>{n.name}</option>)}</select></label>
+   <label htmlFor={`${id}-file`}>Arquivo JSON de incidência<input id={`${id}-file`} name="incidence-file" type="file" accept=".json,application/json" onChange={e=>{const file=e.target.files?.[0];if(file)void run(async()=>{if(file.size>maxImportBytes)throw new Error("$: limite de 512 KiB");changeRaw(await file.text());});}}/></label>
+   <label htmlFor={`${id}-raw`}>Ou cole o JSON de incidência<textarea id={`${id}-raw`} name="incidence-json" spellCheck={false} rows={12} value={raw} onChange={e=>changeRaw(e.target.value)}/></label>
    <button type="button" className="primary" onClick={generate}>Gerar prévia da incidência</button>
   </>}
   </fieldset>

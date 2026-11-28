@@ -237,6 +237,26 @@ try {
         assert.equal(await evaluate("!!document.querySelector('.material-card .action-menu[open]')"),false);
         await evaluate("window.scrollTo(0,0)");
         assert.equal(await evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"),true);
+
+        // Exercise the real Library importer; data is explicitly fictitious.
+        await evaluate("[...document.querySelectorAll('.library-toolbar summary')].find(b=>b.textContent.includes('Mais opções')).click()");
+        await evaluate("[...document.querySelectorAll('.library-toolbar button')].find(b=>b.textContent==='Importar materiais JSON').click()");
+        const reviewFixture={schema_version:"1.0",type:"library_batch",materials:[{id:"qa-ficticio",title:"a".repeat(181),section:"Teoria e resumos",kind:"text",body:"Material inteiramente fictício para QA."}]};
+        await evaluate(`(()=>{const el=document.querySelector('[name=library-json]');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(el,${JSON.stringify(JSON.stringify(reviewFixture))});el.dispatchEvent(new Event('input',{bubbles:true}));})()`);
+        await until("!!document.querySelector('.json-field.invalid')");
+        assert.equal(await evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"),true,"Overflow review invalid "+width);
+        const invalidShot=await call("Page.captureScreenshot",{format:"png",captureBeyondViewport:true});
+        await writeFile(resolve(scratch,`ui-${width}-json-errors.png`),Buffer.from(invalidShot.data,"base64"));
+        await evaluate("(()=>{const el=[...document.querySelectorAll('.json-field input')].find(e=>e.id.endsWith('$.materials[0].title'));Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,'Material fictício revisado');el.dispatchEvent(new Event('input',{bubbles:true}));})()");
+        await until("!document.querySelector('.json-issues')");
+        await evaluate("[...document.querySelectorAll('button')].find(b=>b.textContent==='Gerar prévia de materiais').click()");
+        await until("!!document.querySelector('.library-import-preview')");
+        assert.equal(await evaluate("[...document.querySelectorAll('button')].find(b=>b.textContent==='Baixar JSON revisado').disabled"),false);
+        assert.equal(await evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"),true,"Overflow review valid "+width);
+        const reviewShot=await call("Page.captureScreenshot",{format:"png",captureBeyondViewport:true});
+        await writeFile(resolve(scratch,`ui-${width}-json-reviewed.png`),Buffer.from(reviewShot.data,"base64"));
+        await evaluate("(()=>{const el=[...document.querySelectorAll('.json-field input')].find(e=>e.id.endsWith('$.materials[0].title'));Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,'Segunda revisão fictícia');el.dispatchEvent(new Event('input',{bubbles:true}));})()");
+        await until("!document.querySelector('.library-import-preview')");
       }
       if(page==="productivity") {
         await until("document.querySelectorAll('.collapsible-trigger').length>=4");
@@ -254,7 +274,7 @@ try {
     console.log(`OK: ${width}x${height}, início, perfil, edital, biblioteca, plano, desempenho, navegação e Enter.`);
   }
   assert.deepEqual(runtimeErrors,[],"Erros de runtime/console no navegador");
-  await writeFile(resolve(scratch,"ui-report.json"),JSON.stringify({viewports:[1440,768,390],pages:["home","profile","study","catalog","notice","library","planner","productivity"],runtimeErrors},null,2));
+  await writeFile(resolve(scratch,"ui-report.json"),JSON.stringify({viewports:[1440,768,390],pages:["home","profile","study","catalog","notice","library","planner","productivity"],jsonReview:["invalid field","table correction","fresh preview","stale preview invalidated"],runtimeErrors},null,2));
   await evaluate("document.querySelector('.theme-toggle').click()");
   assert.equal(
     await evaluate("document.documentElement.dataset.theme"),

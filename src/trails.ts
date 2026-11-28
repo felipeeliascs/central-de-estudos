@@ -1,3 +1,4 @@
+import { parseImportJson } from "./import-json";
 import { addDays, capacity, todayInBrazil, type Topic } from "./planner";
 import type { Incidence } from "./productivity-data";
 import { incidenceSummary } from "./incidence";
@@ -34,7 +35,8 @@ export function validateTrailTopics(topics: TrailTopic[], ids: Set<string>) {
 }
 export function parseTrail(raw: string, contest: string, ids: Set<string>): TrailTopic[] {
   if (new TextEncoder().encode(raw).length > 512 * 1024) throw new Error("Limite de 512 KiB.");
-  const doc = JSON.parse(raw.replace(/^\uFEFF/, ""));
+  const value = parseImportJson(raw);
+  const doc = value as {schema_version?:unknown;type?:unknown;contest_id?:unknown;topics?:TrailTopic[]}|null;
   if (!doc || doc.schema_version !== "1.0" || doc.type !== "study_trail" ||
       doc.contest_id !== contest || Object.keys(doc).some(k => !["schema_version","type","contest_id","topics"].includes(k)) ||
       !Array.isArray(doc.topics) || !doc.topics.length) throw new Error("Documento inválido ou concurso diferente do destino.");

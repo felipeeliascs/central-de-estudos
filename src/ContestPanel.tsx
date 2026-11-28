@@ -1,3 +1,4 @@
+import { JsonImportWorkbench } from "./JsonImportWorkbench";
 import { ActionMenu } from "./ActionMenu";
 import { officialPortal } from "./library";
 import { History, Archive, Trash2 } from "lucide-react";
@@ -78,6 +79,10 @@ export function ContestPanel({
   const [videoPreview, setVideoPreview] = useState<ReturnType<typeof previewVideoBatch> | null>(null);
   const [edition, setEdition] = useState<Edition | null>(null);
   const [raw, setRaw] = useState("");
+  const [importBase, setImportBase] = useState<ContestDocument | null>(null);
+  const [partialReviewed, setPartialReviewed] = useState(false);
+  const partialImport = edition?.mode === "import" && !videoPreview && !edition.doc.items.length;
+  function changeRaw(value: string) { setRaw(value); setPreview(null); setVideoPreview(null); setEdition(null); setPartialReviewed(false); setError(""); }
   const [importing, setImporting] = useState(startImport);
   const [target, setTarget] = useState("");
   const [preview, setPreview] = useState<ReturnType<
@@ -170,6 +175,7 @@ export function ContestPanel({
     return result.data as ContestDocument;
   }
   function reset() {
+    setImportBase(null); setPartialReviewed(false);
     setDeletion(null);
     setDeleteConfirmation("");
     setEdition(null);
@@ -239,6 +245,7 @@ export function ContestPanel({
         }
         if (!chosen) throw new Error("Selecione um edital já cadastrado.");
         const base = await read(chosen);
+        setImportBase(base);
         const result = previewVideoBatch(raw, base);
         setVideoPreview(result);
         setEdition({ doc: result.doc, base, target: chosen, mode: "import" });
@@ -257,9 +264,11 @@ export function ContestPanel({
         if (lookup.error) throw new Error(lookup.error.message);
         chosen = lookup.data?.contest_id ?? null;
       }
+      const base = chosen ? await read(chosen) : null;
+      setImportBase(base);
       makePreview({
         doc,
-        base: chosen ? await read(chosen) : null,
+        base,
         target: chosen,
         mode: "import",
       });
@@ -295,7 +304,7 @@ export function ContestPanel({
     });
   }
   function commit() {
-    if (!edition || (videoPreview && !videoPreview.valid)) return;
+    if (!edition || (videoPreview && !videoPreview.valid) || (partialImport && !partialReviewed)) return;
     void run(async () => {
       const result = videoPreview ? await db.rpc("study_apply_video_batch", {
         batch: videoPreview.batch, expected: edition.base, target: edition.target, request_id: newId(),
@@ -329,6 +338,7 @@ export function ContestPanel({
             {message}
           </p>
         )}
+        {importing && <JsonImportWorkbench raw={raw} onChange={changeRaw} accepted={["contest","video_batch"]} context={{contest:importBase}} disabled={busy} />}
         {deletion ? (
           <section className="catalog-deletion" aria-label="Excluir concurso importado">
             <h3>Excluir concurso importado</h3>
@@ -369,6 +379,7 @@ export function ContestPanel({
             ) : <ul>{preview.map((row, i) => (
               <li key={`${row.id}-${i}`}><strong>{row.status}</strong> · {row.name} <small>({row.id})</small></li>
             ))}</ul>}
+            {partialImport && <div className="json-wrapper-notice"><p>Cadastro parcial: este JSON não contém conteúdo programático. Confira se o anexo de disciplinas e assuntos foi fornecido. Nenhum conteúdo será inventado.</p><label className="check-label"><input type="checkbox" checked={partialReviewed} onChange={e => setPartialReviewed(e.target.checked)} />Confirmo o cadastro parcial, sem conteúdo programático</label></div>}
             <p id={`${importId}-confirmation`} role="status">
               {videoErrors.length ? `${videoErrors.length} ${videoErrors.length === 1 ? "erro impede" : "erros impedem"} salvar. Volte e corrija as aulas destacadas; nenhum recurso foi gravado.` : "Prévia válida. Confira os vínculos antes de confirmar."}
             </p>
@@ -376,7 +387,7 @@ export function ContestPanel({
               <button className="secondary" onClick={() => { setPreview(null); if (edition.mode === "import") { setEdition(null); setVideoPreview(null); } }}>
                 {edition.mode === "import" ? "Voltar e corrigir JSON" : "Voltar"}
               </button>
-              <button className="primary" aria-describedby={`${importId}-confirmation`} disabled={!!videoPreview && !videoPreview.valid} onClick={commit}>
+              <button className="primary" aria-describedby={`${importId}-confirmation`} disabled={(!!videoPreview && !videoPreview.valid) || (!!partialImport && !partialReviewed)} onClick={commit}>
                 Confirmar e salvar
               </button>
             </div>
@@ -397,7 +408,7 @@ export function ContestPanel({
               <select
                 id={`${importId}-target`} name="contest-target"
                 value={target}
-                onChange={(e) => setTarget(e.target.value)}
+                onChange={(e) => { setTarget(e.target.value); setImportBase(documents[e.target.value] ?? null); setPreview(null); setPartialReviewed(false); }}
               >
                 <option value="">Identificar pelo ID do JSON</option>
                 {roots
@@ -421,7 +432,7 @@ export function ContestPanel({
                     void run(async () => {
                       if (file.size > maxBytes)
                         throw new Error("Limite de 512 KiB.");
-                      setRaw(await file.text());
+                      changeRaw(await file.text());
                     });
                 }}
               />
@@ -432,7 +443,7 @@ export function ContestPanel({
                 id={`${importId}-raw`} name="contest-json-text" spellCheck={false}
                 rows={13}
                 value={raw}
-                onChange={(e) => setRaw(e.target.value)}
+                onChange={(e) => changeRaw(e.target.value)}
               />
             </label>
             <div className="form-actions">

@@ -1,3 +1,4 @@
+import { JsonImportWorkbench } from "./JsonImportWorkbench";
 import { useEffect, useState } from "react";
 import { CalendarDays, CheckCircle2, Settings2 } from "lucide-react";
 import { ModulePage } from "./ModulePage";
@@ -107,6 +108,7 @@ export function TrailPanel({ snapshot, user, demo, close, study, prompts }: { sn
         </form>
         <h3>Importar sugestão do prompt</h3><p>A importação altera apenas a configuração. Sessões concluídas, materiais e progresso são preservados. Gere a semana novamente após conferir as mudanças.</p>
         <label>JSON de Trilhas<textarea rows={8} value={raw} onChange={e => { setRaw(e.target.value); setPreview(null); }} /></label>
+        <JsonImportWorkbench raw={raw} onChange={value => {setRaw(value);setPreview(null);setError("");}} accepted={["study_trail"]} context={{contestUuid:contest,nodes:snapshot.nodes}} disabled={busy}/>
         <button className="secondary" onClick={() => { try { const entries=implicit(parseTrail(raw,contest,ids)); validateTrailTopics([...config.topics.filter(t => !entries.some(n => n.topic_id === t.topic_id)),...entries],ids); setPreview(entries); setError(""); } catch(e) { setPreview(null); setError((e as Error).message); } }}>Gerar prévia da trilha</button>
         {preview && <><h4>Prévia da sequência</h4><ul>{preview.map(t => <li key={t.topic_id}>{title(t.topic_id)} · {t.minutes} min · pré-requisitos: {t.requires.map(title).join(", ") || "nenhum"} · prioridade estimada {t.estimated_priority}</li>)}</ul><button className="primary" disabled={busy} onClick={() => void run(async () => { const entries=[...config.topics.filter(t => !preview.some(n => n.topic_id === t.topic_id)),...preview]; validateTrailTopics(entries,ids); await store({ ...saved.state,config:{...config,topics:entries} }); setPreview(null); })}>Confirmar configuração</button></>}
       </section>}
