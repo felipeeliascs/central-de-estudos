@@ -28,7 +28,7 @@ function FieldEditor(props:EditorProps) {
       <option value="__missing__">{field.required?"Selecione":"Não informado (omitir)"}</option>
       {field.nullable&&<option value="__null__">Sem referência (null)</option>}
       {field.kind==="boolean"?<><option value="true">Sim (true)</option><option value="false">Não (false)</option></>:
-       field.values?field.values.map(v=><option key={String(v)} value={v===null?"__null__":String(v)}>{String(v)}</option>:
+       field.values?field.values.map(v=><option key={String(v)} value={v===null?"__null__":String(v)}>{String(v)}</option>):
        choices?.map(c=><option key={c.value} value={c.value}>{c.label}</option>)}
       {!unknown&&value!==null&&choices&&!choices.some(c=>c.value===value)&&<option value={String(value)}>Referência não encontrada: {String(value)}</option>}
       {!unknown&&field.values&&!field.values.includes(value as string)&&<option value={String(value)}>Valor inválido: {String(value)}</option>}
@@ -113,7 +113,7 @@ export function JsonImportWorkbench({raw,onChange,accepted,context={},disabled=f
     {input.wrapped&&<div className="json-wrapper-notice"><p>Foi encontrado um único JSON dentro de uma cerca de código. Confira antes de usar. Nenhuma aspa, vírgula ou valor será adivinhado.</p><button type="button" className="secondary" disabled={disabled||!input.normalized||input.issues.length>0} onClick={()=>update(input.normalized!)}>Usar somente o JSON identificado</button></div>}
     <p role="status">{issues.length?issues.length+" erros encontrados. Revise os campos antes de gerar a prévia de gravação.":input.type?"Validação local concluída. Gere a prévia de gravação para revalidar destino, duplicatas, permissões e versão.":""}</p>
     {needsContext&&<p>Selecione o destino e gere uma prévia para carregar os IDs do edital. As referências só serão verificadas com esse contexto.</p>}
-    {issues.length>0&&<details className="json-issues" open><summary>Erros por campo ({issues.length})</summary><ol>{issues.map((issue,i)=><li key={i}><strong>{issue.label}</strong><p>{issue.message}</p><small>{issue.path} · {issue.code}</small>{correctType&&!input.wrapped&&input.value&&<button type="button" className="text-button" onClick={()=>setFocusPath(issue.path+"#"+crypto.randomUUID())}>Corrigir este campo</button>}</li>)}</ol></details>}
+    {issues.length>0&&<details className="json-issues" open><summary>Erros por campo ({issues.length})</summary><ol>{issues.map((issue,i)=><li key={i}><strong>{issue.label}</strong><p>{issue.message}</p><small>{issue.path} · {issue.code}</small>{correctType&&!input.wrapped&&input.value!==undefined&&<button type="button" className="text-button" onClick={()=>setFocusPath(issue.path+"#"+crypto.randomUUID())}>Corrigir este campo</button>}</li>)}</ol></details>}
     {correctType&&record(input.value)&&!input.wrapped&&<fieldset disabled={disabled}><details className="json-review-fields" open={issues.length>0||!!focusPath}><summary>Revisar e corrigir em tabela</summary><ObjectEditor field={importTypes[input.type!].schema} path="$" value={input.value} document={input.value} type={input.type!} context={context} issues={issues} prefix={prefix} focusPath={focusPath} change={change}/></details></fieldset>}
     <div className="json-assist-actions">
       <button type="button" className="text-button" onClick={()=>{setReport(repairInstructions(input.type,issues,context));}}>Preparar pedido de correção para IA externa</button>

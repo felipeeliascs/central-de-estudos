@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import sample from "../examples/concurso-ficticio.json";
 const { rpc } = vi.hoisted(() => ({
@@ -157,4 +157,29 @@ it("associa controles de importação a IDs únicos, nomes e rótulos e permite 
  for(const el of controls) { expect(el.id).toBeTruthy(); expect(el.getAttribute("name")).toBeTruthy(); }
  await user.click(controls[0]); await user.tab(); expect(document.activeElement).toBe(controls[1]);
  await user.tab(); expect(document.activeElement).toBe(controls[2]);
+});
+
+import roseira from "../examples/roseira-ps-02-2026-matematica-parcial.json";
+it.each(["arquivo","colagem"] as const)("simula Roseira Matemática parcial com confirmação e nova prévia após edição: %s",async method=>{
+ rpc.mockImplementation(async()=>({data:"saved",error:null}));
+ const user=userEvent.setup();
+ render(<ContestPanel startImport nodes={[]} editable={new Set()} user="a" admin close={()=>{}} open={()=>{}} refresh={async()=>{}}/>);
+ await enter(JSON.stringify(roseira),method,user);
+ await user.click(screen.getByRole("button",{name:"Gerar prévia"}));
+ await screen.findByRole("heading",{name:"Prévia de alterações"});
+ expect((screen.getByRole("button",{name:"Confirmar e salvar"}) as HTMLButtonElement).disabled).toBe(true);
+ expect(rpc.mock.calls.some(c=>c[0].startsWith("study_apply"))).toBe(false);
+ await user.click(screen.getByRole("checkbox",{name:"Confirmo o cadastro parcial, sem conteúdo programático"}));
+ expect((screen.getByRole("button",{name:"Confirmar e salvar"}) as HTMLButtonElement).disabled).toBe(false);
+ await user.click(screen.getByText("Revisar e corrigir em tabela"));
+ const name=screen.getByLabelText(/Nome do concurso \*.*\$\.name/);
+ fireEvent.change(name,{target:{value:roseira.name+" revisado"}});
+ expect(screen.queryByRole("button",{name:"Confirmar e salvar"})).toBeNull();
+ await user.click(screen.getByRole("button",{name:"Gerar prévia"}));
+ await screen.findByRole("heading",{name:"Prévia de alterações"});
+ expect((screen.getByRole("button",{name:"Confirmar e salvar"}) as HTMLButtonElement).disabled).toBe(true);
+ await user.click(screen.getByRole("checkbox",{name:"Confirmo o cadastro parcial, sem conteúdo programático"}));
+ await user.click(screen.getByRole("button",{name:"Confirmar e salvar"}));
+ await screen.findByText("Concurso salvo.");
+ expect(rpc).toHaveBeenCalledWith("study_apply_catalog",expect.objectContaining({doc:{...roseira,name:roseira.name+" revisado"},expected:null,operation:"import"}));
 });
