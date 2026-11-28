@@ -1186,7 +1186,7 @@ function Workspace({
                 {isTopic && node ? (
                   <>
                     <StudyLibraryLinks snapshot={snapshot} repo={repo} selected={selected} link={linkLibraryMaterial} refresh={refresh} prompts={() => openStudyResource("prompts")} library={() => openStudyResource("library")} />
-                    <div className="study-tools"><button className="text-button" onClick={() => setQuestionsOpen(true)}>Resolver questões</button><button className="text-button" onClick={() => setFlashcardsOpen(true)}>Estudar flashcards e revisões</button><button className="text-button" onClick={() => { setStudySession(selected); setProductivityOpen(true); }}>Registrar sessão de estudo</button></div>
+                    <div className="study-tools"><button className="text-button" onClick={() => setQuestionsOpen(true)}>Resolver questões</button><button className="text-button" onClick={() => setFlashcardsOpen(true)}>Estudar flashcards e revisões</button><button className="text-button" onClick={() => { if (dirty && !window.confirm("Sair sem salvar as anotações?")) return; setDirty(false); setStudySession(selected); setProductivityOpen(true); }}>Registrar sessão de estudo</button></div>
                     <div
                       className="tabs"
                       role="tablist"

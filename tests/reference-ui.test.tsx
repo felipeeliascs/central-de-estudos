@@ -70,3 +70,21 @@ it("pede uma única confirmação ao abrir o perfil pelo menu com anotação nã
   expect(confirm).toHaveBeenCalledTimes(1);
   confirm.mockRestore();
 });
+
+it("protege notas não salvas ao abrir sessão e mantém o assunto da tarefa",async()=>{
+ const user=userEvent.setup();render(<App/>);
+ await user.click(await screen.findByRole("button",{name:"Continuar estudando"}));
+ await user.click(await screen.findByRole("tab",{name:"Anotações"}));
+ const note=screen.getByRole("textbox",{name:"Anotações pessoais · somente você"});
+ await user.type(note,"Rascunho fictício");
+ const confirm=vi.spyOn(window,"confirm").mockReturnValue(false);
+ try {
+  await user.click(screen.getByRole("button",{name:"Registrar sessão de estudo"}));
+  expect((screen.getByRole("textbox",{name:"Anotações pessoais · somente você"}) as HTMLTextAreaElement).value).toBe("Rascunho fictício");
+  expect(screen.queryByRole("heading",{name:"Meu desempenho",level:1})).toBeNull();
+  confirm.mockReturnValue(true);
+  await user.click(screen.getByRole("button",{name:"Registrar sessão de estudo"}));
+  await screen.findByRole("heading",{name:"Meu desempenho",level:1});
+  expect((screen.getByRole("combobox",{name:"Assunto ou subassunto"}) as HTMLSelectElement).value).toBe("demo-topic");
+ } finally { confirm.mockRestore(); }
+});
