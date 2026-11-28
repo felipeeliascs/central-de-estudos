@@ -73,6 +73,7 @@ export function QuestionsPanel({
   demo,
   close,
   openExternal,
+  initialTopic = "",
 }: {
   nodes: Node[];
   startImport?: boolean;
@@ -80,6 +81,7 @@ export function QuestionsPanel({
   demo: boolean;
   close: () => void;
   openExternal: () => void;
+  initialTopic?: string;
 }) {
   const [view, setView] = useState<View>(startImport ? "import" : "bank");
   const [data, setData] = useState<Data | null>(null);
@@ -89,9 +91,9 @@ export function QuestionsPanel({
   const [batch, setBatch] = useState<Batch | null>(null);
   const [authorized, setAuthorized] = useState(false);
   const [search, setSearch] = useState("");
-  const [contest, setContest] = useState("");
-  const [discipline, setDiscipline] = useState("");
-  const [topic, setTopic] = useState("");
+  const [contest, setContest] = useState(() => pathFor(nodes,initialTopic).find(n=>n.kind==="contest")?.id ?? "");
+  const [discipline, setDiscipline] = useState(() => pathFor(nodes,initialTopic).find(n=>n.kind==="discipline")?.id ?? "");
+  const [topic, setTopic] = useState(initialTopic);
   const [board, setBoard] = useState("");
   const [title, setTitle] = useState("");
   const [minutes, setMinutes] = useState(30);

@@ -1,3 +1,4 @@
+import { libraryContract } from "./library-import";
 import { parseContest, type ContestDocument } from "./contest-schema";
 import { trailContract } from "./trails";
 import { videoBatchContract } from "./video-batch";
@@ -13,6 +14,7 @@ export type PromptTemplate = {
   revision: number;
 };
 export const templates: PromptTemplate[] = [
+  ["biblioteca-json","Gerar materiais para a Biblioteca · JSON","Criar materiais reutilizáveis no acervo.","Produza materiais a partir das fontes fornecidas, sem vincular a um concurso nem inventar fatos, autores, obras, edições ou URLs. Use IDs externos estáveis e apenas os campos do contrato library_batch. Resumos, mapas mentais textuais e anotações usam kind text; links verificados usam link/youtube. Para mapas em imagem ou PDFs, o envio será pelo cadastro individual. Retorne somente JSON válido, sem cercas de código, até 512 KiB e 300 entradas. Cada título tem até 180 caracteres; detalhes vão no body. Dados opcionais desconhecidos devem ser omitidos, sem null.","none"],
   [
     "edital",
     "Analisar edital PDF",
@@ -175,6 +177,7 @@ export function buildPrompt(template: PromptTemplate, context: Context) {
     "IDs externos elegíveis para cobertura:", JSON.stringify(coverage, null, 2),
     "Reaproveite o ID do recurso existente somente para o mesmo vídeo do YouTube e o mesmo item. Para outro vídeo ou item, crie um novo ID único; não reutilize o ID do vídeo antigo. Cada title deve ter de 1 a 180 caracteres. Encurte o título sem perder seu sentido; detalhes adicionais vão em text. Use apenas URLs reais verificadas. Revise cobertura, IDs e limites antes de retornar apenas o JSON video_batch 1.0."
   );
+  if (template.id === "biblioteca-json") lines.push("Contrato para importação na Biblioteca:",libraryContract,"Seções aceitas: Teoria e resumos, Mapas mentais, Anotações pessoais, Bibliografia, Legislação, Videoaulas, Questões externas ou Flashcards. Frente e verso são obrigatórios em Flashcards. Não gere IDs de conta, caminhos de arquivos, permissões ou vínculos. A prévia identifica duplicatas e exige revisão humana.");
   if (template.id === "trilhas") lines.push("Retorne apenas JSON para o importador de Trilhas:", trailContract, "UUID do concurso: " + (context.trailContest || "Selecione um concurso na Central de Prompts."), "Assuntos e relações do edital:", JSON.stringify(context.trailTopics ?? [], null, 2), 'Exemplo fictício: {"schema_version":"1.0","type":"study_trail","contest_id":"UUID_DO_CONCURSO","topics":[{"topic_id":"UUID_DO_ASSUNTO","requires":[],"minutes":45,"estimated_priority":"medium"}]}');
   if (template.id === "retificacao" || template.id === "videos")
     lines.push(

@@ -76,10 +76,10 @@ export function MaterialForm({
   busy,
   demo,
   materials = [],
-  useExisting,
+  onUseExisting,
 }: {
   materials?: Material[];
-  useExisting?: (m: Material) => Promise<boolean>;
+  onUseExisting?: (m: Material) => Promise<boolean>;
   initial?: Material;
   topic: string;
   user: string;
@@ -326,7 +326,7 @@ export function MaterialForm({
             </label>
           )}
           {pending && <section className="duplicate-review" aria-label="Possíveis materiais duplicados"><h3>Possíveis materiais duplicados</h3><p>Compare conteúdo, fonte e versão. Nenhum material foi alterado.</p><ul>{duplicates.map(existing => <li key={existing.id}><strong>{existing.title}</strong> · {existing.author || "Autor não informado"} · {existing.edition || "Edição não informada"}
-            {useExisting && <button type="button" className="text-button" onClick={async () => { if (await useExisting(existing)) close(); }}>Utilizar material existente</button>}
+            {onUseExisting && <button type="button" className="text-button" onClick={async () => { if (await onUseExisting(existing)) close(); }}>Utilizar material existente</button>}
             {existing.owner_id === user && !existing.catalog_managed && <button type="button" className="text-button" onClick={async () => { if (!window.confirm("Atualizar este material? O novo conteúdo aparecerá em todos os seus vínculos.")) return; if (await onSave({ ...pending.value, id: existing.id, library_key: existing.library_key, topic_id: existing.topic_id, owner_id: existing.owner_id, visibility: existing.visibility, shared_with: existing.shared_with, file_path: existing.file_path }, pending.file)) close(); }}>Atualizar material existente</button>}
           </li>)}</ul><button type="button" className="secondary" onClick={async () => { if (await onSave(pending.value, pending.file)) close(); }}>Manter ambos como materiais distintos</button><button type="button" className="text-button" onClick={() => { setPending(null); setDuplicates([]); }}>Voltar à edição do material</button></section>}
           {error && (

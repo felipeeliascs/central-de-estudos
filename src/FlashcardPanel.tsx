@@ -53,12 +53,14 @@ export function FlashcardPanel({
   user,
   demo,
   close,
+  initialTopic = "",
 }: {
   nodes: Node[];
   startImport?: boolean;
   user: string;
   demo: boolean;
   close: () => void;
+  initialTopic?: string;
 }) {
   const [data, setData] = useState<FlashData | null>(null);
   const [mode, setMode] = useState<Mode>(startImport ? "import" : "library");
@@ -68,9 +70,9 @@ export function FlashcardPanel({
   const [recipients, setRecipients] = useState("");
   const [search, setSearch] = useState("");
   const [author, setAuthor] = useState("");
-  const [catalog, setCatalog] = useState("");
-  const [discipline, setDiscipline] = useState("");
-  const [subject, setSubject] = useState("");
+  const [catalog, setCatalog] = useState(() => pathFor(nodes,initialTopic).find(n=>n.kind==="contest")?.id ?? "");
+  const [discipline, setDiscipline] = useState(() => pathFor(nodes,initialTopic).find(n=>n.kind==="discipline")?.id ?? "");
+  const [subject, setSubject] = useState(initialTopic);
   const [showArchived, setShowArchived] = useState(false);
   const [raw, setRaw] = useState("");
   const [importId, setImportId] = useState("");

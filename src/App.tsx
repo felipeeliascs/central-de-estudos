@@ -121,6 +121,7 @@ function Workspace({
     readRoute().page === "profile" ? "profile" : readRoute().page === "admin" ? "admin" : null,
   );
   const [incidenceOpen, setIncidenceOpen] = useState(false);
+  const [studySession,setStudySession] = useState("");
   const [collapsed, setCollapsed] = useState(false);
   const [theme, setTheme] = useState(
     () => localStorage.getItem("central-theme") || "light",
@@ -380,10 +381,20 @@ function Workspace({
     setAccountPage("profile");
   }
 
-  function navigate(id: string) {
+  async function navigate(id: string) {
     if (dirty && !window.confirm("Há anotações não salvas. Sair sem salvar?"))
       return;
     setDirty(false);
+    try {
+      let targetNode = snapshot.nodes.find(n => n.id === id);
+      const visited = new Set<string>();
+      while(targetNode?.parent_id && !visited.has(targetNode.id)) { visited.add(targetNode.id); targetNode = snapshot.nodes.find(n => n.id === targetNode!.parent_id); }
+      if (!repo.demo && supabase && targetNode?.catalog_key && !enrolled.has(targetNode.id) && !targetNode.catalog_archived) {
+        const result = await supabase.from("study_enrollments").upsert({ user_id: repo.user,contest_id: targetNode.id,status: "active" },{ onConflict:"user_id,contest_id" });
+        if (result.error) throw result.error;
+        await refresh();
+      }
+    } catch(e) { setError((e as Error).message || "Não foi possível selecionar este concurso."); return; }
     setSelected(id);
     openModule(null);
     setAccountPage(null);
@@ -432,6 +443,10 @@ function Workspace({
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     followRoute(readRoute(new URL(event.currentTarget.href).search));
+  }
+  function openStudyResource(page: Module) {
+    if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
+    setDirty(false); openModule(page);
   }
   function changeSection(s: Section) {
     if (dirty && !window.confirm("Há anotações não salvas. Sair sem salvar?"))
@@ -733,6 +748,8 @@ function Workspace({
               {currentPage !== "home" && <><ChevronRight size={14} aria-hidden="true" /><a href={pageHref(currentPage, selected)} onClick={routeLink} aria-current="page">{{ study: "Estudar", profile: "Meu perfil", admin: "Administração", catalog: "Meus concursos", planner: "Plano de Estudos", library: "Biblioteca", notice: "Abrir Edital", prompts: "Central de Prompts", productivity: "Meu desempenho", trails: "Trilha da Semana", home: "Início" }[currentPage]}</a></>}
               {previousHref && <a className="previous-page" href={previousHref} onClick={routeLink}>← Página anterior</a>}
             </nav>
+            {modulePage && error && <p className="error" role="alert">{error}</p>}
+            {modulePage && status && <p className="success" role="status">{status}</p>}
             {modulePage ? (
               <>
         {modulePage === "notice" && <NoticePage id={selected} snapshot={snapshot} demo={repo.demo} close={() => openModule("catalog")} study={navigate} />}
@@ -768,7 +785,8 @@ function Workspace({
         {productivityOpen && (
           <Suspense fallback={<p role="status">Carregando estatísticas…</p>}>
             <ProductivityPanel
-              startDashboard={!externalMock && !incidenceOpen}
+              initialTopic={studySession}
+              startDashboard={!externalMock && !incidenceOpen && !studySession}
               externalMock={externalMock}
               startIncidence={incidenceOpen}
               snapshot={snapshot}
@@ -776,6 +794,7 @@ function Workspace({
               demo={repo.demo}
               close={() => {
                 setProductivityOpen(false);
+                setStudySession("");
                 setExternalMock(false);
                 setIncidenceOpen(false);
               }}
@@ -837,10 +856,7 @@ function Workspace({
               }}
               refresh={refresh}
               notice={(id) => { setSelected(id); openModule("notice"); }}
-              open={(id) => {
-                navigate(id);
-                setCatalogOpen(false);
-              }}
+              open={(id) => { void navigate(id); }}
             />}
           </Suspense>
         )}
@@ -1166,8 +1182,8 @@ function Workspace({
                 )}
                 {isTopic && node ? (
                   <>
-                    <StudyLibraryLinks snapshot={snapshot} repo={repo} selected={selected} link={linkLibraryMaterial} refresh={refresh} prompts={() => setPromptsOpen(true)} library={() => openModule("library")} />
-                    <div className="study-tools"><button className="text-button" onClick={() => setQuestionsOpen(true)}>Resolver questões</button><button className="text-button" onClick={() => setFlashcardsOpen(true)}>Estudar flashcards e revisões</button><button className="text-button" onClick={() => setProductivityOpen(true)}>Registrar sessão de estudo</button></div>
+                    <StudyLibraryLinks snapshot={snapshot} repo={repo} selected={selected} link={linkLibraryMaterial} refresh={refresh} prompts={() => openStudyResource("prompts")} library={() => openStudyResource("library")} />
+                    <div className="study-tools"><button className="text-button" onClick={() => setQuestionsOpen(true)}>Resolver questões</button><button className="text-button" onClick={() => setFlashcardsOpen(true)}>Estudar flashcards e revisões</button><button className="text-button" onClick={() => { setStudySession(selected); setProductivityOpen(true); }}>Registrar sessão de estudo</button></div>
                     <div
                       className="tabs"
                       role="tablist"
@@ -1487,6 +1503,7 @@ function Workspace({
         {questionsOpen && (
           <Suspense fallback={<p role="status">Carregando questões…</p>}>
             <QuestionsPanel
+              initialTopic={isTopic ? selected : ""}
               startImport={importTarget === "questions"}
               nodes={data.nodes}
               user={repo.user}
@@ -1507,6 +1524,7 @@ function Workspace({
         {flashcardsOpen && (
           <Suspense fallback={<p role="status">Carregando flashcards…</p>}>
             <FlashcardPanel
+              initialTopic={isTopic ? selected : ""}
               startImport={importTarget === "cards"}
               nodes={data.nodes}
               user={repo.user}
@@ -1525,7 +1543,7 @@ function Workspace({
             initial={materialForm === "new" ? undefined : materialForm}
             topic={modulePage === "library" ? "" : selected}
             materials={snapshot.materials}
-            useExisting={async m => modulePage === "library" ? (setMaterialForm(null), true) : linkLibraryMaterial(m, selected, true)}
+            onUseExisting={async m => modulePage === "library" ? (setMaterialForm(null), true) : linkLibraryMaterial(m, selected, true)}
             user={repo.user}
             section={modulePage === "library" ? "Teoria e resumos" : section}
             demo={repo.demo}

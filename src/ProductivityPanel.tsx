@@ -61,6 +61,7 @@ export function ProductivityPanel({
   externalMock = false,
   startIncidence = false,
   startDashboard = false,
+  initialTopic = "",
 }: {
   snapshot: Snapshot;
   user: string;
@@ -69,6 +70,7 @@ export function ProductivityPanel({
   externalMock?: boolean;
   startIncidence?: boolean;
   startDashboard?: boolean;
+  initialTopic?: string;
 }) {
   const [view, setView] = useState<
     "timer" | "dashboard" | "results" | "incidence"
@@ -92,9 +94,9 @@ export function ProductivityPanel({
   const lock = useRef(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
-  const [contest, setContest] = useState("");
-  const [discipline, setDiscipline] = useState("");
-  const [topic, setTopic] = useState("");
+  const [contest, setContest] = useState(() => ancestors(snapshot.nodes,initialTopic).find(n=>n.kind==="contest")?.id ?? "");
+  const [discipline, setDiscipline] = useState(() => ancestors(snapshot.nodes,initialTopic).find(n=>n.kind==="discipline")?.id ?? "");
+  const [topic, setTopic] = useState(initialTopic);
   const [mode, setMode] = useState<Mode>("theory");
   const [pomodoro, setPomodoro] = useState(false);
   const [focus, setFocus] = useState(25);
@@ -453,13 +455,14 @@ export function ProductivityPanel({
           .slice(0, 5)
       : [];
   function evidence(id: string): Evidence {
-    const ss = (data?.sessions ?? []).filter((s) => s.topic_id === id);
-    const rr = (data?.results ?? []).filter((r) => r.topic_id === id);
+    const evidenceTopics = new Set([id,...(source?.equivalences ?? []).filter(pair=>pair.includes(id)).flatMap(pair=>pair)]);
+    const ss = (data?.sessions ?? []).filter((s) => evidenceTopics.has(s.topic_id));
+    const rr = (data?.results ?? []).filter((r) => evidenceTopics.has(r.topic_id));
     const aa = (data?.answers ?? []).filter(
-      (a) => a.study_questions?.topic_id === id,
+      (a) => !!a.study_questions && evidenceTopics.has(a.study_questions.topic_id),
     );
     const vv = (data?.reviews ?? []).filter(
-      (r) => cardTopic.get(r.card_id) === id,
+      (r) => evidenceTopics.has(cardTopic.get(r.card_id) ?? ""),
     );
     const newest = (values: string[]) => values.sort().at(-1);
     return {
@@ -1014,7 +1017,7 @@ export function ProductivityPanel({
           <CollapsibleSection title="Mapa de domínio" description="Consulte evidências de aprendizagem." icon={null} storageKey={"central-performance:"+user+":mastery"}>
           <p>
             Usa histórico completo até hoje. Dominado exige pelo menos 20
-            questões, 80% de acerto, duas revisões e evidências recentes.
+            questões, 80% de acerto, duas revisões e evidências recentes. Equivalências integrais revisadas permitem consultar as evidências compartilhadas sem copiar registros; equivalências parciais não consolidam domínio.
           </p>
           <ul>
             {relevant.map((n) => (
@@ -1023,7 +1026,7 @@ export function ProductivityPanel({
                   .slice(1)
                   .map((x) => x.name)
                   .join(" / ")}{" "}
-                · {dominance(evidence(n.id), new Date(tick))}
+                · {dominance(evidence(n.id), new Date(tick))}{source?.equivalences.some(pair=>pair.includes(n.id)) && <small> · Inclui evidências de equivalência integral revisada. Pesos e prioridades continuam específicos do edital.</small>}
               </li>
             ))}
           </ul>

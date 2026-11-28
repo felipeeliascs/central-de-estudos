@@ -27,7 +27,7 @@ it("oferece resumo no início e URLs próprias nos caminhos, incluindo navegaç�
 it("restaura link direto para planejamento", async () => {
   history.replaceState(null, "", "?page=planner");
   render(<App />);
-  await screen.findByRole("heading", { name: "Planejamento adaptativo", level: 1 });
+  await screen.findByRole("heading", { name: "Plano de Estudos", level: 1 });
   expect(location.search).toBe("?page=planner");
 });
 it("mostra distribuição documentada e estado vazio sem inventar desempenho", () => {
