@@ -135,8 +135,8 @@ try {
       key,
       code,
       windowsVirtualKeyCode: virtualKey,
-      text: "\r",
-      unmodifiedText: "\r",
+      text: key === "Enter" ? "\r" : undefined,
+      unmodifiedText: key === "Enter" ? "\r" : undefined,
     }).then(() =>
       call("Input.dispatchKeyEvent", {
         type: "keyUp",
