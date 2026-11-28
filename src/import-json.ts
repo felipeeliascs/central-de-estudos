@@ -38,9 +38,52 @@ export function parseImportJson(raw: string, limitBytes = maxImportBytes): unkno
     throw new Error("$: limite de " + (limitBytes === 1048576 ? "1 MiB" : limitBytes / 1024 + " KiB"));
   // A UTF-8 BOM is a file encoding marker, not arbitrary content to extract.
   const source = raw.replace(/^\uFEFF/, "");
+  let value: unknown;
   try {
-    return JSON.parse(source);
+    value = JSON.parse(source);
   } catch (error) {
     throw new Error(jsonSyntaxMessage(error, source));
   }
+  rejectDuplicateKeys(source);
+  return value;
+}
+
+/** JSON.parse silently keeps only the last duplicate property. Reject before any importer can save it. */
+function rejectDuplicateKeys(source: string) {
+  let cursor = 0;
+  const space = () => { while (/\s/.test(source[cursor] ?? "") && cursor < source.length) cursor++; };
+  function stringToken() {
+    const start = cursor++;
+    while (cursor < source.length) {
+      if (source[cursor] === "\\") { cursor += 2; continue; }
+      if (source[cursor++] === '"') break;
+    }
+    return JSON.parse(source.slice(start,cursor)) as string;
+  }
+  function value(path: string, depth = 0) {
+    if (depth > 100) throw new Error(path + ": JSON excessivamente aninhado. Use até 100 níveis.");
+    space();
+    if (source[cursor] === "{") {
+      cursor++; space(); const keys = new Set<string>();
+      if (source[cursor] !== "}") while (cursor < source.length) {
+        space(); const key = stringToken(); space(); cursor++;
+        const field = path + "[" + JSON.stringify(key) + "]";
+        if (keys.has(key)) throw new Error(field + ": campo repetido no mesmo objeto. Remova a duplicidade após conferir os valores; nenhum valor foi escolhido automaticamente.");
+        keys.add(key); value(field,depth+1); space();
+        if (source[cursor] !== ",") break;
+        cursor++;
+      }
+      cursor++;
+    } else if (source[cursor] === "[") {
+      cursor++; space(); let index = 0;
+      if (source[cursor] !== "]") while (cursor < source.length) {
+        value(path + "[" + index++ + "]",depth+1); space();
+        if (source[cursor] !== ",") break;
+        cursor++;
+      }
+      cursor++;
+    } else if (source[cursor] === '"') stringToken();
+    else { while (cursor < source.length && !/[\s,}\]]/.test(source[cursor])) cursor++; }
+  }
+  value("$");
 }
