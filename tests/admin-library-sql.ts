@@ -29,6 +29,9 @@ export async function exerciseAdminLibrary(db: PGlite,a: string,b: string) {
   await db.query("select public.study_link_library_material($1,$2,true)",[material,topic]);
   await db.query("select public.study_link_library_material($1,$2,true)",[material,topic2]);
   expect((await db.query("select * from public.study_material_links where material_id=$1",[material])).rows).toHaveLength(2);
+  await expect(db.query("update public.study_material_links set node_id=$1 where material_id=$2 and node_id=$3",[root2,material,topic])).rejects.toThrow(/Identidade do vínculo/);
+  await db.query("insert into public.study_bibliographies(owner_id,topic_id,title,author,edition,material_id) values($1,$2,'Obra fictícia','Autora fictícia','2ª edição',$3)",[b,topic,material]);
+  expect((await db.query("select author,work,edition from public.study_materials where id=$1",[material])).rows).toEqual([{author:"Autora fictícia",work:"Obra fictícia",edition:"2ª edição"}]);
   await db.query("update public.study_materials set body='Conteúdo versão 2' where id=$1",[material]);
   expect((await db.query("select * from public.study_materials where id=$1",[material])).rows).toHaveLength(1);
   await db.query("select public.study_link_library_material($1,$2,false)",[material,topic]);

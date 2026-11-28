@@ -1716,12 +1716,12 @@ function MaterialCard({
           }
         </span>
         <span className="visibility">
-          {m.visibility === "private" ? (
+          {m.catalog_managed ? <BookOpen size={12} /> : m.visibility === "private" ? (
             <LockKeyhole size={12} />
           ) : (
             <Share2 size={12} />
           )}{" "}
-          {m.visibility === "private" ? "Privado" : "Compartilhado"}
+          {m.catalog_managed ? "Catálogo" : m.visibility === "private" ? "Privado" : "Compartilhado"}
           {!own ? " · somente leitura" : ""}
         </span>
       </div>
