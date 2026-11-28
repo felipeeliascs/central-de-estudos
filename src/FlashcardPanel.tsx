@@ -1,3 +1,4 @@
+import { JsonImportWorkbench } from "./JsonImportWorkbench";
 import { useEffect, useRef, useState } from "react";
 import type { Grade } from "ts-fsrs";
 import { Modal } from "./Forms";
@@ -875,6 +876,7 @@ export function FlashcardPanel({
               }}
             />
           </label>
+          <JsonImportWorkbench raw={raw} onChange={value => {setRaw(value);setIncoming(null);setError("");}} accepted={["flashcard_deck"]} disabled={busy}/>
           <label>
             Assunto de destino
             <select

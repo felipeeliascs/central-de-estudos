@@ -1825,3 +1825,33 @@ dialog[open] { display: flex; flex-direction: column; }
 
 .action-menu.drop-up>.action-menu-options{top:auto;bottom:calc(100% + .35rem);}
 .action-menu-options{max-height:calc(100vh - 2rem);overflow-y:auto;}
+
+/* Import review stays inside the page and never writes before final preview. */
+.json-workbench { margin:1rem 0; padding:1rem; border:1px solid var(--border); border-radius:14px; background:var(--card-surface); min-width:0; }
+.json-workbench h4 { margin-top:0; }
+.json-workbench small { display:block; color:var(--muted); overflow-wrap:anywhere; }
+.json-field-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:1rem; min-width:0; }
+.json-field { min-width:0; padding:.5rem; }
+.json-field label { display:block; }
+.json-field input,.json-field select,.json-field textarea,.json-repair-report textarea { width:100%; min-width:0; box-sizing:border-box; }
+.json-field.invalid { border-left:3px solid #d9534f; }
+.json-field [aria-invalid="true"] { border-color:#d9534f; }
+.json-field ul { padding-left:1.2rem; }
+.json-array { grid-column:1/-1; min-width:0; }
+.json-table-scroll { max-width:100%; overflow:auto; }
+.json-edit-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+.json-edit-table th,.json-edit-table td { padding:.75rem; border:1px solid var(--border); vertical-align:top; text-align:left; overflow-wrap:anywhere; }
+.json-edit-table th:first-child { width:22%; }
+.json-edit-table tr.has-errors > th { background:var(--soft-surface); }
+.json-assist-actions,.json-pagination { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; margin-top:1rem; }
+.json-issues ol { max-height:24rem; overflow:auto; padding-left:1.5rem; }
+.json-issues li { padding:.5rem; border-bottom:1px solid var(--border); overflow-wrap:anywhere; }
+.json-wrapper-notice { background:var(--soft-surface); border-left:3px solid var(--green); padding:1rem; margin:1rem 0; }
+.json-review-fields { margin:1rem 0; }
+.json-repair-report { margin-top:1rem; }
+@media(max-width:600px) {
+ .json-workbench { padding:.65rem; }
+ .json-edit-table th:first-child { width:25%; }
+ .json-edit-table th,.json-edit-table td { padding:.35rem; }
+ .json-assist-actions { align-items:stretch; flex-direction:column; }
+}

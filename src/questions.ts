@@ -1,3 +1,4 @@
+import { parseImportJson } from "./import-json";
 import { safeUrl, type Node } from "./domain";
 export const origins = {
   author: "Original",
@@ -205,7 +206,7 @@ export function importQuestions(
 ) {
   if (new TextEncoder().encode(text).length > 256 * 1024)
     throw new Error("Limite de 256 KiB.");
-  const doc = record(JSON.parse(text.replace(/^\uFEFF/, "")));
+  const doc = record(parseImportJson(text,256*1024));
   if (
     doc.schema_version !== "1.0" ||
     doc.type !== "questions" ||

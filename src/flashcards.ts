@@ -1,3 +1,4 @@
+import { parseImportJson } from "./import-json";
 import {
   createEmptyCard,
   fsrs,
@@ -195,7 +196,7 @@ export function validateCard(raw: unknown): CardContent {
 export function parseDeck(raw: string) {
   if (new TextEncoder().encode(raw).length > 1024 * 1024)
     throw new Error("Limite de 1 MiB por arquivo.");
-  const doc = object(JSON.parse(raw.replace(/^\uFEFF/, "")));
+  const doc = object(parseImportJson(raw,1024*1024));
   if (doc.schema_version !== "1.0" || doc.type !== "flashcard_deck")
     throw new Error("Use o contrato flashcard_deck, versão 1.0.");
   const deck = object(doc.deck);

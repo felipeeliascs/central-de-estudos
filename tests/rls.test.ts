@@ -1,3 +1,4 @@
+import { exerciseRoseiraRegistration } from "./roseira-registration-sql";
 import { exerciseIncidenceImport } from "./incidence-import-sql";
 import { exerciseAdminLibrary } from "./admin-library-sql";
 import { exerciseCatalogDeletion } from "./catalog-deletion-sql";
@@ -428,6 +429,7 @@ it("executa a migração e verifica isolamento no PostgreSQL com duas contas, le
     await db.exec("reset role");
     for (const file of ["202611280017_admin_catalog_billing.sql","202611280018_central_library.sql"]) await db.exec(readFileSync(new URL("../supabase/migrations/"+file,import.meta.url),"utf8"));
     await exerciseAdminLibrary(db,a,b);
+    await exerciseRoseiraRegistration(db,a,b);
     await db.exec("reset role;set role anon;");
     await expect(
       db.query("select public.study_admin_overview()"),

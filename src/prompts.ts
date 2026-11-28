@@ -1,3 +1,4 @@
+import { contractInstructions, type ImportType } from "./import-contracts";
 import { libraryContract } from "./library-import";
 import { incidenceBatchContract, eligibleIncidenceItems } from "./incidence-import";
 import { parseContest, type ContestDocument } from "./contest-schema";
@@ -222,5 +223,7 @@ export function buildPrompt(template: PromptTemplate, context: Context) {
         ? "Use exclusivamente o assunto_id fornecido no contexto em topic_id."
         : "",
     );
+  const kind: ImportType | null = template.id === "videos" ? "video_batch" : template.id === "incidencia-json" ? "incidence_batch" : template.id === "biblioteca-json" ? "library_batch" : template.id === "trilhas" ? "study_trail" : template.target === "contest" ? "contest" : template.target === "cards" ? "flashcard_deck" : template.target === "questions" ? "questions" : null;
+  if (kind) lines.push("Limites compartilhados com a revisão de importação:", contractInstructions(kind));
   return lines.join("\n\n");
 }

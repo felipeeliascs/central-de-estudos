@@ -1,3 +1,4 @@
+import { JsonImportWorkbench } from "./JsonImportWorkbench";
 import { useId, useState } from "react";
 import { maxImportBytes } from "./import-json";
 import { libraryContract, parseLibraryBatch, materialFromEntry, type LibraryEntry } from "./library-import";
@@ -12,6 +13,7 @@ export function LibraryImporter({ snapshot, repo, refresh }: { snapshot: Snapsho
   const candidates = (entry: LibraryEntry) => {
     const m = materialFromEntry(entry,repo.user); return snapshot.materials.filter(existing => existing.library_key === entry.id || possibleDuplicates(m,[existing]).length);
   };
+  function changeRaw(value:string) { setRaw(value); setEntries(null); setDecisions({}); setError(""); }
   function preview() { setError(""); setStatus(""); try { const next = parseLibraryBatch(raw); setEntries(next); setDecisions({}); } catch(e) { setError((e as Error).message); } }
   const unresolved = entries?.filter(e => candidates(e).length && !decisions[e.id]).length ?? 0;
   async function confirm() {
@@ -39,6 +41,7 @@ export function LibraryImporter({ snapshot, repo, refresh }: { snapshot: Snapsho
     <label htmlFor={id+"-file"}>Arquivo JSON de materiais<input id={id+"-file"} name="library-json-file" type="file" accept=".json,application/json" disabled={busy} onChange={async e => { const file=e.target.files?.[0]; if (!file) return; setError(""); try { if (file.size>maxImportBytes) throw new Error("Limite de 512 KiB."); setRaw(await file.text()); setEntries(null); } catch(e) { setError((e as Error).message); } }} /></label>
     <label htmlFor={id+"-raw"}>Ou cole o JSON de materiais<textarea id={id+"-raw"} name="library-json" value={raw} rows={8} disabled={busy} onChange={e => { setRaw(e.target.value); setEntries(null); }} /></label>
     <label>Vincular lote a um conteúdo (opcional)<select value={target} disabled={busy} onChange={e => { setTarget(e.target.value); setEntries(null); }}><option value="">Somente no acervo, sem concurso</option>{snapshot.nodes.filter(n=>!n.catalog_archived).map(n => <option key={n.id} value={n.id}>{n.kind} · {n.name}</option>)}</select></label>
+    <JsonImportWorkbench raw={raw} onChange={changeRaw} accepted={["library_batch"]} context={{nodes:snapshot.nodes}} disabled={busy}/>
     <button className="secondary" disabled={busy} onClick={preview}>Gerar prévia de materiais</button>
     {entries && <><h3>Prévia · {entries.length} materiais</h3><ol className="library-import-preview">{entries.map((entry,index) => {
       const matches = candidates(entry); const decision = decisions[entry.id];
