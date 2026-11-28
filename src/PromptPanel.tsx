@@ -4,6 +4,7 @@ import { productivityStore } from "./productivity-data";
 import { supabase } from "./repository";
 import {
   buildPrompt,
+  libraryPromptIds,
   templates,
   type Context,
   type PromptTemplate,
@@ -49,6 +50,7 @@ export function PromptPanel({
   const [work, setWork] = useState("");
   const [incidenceMeasure, setIncidenceMeasure] = useState<"exams" | "questions">("exams");
   const [videoMode, setVideoMode] = useState<"fixed" | "complete">("fixed");
+  const [mockBatch, setMockBatch] = useState(1);
   const [quantity, setQuantity] = useState(5);
   const [difficulty, setDifficulty] = useState("Média");
   const [existing, setExisting] = useState("");
@@ -146,6 +148,8 @@ export function PromptPanel({
     author,
     work,
     quantity,
+    mockBatch,
+    questionTopics: nodes.filter(n => (n.kind === "topic" || n.kind === "subtopic") && path(n.id)[0]?.id === contest).map(n => ({topic_id:n.id,name:n.name,discipline_id: path(n.id)[1]?.catalog_key ?? "",discipline_name:path(n.id)[1]?.name ?? ""})),
     videoMode,
     incidenceMeasure,
     difficulty,
@@ -161,8 +165,9 @@ export function PromptPanel({
     try {
       if (selected.id === "trilhas" && (!contest || !subjects.length)) throw new Error("Selecione um concurso com assuntos antes de copiar.");
       if ((selected.id === "videos" || selected.id === "incidencia-json")) parseContest(existing);
-      if (selected.target === "questions" && !topic)
+      if (selected.target === "questions" && selected.id !== "simulados" && !topic)
         throw new Error("Selecione um assunto para preencher o identificador.");
+      if (selected.id === "simulados" && !contest) throw new Error("Selecione um concurso para preparar os lotes do simulado.");
       if (selected.id === "desempenho" && !performance.trim())
         throw new Error("Gere e revise os dados agregados antes de copiar.");
       await navigator.clipboard.writeText(buildPrompt(selected, context));
@@ -442,7 +447,8 @@ export function PromptPanel({
                 <option value="complete">Cobertura completa do edital</option>
               </select>
             </label>}
-            {selected.id !== "incidencia-json" && !(selected.id === "videos" && videoMode === "complete") && <label>
+            {selected.id === "simulados" && <label>Lote do simulado<input type="number" min={1} max={100} value={mockBatch} onChange={e=>setMockBatch(Number(e.target.value))}/></label>}
+            {selected.id !== "simulados" && selected.id !== "incidencia-json" && !(selected.id === "videos" && videoMode === "complete") && <label>
               Quantidade
               <input
                 type="number"
@@ -466,7 +472,7 @@ export function PromptPanel({
           </div>
           {selected.id === "videos" && videoMode === "complete" && <p role="status">A cobertura usa todos os assuntos e subassuntos ativos do JSON abaixo, incluindo assuntos com subassuntos. Não é limitada pelos filtros nem pela quantidade fixa. A meta e os IDs aparecem na prévia do prompt; URLs não verificadas não devem ser inventadas.</p>}
           {selected.id === "incidencia-json" && <label>Unidade para calcular incidência<select id={`${promptId}-incidence-measure`} name="incidence-measure" value={incidenceMeasure} onChange={e=>setIncidenceMeasure(e.target.value as "exams" | "questions")}><option value="exams">Provas com o assunto / provas analisadas</option><option value="questions">Questões do assunto / questões analisadas</option></select></label>}
-          {(selected.id === "retificacao" || selected.id === "videos" || selected.id === "incidencia-json") && (
+          {(selected.id === "retificacao" || selected.id === "videos" || selected.id === "incidencia-json" || selected.id === "simulados") && (
             <label>
               JSON atual do concurso
               <textarea
@@ -514,7 +520,7 @@ export function PromptPanel({
               Abrir ChatGPT
             </a>
             {selected.id === "incidencia-json" && openIncidence && <button className="secondary" onClick={openIncidence}>Abrir importador de incidência</button>}
-            {selected.id === "biblioteca-json" && openLibrary && <button className="secondary" onClick={openLibrary}>Abrir importador da Biblioteca</button>}
+            {libraryPromptIds.includes(selected.id) && openLibrary && <button className="secondary" onClick={openLibrary}>Abrir importador da Biblioteca</button>}
             {selected.id === "trilhas" && openTrails && <button className="secondary" onClick={openTrails}>Abrir importador de Trilhas</button>}
             {selected.target !== "none" && (
               <button
@@ -529,7 +535,7 @@ export function PromptPanel({
               </button>
             )}
           </div>
-          {selected.target === "none" && selected.id !== "trilhas" && selected.id !== "incidencia-json" && selected.id !== "biblioteca-json" && (
+          {selected.target === "none" && selected.id !== "trilhas" && selected.id !== "incidencia-json" && !libraryPromptIds.includes(selected.id) && (
             <p>
               A resposta é textual. Revise e cadastre os dados na seção
               correspondente.
