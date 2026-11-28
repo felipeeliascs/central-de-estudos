@@ -96,3 +96,10 @@ Os contratos existentes permanecem compatíveis. Abrir Edital é consulta inform
 ## Importar incidência histórica
 
 O contrato **incidence_batch 1.0** permite importar evidências para assuntos de um edital existente, separadamente das videoaulas e do edital. Use o novo prompt Calcular incidência por assunto · JSON e o importador em Desempenho → Raio-X do edital. Veja campos, limites, denominadores, lacunas e controle de substituições em [INCIDENCIA-JSON.md](INCIDENCIA-JSON.md). Requer a migração 016 no ambiente autorizado; não altera materiais ou progresso.
+\n
+
+## Revisão assistida de importação JSON
+
+Use a revisão por campo junto ao JSON colado ou enviado. Corrija os registros, gere uma nova prévia e confirme conforme as regras do módulo. O download revisado não grava no banco. Tipos incorretos apontam o destino adequado.
+
+Consulte [decisões, simulação do edital e limitações](JSON-IMPORTACAO-ASSISTIDA.md). Nenhuma nova migração é necessária.

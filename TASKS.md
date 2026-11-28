@@ -416,3 +416,15 @@ Decisões e limites em BIBLIOTECA.md e MERCADO-PAGO.md.
 - [ ] Aplicar migração 016, incorporar e publicar somente após autorização específica.
 
 Contrato e instruções em INCIDENCIA-JSON.md. URLs e contagens dos testes são fictícias, sem pretensão de evidência real.
+\n
+
+## Revisão assistida de importação JSON
+
+- [x] Compartilhar limites dos sete contratos entre diagnóstico, tabela e prompts.
+- [x] Permitir correções por campo, identificação de tipo, download e normalização explícita de uma cerca exata.
+- [x] Invalidar prévias após edição e preservar validações finais/RPCs.
+- [x] Preparar simulação parcial de Roseira — Professor de Matemática, sem inventar Anexo II.
+- [ ] Registrar resultado final de lint, testes, build e Chrome na nuvem.
+- [ ] Validar Anexo II completo e fluxos Auth/Storage em homologação.
+
+Consulte [decisões, simulação do edital e limitações](JSON-IMPORTACAO-ASSISTIDA.md). Nenhuma nova migração é necessária.
