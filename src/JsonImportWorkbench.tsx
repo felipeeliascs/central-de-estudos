@@ -51,8 +51,13 @@ function ObjectEditor(props:EditorProps) {
   const {field,path,value,document,type,context,issues,prefix,focusPath,change}=props;
   if(!record(value))return <div id={fieldId(prefix,path)} tabIndex={-1} className="json-field invalid"><strong>{field.label}</strong><p>Esperado objeto.</p><button type="button" className="secondary" onClick={()=>change(path,{})}>Adicionar objeto vazio: {field.label}</button></div>;
   const extra=Object.keys(value).filter(key=>!Object.hasOwn(field.fields??{},key));
+  const entries=Object.entries(field.fields??{});
+  const primary=([,child]:[string,Field])=>!!child.required||!!child.long||child.kind==="url";
+  const secondary=entries.filter(entry=>!primary(entry));
+  const renderField=([key,child]:[string,Field])=><FieldEditor key={key} field={child} path={path+"."+key} value={value[key]} document={document} type={type} context={context} issues={issues} prefix={prefix} focusPath={focusPath} change={change}/>;
   return <div className="json-field-grid" id={fieldId(prefix,path)} tabIndex={-1}>
-    {Object.entries(field.fields??{}).map(([key,child])=><FieldEditor key={key} field={child} path={path+"."+key} value={value[key]} document={document} type={type} context={context} issues={issues} prefix={prefix} focusPath={focusPath} change={change}/>)}
+    {entries.filter(primary).map(renderField)}
+    {secondary.length>0&&<details className="json-optional" open={secondary.some(([key])=>focusPath.startsWith(path+"."+key)||issues.some(i=>i.path===path+"."+key||i.path.startsWith(path+"."+key+".")||i.path.startsWith(path+"."+key+"[")))}><summary>Campos opcionais e metadados ({secondary.length})</summary><div className="json-field-grid">{secondary.map(renderField)}</div></details>}
     {extra.map(key=><div className="json-field invalid" key={key} id={fieldId(prefix,path+"."+key)} tabIndex={-1}><strong>Campo desconhecido: {key}</strong><p>O valor foi preservado. Revise a origem antes de remover.</p>{/^[a-zA-Z_]\w*$/.test(key)&&!["__proto__","constructor","prototype"].includes(key)&&<button type="button" className="text-button" onClick={()=>{if(window.confirm("Remover somente o campo desconhecido "+key+" deste rascunho?"))change(path+"."+key,undefined,true);}}>Remover campo desconhecido</button>}</div>)}
   </div>;
 }
@@ -73,7 +78,7 @@ function ArrayEditor(props:EditorProps) {
     <div className="json-table-scroll"><table className="json-edit-table"><thead><tr><th>Registro</th><th>Revisão dos campos</th></tr></thead><tbody>{visible.map(i=>{
       const entry=value[i],rowPath=path+"["+i+"]",rowErrors=issues.filter(e=>e.path.startsWith(rowPath));
       const title=record(entry)?entry.title??entry.name??entry.front??entry.statement??entry.item??entry.topic_id:"";
-      return <tr key={i} className={rowErrors.length?"has-errors":""}><th scope="row">{i+1}<small>{typeof title==="string"?title.slice(0,100):""}</small><small>{rowPath}</small>{rowErrors.length>0&&<span>{rowErrors.length} erros</span>}</th><td><details open={rowErrors.length>0||focusPath.startsWith(rowPath)}><summary>Editar registro {i+1}</summary><FieldEditor {...props} field={field.entry!} path={rowPath} value={entry} document={document} type={type} context={context} issues={issues} prefix={prefix} focusPath={focusPath} change={change}/></details></td></tr>;
+      return <tr key={i} className={rowErrors.length?"has-errors":""}><th scope="row">{i+1}<small>{typeof title==="string"?title.slice(0,100):""}</small><small>{rowPath}</small>{rowErrors.length>0&&<span>{rowErrors.length} {rowErrors.length===1?"erro":"erros"}</span>}</th><td><details open={rowErrors.length>0||focusPath.startsWith(rowPath)}><summary>Editar registro {i+1}</summary><FieldEditor {...props} field={field.entry!} path={rowPath} value={entry} document={document} type={type} context={context} issues={issues} prefix={prefix} focusPath={focusPath} change={change}/></details></td></tr>;
     })}</tbody></table></div>
     {!value.length&&<p className="muted">Nenhum registro informado. A tabela não inventa conteúdo ausente.</p>}
     {indices.length>10&&<div className="json-pagination"><button type="button" className="text-button" disabled={!current} onClick={()=>{setIgnoredFocus(focusPath);setPage(current-1);}}>Registros anteriores</button><span>Página {current+1} de {Math.ceil(indices.length/10)}</span><button type="button" className="text-button" disabled={(current+1)*10>=indices.length} onClick={()=>{setIgnoredFocus(focusPath);setPage(current+1);}}>Próximos registros</button></div>}

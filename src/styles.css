@@ -1855,3 +1855,16 @@ dialog[open] { display: flex; flex-direction: column; }
  .json-edit-table th,.json-edit-table td { padding:.35rem; }
  .json-assist-actions { align-items:stretch; flex-direction:column; }
 }
+
+.admin-card > label { display:block; margin:.75rem 0; }
+.admin-card > label textarea { display:block; width:100%; }
+.json-workbench textarea,.admin-card > label textarea { border:1px solid var(--border); border-radius:10px; background:var(--card-surface,#fff); color:inherit; padding:.65rem; resize:vertical; }
+.json-optional { grid-column:1/-1; min-width:0; padding:.5rem; border-top:1px solid var(--border); }
+.json-edit-table th small:first-of-type { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; }
+@media(max-width:600px) {
+ .json-edit-table,.json-edit-table tbody,.json-edit-table tr,.json-edit-table th,.json-edit-table td { display:block; width:100%!important; }
+ .json-edit-table thead { display:none; }
+ .json-edit-table th { display:grid; grid-template-columns:auto 1fr; gap:.35rem; }
+ .json-edit-table th small:first-of-type { -webkit-line-clamp:2; }
+ .json-edit-table tr { margin-bottom:.75rem; }
+}

@@ -78,9 +78,9 @@ it("mantém compatibilidade dos exemplos de todos os contratos",()=>{
  expect(diagnoseImport(validVideoBatch,"video_batch",{contest:videoBase})).toEqual([]);
  expect(diagnoseImport(incidenceBatch,"incidence_batch",{contest:incidenceContext.doc,incidence:incidenceContext})).toEqual([]);
  const nodes:Node[]=[
- {id:"demo-contest",parent_id:null,kind:"contest",name:"Fictício",owner_id:"a",position:0},
- {id:"demo-discipline",parent_id:"demo-contest",kind:"discipline",name:"Disciplina",owner_id:"a",position:0},
- {id:"demo-topic",parent_id:"demo-discipline",kind:"topic",name:"Assunto",owner_id:"a",position:0}
+ {id:"demo-contest",parent_id:null,kind:"contest",name:"Fictício",owner_id:"a",board:"",position:0},
+ {id:"demo-discipline",parent_id:"demo-contest",kind:"discipline",name:"Disciplina",owner_id:"a",board:"",position:0},
+ {id:"demo-topic",parent_id:"demo-discipline",kind:"topic",name:"Assunto",owner_id:"a",board:"",position:0}
  ];
  const questions={...contractExamples.questions,questions:contractExamples.questions.questions.map(q=>({...q,topic_id:"demo-topic"}))};
  expect(diagnoseImport(questions,"questions",{nodes})).toEqual([]);
