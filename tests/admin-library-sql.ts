@@ -7,8 +7,8 @@ export async function exerciseAdminLibrary(db: PGlite,a: string,b: string) {
   async function account(id: string) { await db.exec("reset role;set role authenticated;set request.jwt.claim.sub='"+id+"';"); }
   await db.exec("reset role;insert into public.study_signup_allowlist(email,expires_at) values('third@example.test',now()+interval '1 day');insert into auth.users(id,email) values('"+c+"','third@example.test');");
   await account(a);
-  await db.query("insert into public.study_nodes(id,parent_id,kind,name,owner_id) values($1,null,'contest','Concurso de teste',$4),($2,$1,'discipline','Disciplina',$4),($3,$2,'topic','Conteúdo integral',$4)",[root,disc,topic,a]);
-  await db.query("insert into public.study_nodes(id,parent_id,kind,name,owner_id) values($1,null,'contest','Segundo concurso',$4),($2,$1,'discipline','Disciplina',$4),($3,$2,'topic','Conteúdo integral',$4)",[root2,disc2,topic2,a]);
+  for (const [id,parent,kind,name] of [[root,null,"contest","Concurso de teste"],[disc,root,"discipline","Disciplina"],[topic,disc,"topic","Conteúdo integral"]]) await db.query("insert into public.study_nodes(id,parent_id,kind,name,owner_id) values($1,$2,$3,$4,$5)",[id,parent,kind,name,a]);
+  for (const [id,parent,kind,name] of [[root2,null,"contest","Segundo concurso"],[disc2,root2,"discipline","Disciplina"],[topic2,disc2,"topic","Conteúdo integral"]]) await db.query("insert into public.study_nodes(id,parent_id,kind,name,owner_id) values($1,$2,$3,$4,$5)",[id,parent,kind,name,a]);
   await account(b);
   expect((await db.query("select id from public.study_nodes where id=$1",[root])).rows).toHaveLength(0);
   await expect(db.query("select public.study_admin_catalog_availability()")).rejects.toThrow(/administradores/);

@@ -1,3 +1,4 @@
+import { ActionMenu } from "./ActionMenu";
 import { LibraryPanel } from "./LibraryPanel";
 import { NoticePage } from "./NoticePage";
 import { StudyLibraryLinks } from "./StudyLibraryLinks";
@@ -753,9 +754,9 @@ function Workspace({
             {modulePage ? (
               <>
         {modulePage === "notice" && <NoticePage id={selected} snapshot={snapshot} demo={repo.demo} close={() => openModule("catalog")} study={navigate} />}
-        {modulePage === "library" && <LibraryPanel snapshot={snapshot} repo={repo} close={() => openModule(null)} add={() => setMaterialForm("new")} edit={setMaterialForm} refresh={refresh}
+        {modulePage === "library" && <LibraryPanel snapshot={snapshot} repo={repo} close={() => openModule(null)} add={() => setMaterialForm("new")} refresh={refresh}
           study={navigate} prompts={() => setPromptsOpen(true)} link={linkLibraryMaterial}
-          renderMaterial={m => <MaterialCard m={m} own={false} disabled={busy} edit={() => setMaterialForm(m)} remove={() => setDeleting(m)} move={() => {}} open={() => openFile(m)} />} />}
+          renderMaterial={m => <MaterialCard m={m} reorder={false} own={m.owner_id === repo.user && !m.catalog_managed} disabled={busy} edit={() => setMaterialForm(m)} remove={() => setDeleting(m)} move={() => {}} open={() => openFile(m)} />} />}
         {trailsOpen && (
           <Suspense fallback={<p role="status">Carregando trilhas…</p>}>
             <TrailPanel snapshot={snapshot} user={repo.user} demo={repo.demo}
@@ -1673,6 +1674,7 @@ function Workspace({
 }
 function MaterialCard({
   m,
+  reorder = true,
   own,
   disabled,
   edit,
@@ -1681,6 +1683,7 @@ function MaterialCard({
   open,
 }: {
   m: Material;
+  reorder?: boolean;
   own: boolean;
   disabled: boolean;
   edit: () => void;
@@ -1775,8 +1778,8 @@ function MaterialCard({
           )}
         </div>
         {own && (
-          <div className="edit-actions">
-            <button
+          <ActionMenu label={`Ações do material ${m.title}`}>
+            {reorder && <><button
               className="icon"
               aria-label={`Mover ${m.title} para cima`}
               disabled={disabled}
@@ -1791,14 +1794,14 @@ function MaterialCard({
               onClick={() => move(1)}
             >
               <ArrowDown size={16} />
-            </button>
+            </button></>}
             <button
               className="icon"
               aria-label={`Editar ${m.title}`}
               disabled={disabled}
               onClick={edit}
             >
-              <Pencil size={16} />
+              <Pencil size={16} /> Editar material
             </button>
             <button
               className="icon"
@@ -1806,9 +1809,9 @@ function MaterialCard({
               disabled={disabled}
               onClick={remove}
             >
-              <Trash2 size={16} />
+              <Trash2 size={16} /> Excluir material
             </button>
-          </div>
+          </ActionMenu>
         )}
       </div>
     </article>

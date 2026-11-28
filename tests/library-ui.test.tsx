@@ -44,7 +44,7 @@ it("consulta edital informativo com portal único e sem controles de estudo",asy
 });
 it("biblioteca filtra e cria vínculos sem duplicar o material",async()=>{
  const user=userEvent.setup(); const link=vi.fn().mockResolvedValue(true);
- render(<LibraryPanel snapshot={snapshot} repo={{user:"user",demo:true} as Repository} close={vi.fn()} add={vi.fn()} edit={vi.fn()} refresh={vi.fn()} renderMaterial={x=><p>{x.body}</p>} link={link} study={vi.fn()} prompts={vi.fn()}/>);
+ render(<LibraryPanel snapshot={snapshot} repo={{user:"user",demo:true} as Repository} close={vi.fn()} add={vi.fn()} refresh={vi.fn()} renderMaterial={x=><p>{x.body}</p>} link={link} study={vi.fn()} prompts={vi.fn()}/>);
  await user.click(screen.getByText("Resumo da LDB"));
  await user.selectOptions(screen.getByLabelText("Vincular a concurso, disciplina ou assunto"),"r2");
  await user.click(screen.getByRole("button",{name:"Vincular material existente"}));

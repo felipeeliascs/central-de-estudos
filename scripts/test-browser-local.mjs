@@ -238,6 +238,8 @@ try {
       const shot=await call("Page.captureScreenshot",{format:"png",captureBeyondViewport:false});
       await writeFile(resolve(scratch,`ui-${width}-${page.split("&")[0]}.png`),Buffer.from(shot.data,"base64"));
     }
+    await evaluate('history.pushState(null,"","?page=study&item=demo-topic");window.dispatchEvent(new PopStateEvent("popstate"))');
+    await until("!!document.querySelector('.tabs')");
     await evaluate('history.pushState(null,"","?page=home");window.dispatchEvent(new PopStateEvent("popstate"))');
     await until("!!document.querySelector('.home-page')");
     console.log(`OK: ${width}x${height}, início, perfil, edital, biblioteca, plano, desempenho, navegação e Enter.`);

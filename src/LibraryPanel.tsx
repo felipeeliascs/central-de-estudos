@@ -6,8 +6,8 @@ import { linkedNodes, appliesTo } from "./library";
 import { progress, type Material, type Node, type Snapshot } from "./domain";
 import type { Repository } from "./repository";
 
-export function LibraryPanel({ snapshot, repo, close, add, edit, renderMaterial, link, study, prompts, refresh }: {
-  snapshot: Snapshot; repo: Repository; close: () => void; add: () => void; edit: (m: Material) => void;
+export function LibraryPanel({ snapshot, repo, close, add, renderMaterial, link, study, prompts, refresh }: {
+  snapshot: Snapshot; repo: Repository; close: () => void; add: () => void;
   renderMaterial: (m: Material) => ReactNode; link: (m: Material, node: string, active: boolean) => Promise<boolean>;
   study: (id: string) => void; prompts: () => void; refresh: () => Promise<void>;
 }) {
@@ -45,12 +45,12 @@ export function LibraryPanel({ snapshot, repo, close, add, edit, renderMaterial,
     </div></details>
     {importing && <LibraryImporter snapshot={snapshot} repo={repo} refresh={refresh} />}
     <p className="muted">{filtered.length} materiais · apenas conteúdos próprios, do catálogo ou compartilhados com você.</p>
-    <ul className="library-list">{filtered.map(m => <LibraryRow key={m.id} m={m} snapshot={snapshot} user={repo.user} edit={edit} renderMaterial={renderMaterial} link={link} study={study} />)}</ul>
+    <ul className="library-list">{filtered.map(m => <LibraryRow key={m.id} m={m} snapshot={snapshot} user={repo.user} renderMaterial={renderMaterial} link={link} study={study} />)}</ul>
     {!filtered.length && <div className="chart-empty"><BookOpen aria-hidden="true" /><p>Nenhum material encontrado. Ajuste os filtros ou adicione uma referência ao acervo.</p></div>}
   </ModulePage>;
 }
-function LibraryRow({ m, snapshot, user, edit, renderMaterial, link, study }: {
-  m: Material; snapshot: Snapshot; user: string; edit: (m: Material) => void;
+function LibraryRow({ m, snapshot, user, renderMaterial, link, study }: {
+  m: Material; snapshot: Snapshot; user: string;
   renderMaterial: (m: Material) => ReactNode; link: (m: Material, node: string, active: boolean) => Promise<boolean>; study: (id: string) => void;
 }) {
   const [target,setTarget] = useState(""); const [busy,setBusy] = useState(false);
@@ -59,7 +59,6 @@ function LibraryRow({ m, snapshot, user, edit, renderMaterial, link, study }: {
   return <li><details className="library-row"><summary><span><strong>{m.title}</strong><small>{m.section} · {m.author || "Autor não informado"}{m.edition ? " · " + m.edition : ""}</small></span><span className="catalog-badge">{ids.length} vínculos</span></summary>
     <div className="library-row-content">
       {renderMaterial(m)}
-      {m.owner_id === user && !m.catalog_managed && <button className="text-button" onClick={() => edit(m)}>Editar material do acervo</button>}
       <h3>Onde utilizar este material</h3>
       <p className="muted">Vincular não copia o conteúdo. Desvincular não exclui o original. Alterações no material aparecem em todos os vínculos.</p>
       <ul>{ids.map(id => { const n = snapshot.nodes.find(n => n.id === id); return <li key={id}><span>{n ? path(n) : "Conteúdo indisponível"}</span>{n && <button className="text-button" onClick={() => study(id)}>Estudar conteúdo</button>}<button className="text-button" disabled={busy || snapshot.libraryReady === false} onClick={async () => { setBusy(true); await link(m,id,false); setBusy(false); }}>Desvincular material</button></li>; })}</ul>

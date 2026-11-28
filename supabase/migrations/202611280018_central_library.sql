@@ -171,3 +171,19 @@ begin
 end; $$;
 revoke all on function public.study_import_library_batch(jsonb,uuid,uuid) from public,anon,authenticated;
 grant execute on function public.study_import_library_batch(jsonb,uuid,uuid) to authenticated;
+
+-- Preserve bibliographic metadata already present in the relational catalog.
+update public.study_materials m set author=b.author,work=b.title,edition=coalesce(b.edition,''),source=coalesce(b.url,'')
+  from public.study_bibliographies b where b.material_id=m.id;
+create function public.study_sync_bibliography_metadata() returns trigger
+language plpgsql security invoker set search_path='' as $$
+begin
+  if new.material_id is not null then
+    update public.study_materials set author=new.author,work=new.title,edition=coalesce(new.edition,''),source=coalesce(new.url,'')
+      where id=new.material_id;
+  end if;
+  return new;
+end; $$;
+create trigger study_sync_bibliography_metadata after insert or update on public.study_bibliographies
+for each row execute function public.study_sync_bibliography_metadata();
+revoke all on function public.study_sync_bibliography_metadata() from public,anon,authenticated;
