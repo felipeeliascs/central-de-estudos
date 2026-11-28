@@ -65,7 +65,29 @@ begin
     if jsonb_typeof(entry->'occurrences') is distinct from 'number' or (entry->>'occurrences')!~'^[0-9]+$' then raise exception 'Ocorrências devem ser inteiras'; end if;
     occurrence_value=(entry->>'occurrences')::integer;
     if occurrence_value not between 0 and sample_value then raise exception 'Ocorrências não podem exceder a amostra'; end if;
-    if jsonb_typeof(entry->'source_url') is distinct from 'string' or length(entry->>'source_url') not between 1 and 2000 or (entry->>'source_url')!~'^https://[^/@[:space:]]+([/:?#].*)?$' then raise exception 'Use fonte HTTPS sem credenciais, até 2000 caracteres'; end if;
+    if jsonb_typeof(entry->'source_url') is distinct from 'string' or length(entry->>'source_url') not between 1 and 2000 or (entry->>'source_url')!~'^https://[^/@[:space:]:?#]+(:[0-9]+)?([/?#][^[:space:]]*)? then raise exception 'Use fonte HTTPS sem credenciais, até 2000 caracteres'; end if;
+   end if;
+  end loop;
+ end loop;
+ if exists(select 1 from public.study_imports where user_id=auth.uid() and idempotency_key=request_id) then raise exception 'Identificador de operação já utilizado'; end if;
+ for entry in select * from jsonb_array_elements(batch->'entries') loop
+  item_id=(ctx->'itemMap'->>(entry->>'item'))::uuid;
+  insert into public.study_historical_incidence(topic_id,board,measure,sample,occurrences,source_url,period_start,period_end,verified_by)
+  values(item_id,batch->>'board',batch->>'measure',sample_value,(entry->>'occurrences')::integer,entry->>'source_url',first_day,last_day,auth.uid())
+  on conflict(topic_id,board) do update set measure=excluded.measure,sample=excluded.sample,occurrences=excluded.occurrences,source_url=excluded.source_url,period_start=excluded.period_start,period_end=excluded.period_end,verified_by=excluded.verified_by,verified_at=now()
+  where (study_historical_incidence.measure,study_historical_incidence.sample,study_historical_incidence.occurrences,study_historical_incidence.source_url,study_historical_incidence.period_start,study_historical_incidence.period_end)
+   is distinct from (excluded.measure,excluded.sample,excluded.occurrences,excluded.source_url,excluded.period_start,excluded.period_end);
+  get diagnostics affected=row_count; changed=changed+affected;
+ end loop;
+ if changed>0 then
+  insert into public.study_imports(user_id,kind,contract_version,idempotency_key,status,summary)
+  values(auth.uid(),'incidence:import','1.0',request_id,'applied',jsonb_build_object('contest_id',target,'name',ctx#>>'{doc,name}','changed',changed,'measure',batch->>'measure','sample',sample_value));
+ end if;
+ return changed;
+end; $$;
+revoke all on function public.study_apply_incidence_batch(uuid,jsonb,jsonb,jsonb,uuid) from public,anon;
+grant execute on function public.study_apply_incidence_batch(uuid,jsonb,jsonb,jsonb,uuid) to authenticated;
+ then raise exception 'Use fonte HTTPS sem credenciais, até 2000 caracteres'; end if;
    end if;
   end loop;
  end loop;
