@@ -273,8 +273,66 @@ try {
     await until("!!document.querySelector('.home-page')");
     console.log(`OK: ${width}x${height}, início, perfil, edital, biblioteca, plano, desempenho, navegação e Enter.`);
   }
+
+  // An isolated student journey seeded from the supplied Guaratinguetá notice.
+  // This runs only on the CI's local server; it never connects to Supabase.
+  const guara=JSON.parse(await readFile(resolve("examples/guaratingueta-001-2026-coordenador-pedagogico.json"),"utf8"));
+  const demoUser="00000000-0000-4000-8000-000000000001";
+  const nodeId=i=>"90000000-0000-4000-8000-"+String(i).padStart(12,"0");
+  const guaraIds=new Map(guara.items.map((n,i)=>[n.id,nodeId(i+2)]));
+  const guaraState={nodes:[{id:nodeId(1),parent_id:null,kind:"contest",name:guara.name,board:guara.board,owner_id:"qa-admin",position:0},
+    ...guara.items.map((n,i)=>({id:guaraIds.get(n.id),parent_id:n.parent?guaraIds.get(n.parent):nodeId(1),kind:n.kind,name:n.name,board:"",owner_id:"qa-admin",position:i,catalog_key:n.id}))],
+    materials:guara.resources.map((r,i)=>({id:nodeId(1000+i),topic_id:guaraIds.get(r.item),owner_id:"qa-admin",section:"Bibliografia",title:r.title,kind:r.url?"link":"text",url:r.url??"",body:r.text??"",back:"",file_path:"",visibility:"shared",shared_with:[demoUser],position:i,embed:false,verified:false,catalog_managed:true,author:r.author,work:r.title,edition:r.edition})),checks:[],notes:[],materialLinks:[],libraryReady:true};
+  const guaraTopic=guaraIds.get("ce-01");
+  await evaluate(`localStorage.setItem("central-estudos-demo-v1",${JSON.stringify(JSON.stringify(guaraState))})`);
+  await call("Emulation.setDeviceMetricsOverride",{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+  await call("Page.navigate",{url:base+"?page=study&item="+guaraTopic});
+  await until("document.querySelector('main h1')?.textContent==='Legislação'");
+  await evaluate("[...document.querySelectorAll('[role=tab]')].find(b=>b.textContent==='Bibliografia').click()");
+  await until("document.querySelectorAll('.material-card').length===75");
+  await evaluate("[...document.querySelectorAll('[role=tab]')].find(b=>b.textContent==='Anotações').click()");
+  await evaluate("(()=>{const el=document.querySelector('#personal-notes');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(el,'Nota privada fictícia da jornada de Guaratinguetá.');el.dispatchEvent(new Event('input',{bubbles:true}));})()");
+  await evaluate("[...document.querySelectorAll('button')].find(b=>b.textContent==='Salvar anotações').click()");
+  await until("document.body.innerText.includes('Todas as anotações salvas')");
+  await evaluate("[...document.querySelectorAll('[role=tab]')].find(b=>b.textContent==='Progresso e checklist').click()");
+  await evaluate("[...document.querySelectorAll('label')].find(l=>l.textContent.includes('Estudar a teoria')).querySelector('input').click()");
+  assert.equal(await evaluate(`JSON.parse(localStorage.getItem("central-estudos-demo-v1")).checks.some(c=>c.topic_id===${JSON.stringify(guaraTopic)}&&c.step===1&&c.done)`),true);
+  for(const [width,height] of [[1440,900],[768,1024],[390,844]]) {
+    await call("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:width<800});
+    for(const [page,title] of [["library","Biblioteca"],["planner","Plano de Estudos"],["trails","Trilha da Semana"],["productivity","Meu desempenho"]]) {
+      await evaluate(`history.pushState(null,"","?page=${page}");window.dispatchEvent(new PopStateEvent("popstate"))`);
+      await until(`document.querySelector("main h1")?.textContent===${JSON.stringify(title)}`);
+      await until("!document.body.innerText.includes('Atualizando o planejamento')&&!document.body.innerText.includes('Carregando dados')");
+      assert.equal(await evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"),true,`Guaratinguetá overflow: ${page} at ${width}`);
+      if(page==="library") {
+        assert.equal(await evaluate("document.querySelectorAll('.library-row').length"),75);
+        await evaluate("(()=>{const el=document.querySelector('.library-toolbar input[type=search]');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,'Pedagogia da Autonomia');el.dispatchEvent(new Event('input',{bubbles:true}));})()");
+        await until("document.querySelectorAll('.library-row').length===1");
+      }
+      if(page==="planner") {
+        await until("!!document.querySelector('.plan-study-link')");
+      }
+      const shot=await call("Page.captureScreenshot",{format:"png",captureBeyondViewport:false});
+      await writeFile(resolve(scratch,`ui-guara-${width}-${page}.png`),Buffer.from(shot.data,"base64"));
+    }
+  }
+  // Check contextual return from an actual planned task.
+  await evaluate('history.pushState(null,"","?page=planner");window.dispatchEvent(new PopStateEvent("popstate"))');
+  await until("!!document.querySelector('.plan-study-link')");
+  await evaluate("document.querySelector('.plan-study-link').click()");
+  await until("!!document.querySelector('.tabs')");
+  const contextual=await evaluate("new URL(location.href).searchParams.get('item')");
+  assert.equal(guaraState.nodes.some(n=>n.id===contextual),true);
+  await call("Page.navigate",{url:base+"?page=study&item="+guaraTopic});
+  await until("document.querySelector('main h1')?.textContent==='Legislação'");
+  await evaluate("[...document.querySelectorAll('[role=tab]')].find(b=>b.textContent==='Anotações').click()");
+  assert.equal(await evaluate("document.querySelector('#personal-notes').value"),"Nota privada fictícia da jornada de Guaratinguetá.");
+  await evaluate('history.pushState(null,"","?page=home");window.dispatchEvent(new PopStateEvent("popstate"))');
+  await until("!!document.querySelector('.home-page')");
+  console.log("OK: Guaratinguetá — 179 itens, 75 obras, nota/checklist persistentes, acervo e filtros, plano contextual, trilhas e desempenho em 1440/768/390 px.");
+
   assert.deepEqual(runtimeErrors,[],"Erros de runtime/console no navegador");
-  await writeFile(resolve(scratch,"ui-report.json"),JSON.stringify({viewports:[1440,768,390],pages:["home","profile","study","catalog","notice","library","planner","productivity"],jsonReview:["invalid field","table correction","fresh preview","stale preview invalidated"],runtimeErrors},null,2));
+  await writeFile(resolve(scratch,"ui-report.json"),JSON.stringify({viewports:[1440,768,390],pages:["home","profile","study","catalog","notice","library","planner","productivity"],guaratingueta:{items:179,bibliography:75,source:"supplied PDF",activities:"fictitious",storage:"isolated demo",contextualPlanTask:true,notesPersisted:true},jsonReview:["invalid field","table correction","fresh preview","stale preview invalidated"],runtimeErrors},null,2));
   await evaluate("document.querySelector('.theme-toggle').click()");
   assert.equal(
     await evaluate("document.documentElement.dataset.theme"),
