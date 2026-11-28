@@ -290,6 +290,7 @@ try {
   await until("document.querySelector('main h1')?.textContent==='Legislação'");
   await evaluate("[...document.querySelectorAll('[role=tab]')].find(b=>b.textContent==='Bibliografia').click()");
   await until("document.querySelectorAll('.material-card').length===75");
+  assert.equal(await evaluate("[...document.querySelectorAll('.summary-card span')].find(e=>e.textContent==='Materiais disponíveis').closest('.summary-card').querySelector('strong').textContent.trim()"),"75");
   await evaluate("[...document.querySelectorAll('[role=tab]')].find(b=>b.textContent==='Anotações').click()");
   await evaluate("(()=>{const el=document.querySelector('#personal-notes');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(el,'Nota privada fictícia da jornada de Guaratinguetá.');el.dispatchEvent(new Event('input',{bubbles:true}));})()");
   await evaluate("[...document.querySelectorAll('button')].find(b=>b.textContent==='Salvar anotações').click()");

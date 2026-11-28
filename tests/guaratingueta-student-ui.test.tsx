@@ -20,6 +20,7 @@ it("estudante encontra bibliografia contextual, cria resumo, salva nota e checkl
  const user=userEvent.setup();localStorage.setItem("central-estudos-demo-v1",JSON.stringify(snapshot()));
  history.replaceState(null,"","/?page=study&item="+subject());
  const view=render(<App/>);await screen.findByRole("heading",{name:"Legislação"});
+ expect(screen.getByText("Materiais disponíveis").closest("section")?.querySelector("strong")?.textContent).toBe("75");
  await user.click(screen.getByRole("tab",{name:"Bibliografia"}));
  expect(screen.getByRole("heading",{name:guara.resources[74].title})).toBeTruthy();
  await user.click(screen.getByRole("tab",{name:"Teoria e resumos"}));
@@ -29,6 +30,7 @@ it("estudante encontra bibliografia contextual, cria resumo, salva nota e checkl
  await user.type(within(form).getByLabelText("Texto",{exact:true}),"Resumo fictício para testar o acervo central.");
  await user.click(within(form).getByRole("button",{name:"Salvar material"}));
  await screen.findByRole("heading",{name:"QA — resumo fictício de legislação"});
+ expect(screen.getByText("Materiais disponíveis").closest("section")?.querySelector("strong")?.textContent).toBe("76");
  await user.click(screen.getByRole("tab",{name:"Anotações"}));
  await user.type(screen.getByRole("textbox",{name:"Anotações pessoais · somente você"}),"Nota privada fictícia para retomar legislação.");
  await user.click(screen.getByRole("button",{name:"Salvar anotações"}));

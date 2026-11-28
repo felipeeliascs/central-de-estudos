@@ -435,6 +435,7 @@ Consulte [decisões, simulação do edital e limitações](JSON-IMPORTACAO-ASSIS
 - [x] Preparar JSON contest 1.0 com 4 disciplinas, 30 assuntos, 145 subassuntos e 75 referências, mantendo a procedência.
 - [x] Preservar informações não estruturadas em ficha textual library_batch; distinguir data prevista de prova e data de assinatura/publicação.
 - [x] Preparar jornada de administrador e estudante com questões, materiais, revisão, planejamento e dados pessoais fictícios.
+- [x] Corrigir o contador de materiais do assunto para incluir os vínculos herdados, mantendo a contagem dos descendentes e sem duplicar materiais.
 - [x] Executar o cadastro integral, idempotência e preservação de dados em PostgreSQL isolado; testar UI administrativa e de estudante.
 - [x] Validar lint, suite completa, build e Chrome em 1440/768/390 px; capturas inspecionadas. O PR registra a execução do commit final.
 - [ ] Homologar Auth/PostgREST/upload real e links assinados quando houver ambiente integrado separado.

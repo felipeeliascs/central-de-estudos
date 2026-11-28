@@ -76,6 +76,14 @@ A ficha usa a Biblioteca já existente. O contrato de concurso não tem campos e
 
 Os dados de estudo, questões, exercícios, horários pessoais, perfis e arquivos de teste são fictícios. **O PDF não contém questões, aulas, resumos, mapas mentais ou provas históricas.** Esses conteúdos não foram apresentados como oficiais nem misturados ao JSON do edital.
 
+## Falha encontrada e corrigida
+
+A inspeção da tela de estudo no celular revelou **Materiais disponíveis: 0**, embora a aba Bibliografia exibisse 75 referências herdadas do agrupamento pai. O contador procurava vínculos no conteúdo selecionado e nos descendentes, sem incluir os ancestrais considerados pela lista de materiais.
+
+A correção reutiliza `appliesTo` para incluir o acervo herdado e mantém a contagem agregada dos descendentes nas visões de concurso/disciplina. Cada material é contado uma única vez; arquivados continuam excluídos. O teste React agora exige 75 antes do resumo pessoal e 76 depois; o Chrome exige 75 em cada tela de estudo. Não há alteração de permissões ou armazenamento.
+
+Na demonstração, a disponibilidade padrão deixa atividades fora do horizonte de 28 dias e o sistema avisa sobre a falta de capacidade. Essa estimativa não mede as horas oficiais do edital: disponibilidade, duração e granularidade dos estudos precisam ser revisadas pelo estudante.
+
 ## Ambiente e limites
 
 - PostgreSQL/PGlite descartável executa as 18 migrações existentes, RLS e RPCs; não é o Supabase de produção.
@@ -85,4 +93,4 @@ Os dados de estudo, questões, exercícios, horários pessoais, perfis e arquivo
 - Auth por e-mail, confirmação, recuperação, PostgREST, transmissão real de PDF/imagem ao Storage e links assinados ainda exigem Supabase de homologação. Este teste não comprova esses serviços integrados.
 - Não foi realizada inscrição na VUNESP, envio de títulos, pagamento ou busca de material pago. A plataforma organiza preparação e não substitui os procedimentos oficiais.
 - Não foram geradas evidências de incidência histórica; o edital descreve conteúdo exigido, não frequência observada em provas anteriores.
-- Sem migrações novas e sem alteração funcional do aplicativo nesta simulação. Se um fluxo falhar no CI, o diagnóstico/correção será registrado no PR antes de marcá-lo para revisão.
+- Sem migrações novas. A única alteração funcional do aplicativo é a correção do contador contextual de materiais, encontrada durante a simulação; as demais mudanças são dados, testes e documentação.
