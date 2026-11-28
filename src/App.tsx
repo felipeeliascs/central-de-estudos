@@ -141,6 +141,7 @@ function Workspace({
   function openModule(page: Module | null) {
     setModulePage(page);
     if (page !== "productivity") {
+      setStudySession("");
       setExternalMock(false);
       setIncidenceOpen(false);
     }

@@ -230,6 +230,12 @@ try {
       if(page==="library") {
         await until("!!document.querySelector('.library-row')");
         await evaluate("document.querySelector('.library-row').open=true");
+        await evaluate("document.querySelector('.material-card .action-menu summary').scrollIntoView({block:'center'});document.querySelector('.material-card .action-menu summary').click()");
+        await until("!!document.querySelector('.material-card .action-menu[open]')");
+        assert.equal(await evaluate("(()=>{const r=document.querySelector('.material-card .action-menu-options').getBoundingClientRect();return r.left>=0 && r.right<=innerWidth})()"),true);
+        await press("Escape","Escape",27);
+        assert.equal(await evaluate("!!document.querySelector('.material-card .action-menu[open]')"),false);
+        await evaluate("window.scrollTo(0,0)");
         assert.equal(await evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"),true);
       }
       if(page==="productivity") {

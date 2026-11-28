@@ -397,7 +397,7 @@ Resultados das verificações em nuvem e commit final são registrados no PR des
 - [x] Reorganizar ações em menus, equivalências integral/parcial e consulta do portal oficial sem fontes redundantes.
 - [x] Manter Plano de Estudos diário/semanal no mesmo modelo, com abertura contextual e confirmação de recálculo.
 - [x] Recolher seções detalhadas de desempenho e guardar preferência por usuário.
-- [ ] Concluir verificações na nuvem e registrar resultados finais no PR.
+- [x] Aprovar lint, 120 testes/32 arquivos, build e Chrome em 1440/768/390 pixels; referência Actions 46103895048. O PR registra o commit final. Relatório em RELATORIO-BIBLIOTECA.md.
 - [ ] Homologar HTTP/PostgREST e Storage real com contas e arquivos fictícios, quando existir ambiente separado.
 - [ ] Autorizar separadamente merge, migrações de produção e publicação. Nenhuma dessas ações foi executada nesta tarefa.
 

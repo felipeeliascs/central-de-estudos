@@ -8,5 +8,5 @@ export function ActionMenu({ label, children }: { label: string; children: React
     document.addEventListener("pointerdown",outside); document.addEventListener("keydown",escape);
     return()=>{ document.removeEventListener("pointerdown",outside); document.removeEventListener("keydown",escape); };
   },[]);
-  return <details className="action-menu" ref={ref}><summary aria-label={label} title={label}><EllipsisVertical size={18} aria-hidden="true" /><span className="sr-only">{label}</span></summary><div className="action-menu-options" onClick={e=>{ if((e.target as HTMLElement).closest("button,a") && ref.current) ref.current.open=false; }}>{children}</div></details>;
+  return <details className="action-menu" ref={ref} onToggle={() => { const el=ref.current; if(!el) return; el.classList.remove("drop-up"); if(el.open) { const panel=el.querySelector(".action-menu-options"); if(panel && panel.getBoundingClientRect().bottom > window.innerHeight-8) el.classList.add("drop-up"); } }}><summary aria-label={label} title={label}><EllipsisVertical size={18} aria-hidden="true" /><span className="sr-only">{label}</span></summary><div className="action-menu-options" onClick={e=>{ if((e.target as HTMLElement).closest("button,a") && ref.current) ref.current.open=false; }}>{children}</div></details>;
 }

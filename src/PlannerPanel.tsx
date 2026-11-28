@@ -186,7 +186,7 @@ export function PlannerPanel({
           {b.completed ? " · Concluída" : ""}
         </p>
         <small>{b.reason}</small>
-        {study && b.topicIds.map(id => <button key={id} className="text-button plan-study-link" onClick={() => study(id)}>Estudar {snapshot.nodes.find(n=>n.id===id)?.name || "conteúdo"} e materiais</button>)}
+        {study && (b.topicIds.length ? b.topicIds : b.contestIds).map(id => <button key={id} className="text-button plan-study-link" onClick={() => study(id)}>Estudar {snapshot.nodes.find(n=>n.id===id)?.name || "conteúdo"} e materiais</button>)}
         {b.kind === "review" && !b.completed && openReviews && (
           <div>
             <button className="secondary" onClick={openReviews}>

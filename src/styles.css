@@ -1822,3 +1822,6 @@ dialog[open] { display: flex; flex-direction: column; }
 .plan-study-link{display:block;margin-block:.35rem;}
 .plan-views .selected{color:inherit;}
 .notice-page>header{display:grid;gap:.65rem;justify-items:start;}
+
+.action-menu.drop-up>.action-menu-options{top:auto;bottom:calc(100% + .35rem);}
+.action-menu-options{max-height:calc(100vh - 2rem);overflow-y:auto;}
