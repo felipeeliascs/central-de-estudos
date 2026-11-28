@@ -299,11 +299,15 @@ try {
   assert.equal(await evaluate(`JSON.parse(localStorage.getItem("central-estudos-demo-v1")).checks.some(c=>c.topic_id===${JSON.stringify(guaraTopic)}&&c.step===1&&c.done)`),true);
   for(const [width,height] of [[1440,900],[768,1024],[390,844]]) {
     await call("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:width<800});
-    for(const [page,title] of [["library","Biblioteca"],["planner","Plano de Estudos"],["trails","Trilha da Semana"],["productivity","Meu desempenho"]]) {
+    for(const [page,title] of [["study&item="+guaraTopic,"Legislação"],["library","Biblioteca"],["planner","Plano de Estudos"],["trails","Trilha da Semana"],["productivity","Meu desempenho"]]) {
       await evaluate(`history.pushState(null,"","?page=${page}");window.dispatchEvent(new PopStateEvent("popstate"))`);
       await until(`document.querySelector("main h1")?.textContent===${JSON.stringify(title)}`);
       await until("!document.body.innerText.includes('Atualizando o planejamento')&&!document.body.innerText.includes('Carregando dados')");
       assert.equal(await evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"),true,`Guaratinguetá overflow: ${page} at ${width}`);
+      if(page.startsWith("study&")) {
+        await evaluate("[...document.querySelectorAll('[role=tab]')].find(b=>b.textContent==='Bibliografia').click()");
+        await until("document.querySelectorAll('.material-card').length===75");
+      }
       if(page==="library") {
         assert.equal(await evaluate("document.querySelectorAll('.library-row').length"),75);
         await evaluate("(()=>{const el=document.querySelector('.library-toolbar input[type=search]');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,'Pedagogia da Autonomia');el.dispatchEvent(new Event('input',{bubbles:true}));})()");
@@ -313,7 +317,7 @@ try {
         await until("!!document.querySelector('.plan-study-link')");
       }
       const shot=await call("Page.captureScreenshot",{format:"png",captureBeyondViewport:false});
-      await writeFile(resolve(scratch,`ui-guara-${width}-${page}.png`),Buffer.from(shot.data,"base64"));
+      await writeFile(resolve(scratch,`ui-guara-${width}-${page.split("&")[0]}.png`),Buffer.from(shot.data,"base64"));
     }
   }
   // Check contextual return from an actual planned task.

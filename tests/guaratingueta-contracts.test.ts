@@ -56,3 +56,29 @@ it("limita questões a 30 por lote e admite 50 questões fictícias em dois lote
  for(const [name,type] of [["edital.pdf","application/pdf"],["mapa.png","image/png"],["mapa.jpg","image/jpeg"],["mapa.webp","image/webp"]])expect(()=>validateFile(new File(["fixture"],name,{type}))).not.toThrow();
  expect(()=>validateFile(new File(["fixture"],"invalido.exe",{type:"application/octet-stream"}))).toThrow();
 });
+
+import {buildPrompt,templates,videoCoverage,type Context} from "../src/prompts";
+import {previewVideoBatch} from "../src/video-batch";
+import {previewIncidenceBatch} from "../src/incidence-import";
+it("prepara prompts externos com todos os 175 IDs e testa lote de videoaulas fictício sem substituir bibliografia",()=>{
+ const context:Context={contest:guara.name,board:"VUNESP",role:guara.role!,discipline:"",topic:"",topicId:"",author:"",work:"",quantity:5,difficulty:"medium",existing:JSON.stringify(guara),performance:"",videoMode:"complete"};
+ expect(videoCoverage(guara)).toHaveLength(175);
+ const prompt=buildPrompt(templates.find(t=>t.id==="videos")!,context);
+ for(const item of guara.items.filter(n=>n.kind==="topic"||n.kind==="subtopic"))expect(prompt).toContain('"item": "'+item.id+'"');
+ const batch={schema_version:"1.0",type:"video_batch",contest_id:guara.id,resources:[{id:"qa-video-ficticio",item:"ce-01",kind:"video",title:"QA — URL sintética para teste, não é indicação de aula",url:"https://youtu.be/abcdefghijk"}]};
+ const first=previewVideoBatch(JSON.stringify(batch),guara);
+ expect(first.valid).toBe(true);expect(first.doc.resources).toHaveLength(76);
+ expect(first.doc.resources.slice(0,75)).toEqual(guara.resources);
+ const second=previewVideoBatch(JSON.stringify(batch),first.doc);
+ expect(second.doc.resources).toHaveLength(76);expect(second.rows[0].status).toContain("Duplicata");
+});
+it("ausência de provas históricas gera lacunas sem inventar zero, amostra ou percentual",()=>{
+ const nodes=guaraSnapshot().nodes;
+ const itemMap=Object.fromEntries(nodes.filter(n=>n.catalog_key).map(n=>[n.catalog_key!,n.id]));
+ const missing=guara.items.filter(n=>n.kind==="topic"||n.kind==="subtopic").map(n=>({item:n.id,reason:"Edital sem corpus de provas anteriores: não é evidência de incidência."}));
+ // The header below is deliberately synthetic solely to exercise the no-evidence path.
+ const batch={schema_version:"1.0",type:"incidence_batch",contest_id:guara.id,board:"VUNESP",measure:"exams",period_start:"2020-01-01",period_end:"2025-12-31",sample:1,entries:[],unavailable:missing};
+ const result=previewIncidenceBatch(JSON.stringify(batch),{target:uuid(1),doc:guara,itemMap,expected:[]});
+ expect(result.valid).toBe(false);expect(result.changes).toBe(0);expect(result.rows).toHaveLength(175);
+ expect(result.rows.every(r=>!r.value&&r.status.includes("Sem evidência"))).toBe(true);
+});

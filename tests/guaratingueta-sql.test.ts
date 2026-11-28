@@ -53,8 +53,9 @@ it("executa jornada de Guaratinguetá: admin cadastra e estudante estuda, import
  const entries=[...ficha.materials,...["Teoria e resumos","Mapas mentais","Anotações pessoais","Bibliografia","Legislação","Questões externas","Flashcards","Videoaulas"].map((section,i)=>({id:"guara-qa-"+i,title:"QA fictício — "+section,section,kind:"text",body:"Conteúdo fictício da simulação; não é material ou referência oficial.",...(section==="Flashcards"?{back:"Verso fictício"}:{}),author:"Autoria fictícia",work:"Obra fictícia",edition:"Edição de teste",source:"QA isolado",content_version:"v1"}))];
  const operations=entries.map(entry=>({entry,action:"create",existing_id:null,expected_updated_at:null}));
  const request=crypto.randomUUID();
- await db.query("select public.study_import_library_batch($1::jsonb,$2,$3)",[JSON.stringify(operations),topic,request]);
- await db.query("select public.study_import_library_batch($1::jsonb,$2,$3)",[JSON.stringify(operations),topic,request]);
+ await db.query("select public.study_import_library_batch($1::jsonb,$2,gen_random_uuid())",[JSON.stringify(operations.slice(0,1)),root]);
+ await db.query("select public.study_import_library_batch($1::jsonb,$2,$3)",[JSON.stringify(operations.slice(1)),topic,request]);
+ await db.query("select public.study_import_library_batch($1::jsonb,$2,$3)",[JSON.stringify(operations.slice(1)),topic,request]);
  const own=(await db.query<{id:string;library_key:string;updated_at:string}>("select id,library_key,updated_at from public.study_materials where owner_id=$1",[student])).rows;
  expect(own).toHaveLength(entries.length);
  const reusable=own.find(m=>m.library_key==="guara-qa-0")!;

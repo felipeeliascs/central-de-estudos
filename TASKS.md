@@ -427,3 +427,17 @@ Contrato e instruções em INCIDENCIA-JSON.md. URLs e contagens dos testes são 
 - [ ] Validar Anexo II completo e fluxos Auth/Storage em homologação.
 
 Consulte [decisões, simulação do edital e limitações](JSON-IMPORTACAO-ASSISTIDA.md). Nenhuma nova migração é necessária.
+
+
+## Simulação de Guaratinguetá — Coordenador Pedagógico — 28/11/2026
+
+- [x] Conferir PDF de 123 páginas, escopo do cargo e conteúdo comum/específico, sem importar outros cargos.
+- [x] Preparar JSON contest 1.0 com 4 disciplinas, 30 assuntos, 145 subassuntos e 75 referências, mantendo a procedência.
+- [x] Preservar informações não estruturadas em ficha textual library_batch; distinguir data prevista de prova e data de assinatura/publicação.
+- [x] Preparar jornada de administrador e estudante com questões, materiais, revisão, planejamento e dados pessoais fictícios.
+- [x] Executar o cadastro integral, idempotência e preservação de dados em PostgreSQL isolado; testar UI administrativa e de estudante.
+- [ ] Concluir lint, suite completa, build, Chrome em 1440/768/390 px e inspeção das capturas; resultado final no PR.
+- [ ] Homologar Auth/PostgREST/upload real e links assinados quando houver ambiente integrado separado.
+- [ ] Cadastrar/disponibilizar em produção somente após revisão e autorização específica; esta tarefa é uma simulação.
+
+Decisões, matriz de cobertura e limites em [RELATORIO-GUARATINGUETA.md](RELATORIO-GUARATINGUETA.md). Nenhuma migração nova.
