@@ -27,3 +27,20 @@ it("permite alternar cobertura completa sem quantidade fixa e copiar todos os ID
  await user.selectOptions(screen.getByLabelText("Cobertura das videoaulas"),"fixed");
  expect(screen.getByLabelText("Quantidade")).toBeTruthy();
 });
+
+import {incidenceDoc} from "./incidence-fixture";
+it("copia prompt de incidência sem quantidade fixa e oferece atalho do importador",async()=>{
+ const user=userEvent.setup();const copy=vi.spyOn(navigator.clipboard,"writeText");const open=vi.fn();
+ render(<PromptPanel nodes={[]} user="teste" demo close={()=>{}} openImporter={()=>{}} openIncidence={open}/>);
+ await user.selectOptions(screen.getByLabelText("Modelo"),"incidencia-json");
+ await user.selectOptions(screen.getByLabelText("Unidade para calcular incidência"),"questions");
+ await user.click(screen.getByLabelText("JSON atual do concurso"));await user.paste(JSON.stringify(incidenceDoc));
+ expect(screen.queryByLabelText("Quantidade")).toBeNull();
+ await user.click(screen.getByRole("button",{name:"Copiar prompt"}));
+ await screen.findByText("Prompt copiado.");
+ expect(copy.mock.calls[0][0]).toContain('measure: "questions"');
+ expect(copy.mock.calls[0][0]).not.toContain('"quantidade"');
+ expect(copy.mock.calls[0][0]).toContain('"item": "sub.17"');
+ await user.click(screen.getByRole("button",{name:"Abrir importador de incidência"}));
+ expect(open).toHaveBeenCalledOnce();
+});

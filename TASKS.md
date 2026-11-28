@@ -402,3 +402,17 @@ Resultados das verificações em nuvem e commit final são registrados no PR des
 - [ ] Autorizar separadamente merge, migrações de produção e publicação. Nenhuma dessas ações foi executada nesta tarefa.
 
 Decisões e limites em BIBLIOTECA.md e MERCADO-PAGO.md.
+
+
+## Prompt e importação de incidência — 27/11/2026
+
+- [x] Partir da main 2650c89 e conferir implementação, documentação e ausência de AGENTS.md na árvore.
+- [x] Adicionar prompt Calcular incidência por assunto · JSON, com unidade escolhida, IDs externos de todos os assuntos/subassuntos ativos e contagem documentada sem quantidade fixa.
+- [x] Criar contrato incidence_batch 1.0, arquivo/colagem, prévia, duplicatas, substituições, lacunas, omissões e confirmação após revisão das fontes.
+- [x] Reutilizar erros de JSON em português, linha/coluna quando disponíveis, texto preservado, limites, índice original e destaque das linhas inválidas.
+- [x] Preparar migração 016 com papel/permissão no servidor, validação integral, transação, concorrência e reimportação idempotente; preservar materiais/progresso.
+- [x] Acrescentar testes de contrato, UI e SQL com corpus e contas fictícios; resultado final registrado no PR.
+- [ ] Homologar APIs do Supabase com contas fictícias em projeto separado.
+- [ ] Aplicar migração 016, incorporar e publicar somente após autorização específica.
+
+Contrato e instruções em INCIDENCIA-JSON.md. URLs e contagens dos testes são fictícias, sem pretensão de evidência real.

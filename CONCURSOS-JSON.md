@@ -91,3 +91,8 @@ Histórico de operações e Incidência histórica ficam recolhidos inicialmente
 ## Acervo e consulta do edital
 
 Os contratos existentes permanecem compatíveis. Abrir Edital é consulta informativa; Estudar usa os mesmos materiais gerenciados pela Biblioteca. Veja [BIBLIOTECA.md](BIBLIOTECA.md) para vínculos múltiplos e o novo contrato independente library_batch. A página oficial usa sources com título Página oficial do concurso, sem remover as demais fontes.
+
+
+## Importar incidência histórica
+
+O contrato **incidence_batch 1.0** permite importar evidências para assuntos de um edital existente, separadamente das videoaulas e do edital. Use o novo prompt Calcular incidência por assunto · JSON e o importador em Desempenho → Raio-X do edital. Veja campos, limites, denominadores, lacunas e controle de substituições em [INCIDENCIA-JSON.md](INCIDENCIA-JSON.md). Requer a migração 016 no ambiente autorizado; não altera materiais ou progresso.

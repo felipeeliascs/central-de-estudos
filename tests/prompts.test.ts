@@ -11,7 +11,7 @@ it('usa exemplos reais dos contratos que passam pelos três importadores',()=>{
  expect(importQuestions(JSON.stringify(contractExamples.questions),new Set([context.topicId]),[])[0].question.source).toBe('ai_generated');
 });
 it('inclui identificadores, contratos e dados mínimos somente nos prompts correspondentes',()=>{
- expect(templates).toHaveLength(14);
+ expect(templates).toHaveLength(15);
  for(const target of ['contest','cards','questions'] as const){const template=templates.find(t=>t.target===target)!;const text=buildPrompt(template,context);expect(text).toContain(contracts[target]);expect(text).toContain('UUID_DO_ASSUNTO');}
  expect(buildPrompt(templates.find(t=>t.id==='retificacao')!,context)).toContain('id-estavel');
  expect(buildPrompt(templates.find(t=>t.id==='desempenho')!,context)).toContain('"acertos":7');
@@ -52,4 +52,18 @@ it("não conta descendentes arquivados na cobertura e valida o JSON de contexto"
  const archived={...videoBase,items:videoBase.items.map(i=>({...i,archived:i.id==="disciplina"}))};
  expect(videoCoverage(archived)).toEqual([]);
  expect(()=>buildPrompt(templates.find(t=>t.id==="videos")!,{...context,existing:"texto"})).toThrow(/sintaxe JSON/);
+});
+
+import { incidenceDoc, eligible } from "./incidence-fixture";
+it("gera prompt de incidência com todos os IDs e denominador sem quantidade fixa",()=>{
+ const template=templates.find(t=>t.id==="incidencia-json")!;
+ for(const measure of ["exams","questions"] as const){
+  const text=buildPrompt(template,{...context,existing:JSON.stringify(incidenceDoc),incidenceMeasure:measure});
+  expect(text).toContain('measure: "'+measure+'"');
+  expect(text).toContain('contest_id exato: "'+incidenceDoc.id+'"');
+  expect(text).not.toContain('"quantidade"');
+  for(const x of eligible) expect(text).toContain('"item": "'+x.id+'"');
+  expect(text).toContain("união");expect(text).toContain("unavailable");expect(text).toContain("não invente uma amostra");
+  expect(text).toContain("incidence_batch 1.0");
+ }
 });

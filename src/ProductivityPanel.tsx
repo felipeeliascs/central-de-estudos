@@ -1,3 +1,4 @@
+import { IncidenceImporter } from "./IncidenceImporter";
 import { equivalentEvidenceIds } from "./equivalences";
 import { CollapsibleSection } from "./CollapsibleSection";
 import { PracticeDashboard } from "./PerformanceOverview";
@@ -1066,6 +1067,7 @@ export function ProductivityPanel({
       )}
       {view === "incidence" && (
         <>
+          {admin && !demo && <IncidenceImporter nodes={nodes} onSaved={reload} />}
           <p>
             Registros com período, fonte e amostra. A lista usa a interseção com
             o período selecionado. Frequência histórica não é probabilidade da próxima prova.
