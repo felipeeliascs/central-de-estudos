@@ -1,0 +1,3273 @@
+{
+  "schema_version": "1.0",
+  "type": "contest",
+  "id": "guaratingueta-001-2026-coordenador-pedagogico",
+  "name": "Guaratinguetá — Coordenador Pedagógico — Concurso Público nº 001/2026",
+  "organization": "Prefeitura Municipal da Estância Turística de Guaratinguetá",
+  "role": "Coordenador Pedagógico",
+  "board": "VUNESP",
+  "exam_date": "2027-02-21",
+  "questions": 50,
+  "listed": false,
+  "notice": {
+    "version": 1
+  },
+  "sources": [
+    {
+      "title": "Página oficial do concurso",
+      "url": "https://www.vunesp.com.br/PGUA2501"
+    }
+  ],
+  "items": [
+    {
+      "id": "portugues",
+      "parent": null,
+      "kind": "discipline",
+      "name": "Língua Portuguesa",
+      "questions": 10,
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-01",
+      "parent": "portugues",
+      "kind": "topic",
+      "name": "Leitura e interpretação de textos literários e não literários",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-02",
+      "parent": "portugues",
+      "kind": "topic",
+      "name": "Sinônimos e antônimos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-03",
+      "parent": "portugues",
+      "kind": "topic",
+      "name": "Sentido próprio e figurado das palavras",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-04",
+      "parent": "portugues",
+      "kind": "topic",
+      "name": "Pontuação",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-05",
+      "parent": "portugues",
+      "kind": "topic",
+      "name": "Classes de palavras: emprego e sentido",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-06",
+      "parent": "portugues",
+      "kind": "topic",
+      "name": "Concordância verbal e nominal",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-07",
+      "parent": "portugues",
+      "kind": "topic",
+      "name": "Regência verbal e nominal",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-08",
+      "parent": "portugues",
+      "kind": "topic",
+      "name": "Colocação pronominal",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-09",
+      "parent": "portugues",
+      "kind": "topic",
+      "name": "Crase",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-classes-1",
+      "parent": "pt-05",
+      "kind": "subtopic",
+      "name": "Substantivo",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-classes-2",
+      "parent": "pt-05",
+      "kind": "subtopic",
+      "name": "Adjetivo",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-classes-3",
+      "parent": "pt-05",
+      "kind": "subtopic",
+      "name": "Numeral",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-classes-4",
+      "parent": "pt-05",
+      "kind": "subtopic",
+      "name": "Artigo",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-classes-5",
+      "parent": "pt-05",
+      "kind": "subtopic",
+      "name": "Pronome",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-classes-6",
+      "parent": "pt-05",
+      "kind": "subtopic",
+      "name": "Verbo",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-classes-7",
+      "parent": "pt-05",
+      "kind": "subtopic",
+      "name": "Advérbio",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-classes-8",
+      "parent": "pt-05",
+      "kind": "subtopic",
+      "name": "Preposição",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "pt-classes-9",
+      "parent": "pt-05",
+      "kind": "subtopic",
+      "name": "Conjunção",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "matematica",
+      "parent": null,
+      "kind": "discipline",
+      "name": "Matemática",
+      "questions": 10,
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-01",
+      "parent": "matematica",
+      "kind": "topic",
+      "name": "Situações-problema com números racionais nas representações fracionária ou decimal",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-02",
+      "parent": "matematica",
+      "kind": "topic",
+      "name": "Mínimo múltiplo comum",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-03",
+      "parent": "matematica",
+      "kind": "topic",
+      "name": "Máximo divisor comum",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-04",
+      "parent": "matematica",
+      "kind": "topic",
+      "name": "Porcentagem",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-05",
+      "parent": "matematica",
+      "kind": "topic",
+      "name": "Razão e proporção",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-06",
+      "parent": "matematica",
+      "kind": "topic",
+      "name": "Regra de três simples ou composta",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-07",
+      "parent": "matematica",
+      "kind": "topic",
+      "name": "Equações do 1º ou do 2º grau",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-08",
+      "parent": "matematica",
+      "kind": "topic",
+      "name": "Sistema de equações do 1º grau",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-09",
+      "parent": "matematica",
+      "kind": "topic",
+      "name": "Grandezas e medidas",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-10",
+      "parent": "matematica",
+      "kind": "topic",
+      "name": "Relação entre grandezas: tabela ou gráfico",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-11",
+      "parent": "matematica",
+      "kind": "topic",
+      "name": "Tratamento da informação: média aritmética simples",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-12",
+      "parent": "matematica",
+      "kind": "topic",
+      "name": "Noções de Geometria",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-01-1",
+      "parent": "mat-01",
+      "kind": "subtopic",
+      "name": "Adição",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-01-2",
+      "parent": "mat-01",
+      "kind": "subtopic",
+      "name": "Subtração",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-01-3",
+      "parent": "mat-01",
+      "kind": "subtopic",
+      "name": "Multiplicação",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-01-4",
+      "parent": "mat-01",
+      "kind": "subtopic",
+      "name": "Divisão",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-01-5",
+      "parent": "mat-01",
+      "kind": "subtopic",
+      "name": "Potenciação",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-01-6",
+      "parent": "mat-01",
+      "kind": "subtopic",
+      "name": "Radiciação",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-09-1",
+      "parent": "mat-09",
+      "kind": "subtopic",
+      "name": "Quantidade",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-09-2",
+      "parent": "mat-09",
+      "kind": "subtopic",
+      "name": "Tempo",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-09-3",
+      "parent": "mat-09",
+      "kind": "subtopic",
+      "name": "Comprimento",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-09-4",
+      "parent": "mat-09",
+      "kind": "subtopic",
+      "name": "Superfície",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-09-5",
+      "parent": "mat-09",
+      "kind": "subtopic",
+      "name": "Capacidade",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-09-6",
+      "parent": "mat-09",
+      "kind": "subtopic",
+      "name": "Massa",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-12-1",
+      "parent": "mat-12",
+      "kind": "subtopic",
+      "name": "Forma",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-12-2",
+      "parent": "mat-12",
+      "kind": "subtopic",
+      "name": "Ângulos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-12-3",
+      "parent": "mat-12",
+      "kind": "subtopic",
+      "name": "Área",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-12-4",
+      "parent": "mat-12",
+      "kind": "subtopic",
+      "name": "Perímetro",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-12-5",
+      "parent": "mat-12",
+      "kind": "subtopic",
+      "name": "Volume",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-12-6",
+      "parent": "mat-12",
+      "kind": "subtopic",
+      "name": "Teorema de Pitágoras",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "mat-12-7",
+      "parent": "mat-12",
+      "kind": "subtopic",
+      "name": "Teorema de Tales",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "informatica",
+      "parent": null,
+      "kind": "discipline",
+      "name": "Noções de Informática",
+      "questions": 5,
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-01",
+      "parent": "informatica",
+      "kind": "topic",
+      "name": "MS-Windows 11",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-01-1",
+      "parent": "inf-01",
+      "kind": "subtopic",
+      "name": "Pastas, diretórios, arquivos e atalhos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-01-2",
+      "parent": "inf-01",
+      "kind": "subtopic",
+      "name": "Área de trabalho e área de transferência",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-01-3",
+      "parent": "inf-01",
+      "kind": "subtopic",
+      "name": "Manipulação de arquivos e pastas",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-01-4",
+      "parent": "inf-01",
+      "kind": "subtopic",
+      "name": "Uso dos menus, programas e aplicativos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-01-5",
+      "parent": "inf-01",
+      "kind": "subtopic",
+      "name": "Interação com o conjunto de aplicativos MS-Office 2016",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-02",
+      "parent": "informatica",
+      "kind": "topic",
+      "name": "MS-Word 2016",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-02-1",
+      "parent": "inf-02",
+      "kind": "subtopic",
+      "name": "Estrutura básica dos documentos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-02-2",
+      "parent": "inf-02",
+      "kind": "subtopic",
+      "name": "Edição e formatação de textos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-02-3",
+      "parent": "inf-02",
+      "kind": "subtopic",
+      "name": "Cabeçalhos, parágrafos, fontes e colunas",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-02-4",
+      "parent": "inf-02",
+      "kind": "subtopic",
+      "name": "Marcadores simbólicos e numéricos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-02-5",
+      "parent": "inf-02",
+      "kind": "subtopic",
+      "name": "Tabelas e impressão",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-02-6",
+      "parent": "inf-02",
+      "kind": "subtopic",
+      "name": "Controle de quebras e numeração de páginas",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-02-7",
+      "parent": "inf-02",
+      "kind": "subtopic",
+      "name": "Legendas e índices",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-02-8",
+      "parent": "inf-02",
+      "kind": "subtopic",
+      "name": "Inserção de objetos, campos predefinidos e caixas de texto",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-03",
+      "parent": "informatica",
+      "kind": "topic",
+      "name": "MS-Excel 2016",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-03-1",
+      "parent": "inf-03",
+      "kind": "subtopic",
+      "name": "Estrutura básica das planilhas",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-03-2",
+      "parent": "inf-03",
+      "kind": "subtopic",
+      "name": "Células, linhas, colunas, pastas e gráficos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-03-3",
+      "parent": "inf-03",
+      "kind": "subtopic",
+      "name": "Elaboração de tabelas e gráficos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-03-4",
+      "parent": "inf-03",
+      "kind": "subtopic",
+      "name": "Fórmulas, funções e macros",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-03-5",
+      "parent": "inf-03",
+      "kind": "subtopic",
+      "name": "Impressão, inserção de objetos e campos predefinidos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-03-6",
+      "parent": "inf-03",
+      "kind": "subtopic",
+      "name": "Quebras e numeração de páginas",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-03-7",
+      "parent": "inf-03",
+      "kind": "subtopic",
+      "name": "Obtenção de dados externos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-03-8",
+      "parent": "inf-03",
+      "kind": "subtopic",
+      "name": "Classificação de dados",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-04",
+      "parent": "informatica",
+      "kind": "topic",
+      "name": "MS-PowerPoint 2016",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-04-1",
+      "parent": "inf-04",
+      "kind": "subtopic",
+      "name": "Estrutura básica das apresentações",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-04-2",
+      "parent": "inf-04",
+      "kind": "subtopic",
+      "name": "Slides, anotações, régua, guias, cabeçalhos e rodapés",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-04-3",
+      "parent": "inf-04",
+      "kind": "subtopic",
+      "name": "Edição e formatação de apresentações",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-04-4",
+      "parent": "inf-04",
+      "kind": "subtopic",
+      "name": "Inserção de objetos e numeração de páginas",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-04-5",
+      "parent": "inf-04",
+      "kind": "subtopic",
+      "name": "Botões de ação, animação e transição entre slides",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-05",
+      "parent": "informatica",
+      "kind": "topic",
+      "name": "Correio eletrônico",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-05-1",
+      "parent": "inf-05",
+      "kind": "subtopic",
+      "name": "Uso de correio eletrônico",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-05-2",
+      "parent": "inf-05",
+      "kind": "subtopic",
+      "name": "Preparo e envio de mensagens",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-05-3",
+      "parent": "inf-05",
+      "kind": "subtopic",
+      "name": "Anexação de arquivos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-06",
+      "parent": "informatica",
+      "kind": "topic",
+      "name": "Internet",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-06-1",
+      "parent": "inf-06",
+      "kind": "subtopic",
+      "name": "Navegação na Internet",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-06-2",
+      "parent": "inf-06",
+      "kind": "subtopic",
+      "name": "URL, links e sites",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-06-3",
+      "parent": "inf-06",
+      "kind": "subtopic",
+      "name": "Busca e impressão de páginas",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-07",
+      "parent": "informatica",
+      "kind": "topic",
+      "name": "Google Workspace",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-07-1",
+      "parent": "inf-07",
+      "kind": "subtopic",
+      "name": "Gmail",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-07-2",
+      "parent": "inf-07",
+      "kind": "subtopic",
+      "name": "Agenda",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-07-3",
+      "parent": "inf-07",
+      "kind": "subtopic",
+      "name": "Meet",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-07-4",
+      "parent": "inf-07",
+      "kind": "subtopic",
+      "name": "Chat",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-07-5",
+      "parent": "inf-07",
+      "kind": "subtopic",
+      "name": "Drive",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-07-6",
+      "parent": "inf-07",
+      "kind": "subtopic",
+      "name": "Documentos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-07-7",
+      "parent": "inf-07",
+      "kind": "subtopic",
+      "name": "Planilhas",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-07-8",
+      "parent": "inf-07",
+      "kind": "subtopic",
+      "name": "Apresentações",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-07-9",
+      "parent": "inf-07",
+      "kind": "subtopic",
+      "name": "Formulários",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-08",
+      "parent": "informatica",
+      "kind": "topic",
+      "name": "Microsoft Teams",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-08-1",
+      "parent": "inf-08",
+      "kind": "subtopic",
+      "name": "Chats",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-08-2",
+      "parent": "inf-08",
+      "kind": "subtopic",
+      "name": "Chamadas de áudio e vídeo",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-08-3",
+      "parent": "inf-08",
+      "kind": "subtopic",
+      "name": "Criação de grupos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "inf-08-4",
+      "parent": "inf-08",
+      "kind": "subtopic",
+      "name": "Trabalho colaborativo com Word, Excel e PowerPoint",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 52",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "especificos",
+      "parent": null,
+      "kind": "discipline",
+      "name": "Conhecimentos Específicos",
+      "questions": 25,
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-programa",
+      "parent": "especificos",
+      "kind": "topic",
+      "name": "Conhecimentos específicos — programa e bibliografia do cargo",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-01",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Legislação",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-02",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Princípios educacionais",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-03",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Gestão democrática e participação",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-04",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Relação escola-família",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-05",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "As dimensões do educar e cuidar na escola",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-06",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Educação Integral (desenvolvimento pleno do estudante)",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-07",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Projeto político-pedagógico",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-08",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Função social da educação e da escola e suas implicações educacionais",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-09",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Educação e diversidade",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-10",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Valorização das diferenças individuais, de gênero, étnicas e socioculturais e o combate às desigualdades",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-11",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Inclusão, direitos humanos, equidade e diversidade",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-12",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Educação para as relações étnico-raciais",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-13",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Prevenção e combate ao bullying na escola",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-14",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Relações de gênero na escola",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-15",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Vulnerabilidades, singularidades e outras condições específicas no espaço educativo",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-16",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Relações entre educação, desigualdade social e cidadania",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-17",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "A educação e a diversidade sociocultural",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-18",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Educação Especial na perspectiva da educação inclusiva na escola",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-19",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Concepções de desenvolvimento e aprendizagem",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-20",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Fundamentos filosóficos, socioculturais, psicológicos e pedagógicos da Educação",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-21",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Teóricos da educação",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-22",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Interações, afetos e competências socioemocionais",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-23",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Concepções de ensino e tendências pedagógicas",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-24",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Teorias de aprendizagem",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-25",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "O papel do coordenador pedagógico",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-26",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Identidade, atribuições e funções do coordenador pedagógico",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-27",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "A formação continuada na escola",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-28",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Gestão escolar (concepção e formas de atuação)",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-29",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "A documentação pedagógica",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-30",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Coordenação e interações",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-31",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Intervenção pedagógica e mediação docente – planejamento no ensino",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-32",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Relação entre educação, escola e sociedade",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-33",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Concepções de educação e escola",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-34",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Concepções, metodologias e práticas de ensino",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-35",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Metodologias ativas",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-36",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "O trabalho com projetos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-37",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "O uso das tecnologias para o processo de ensino e aprendizagem",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-38",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Tendências pedagógicas e a prática docente",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-39",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "A organização do tempo didático",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-40",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Interações humanas e mediação docente em sala de aula",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-41",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Os espaços educativos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-42",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "A convivência e a violência na escola",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-43",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "(In) Disciplina",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-44",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Currículo e trabalho docente",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-45",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Planejamento, seleção e organização dos conteúdos",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-46",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Concepções de currículos e suas diferentes implicações",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-47",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Saberes das diversas áreas de conhecimento",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-48",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Currículo e diversidade",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 56",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        },
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-49",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Currículo, áreas de conhecimento e diferentes linguagens",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-50",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "O currículo como desenvolvimento de habilidades cognitivas, afetivas, sociais e de competências necessárias a leitura crítica de mundo, a disciplina autônoma e a convivência ética",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-51",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Conhecimentos sobre a BNCC",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-52",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "A cultura escrita na escola e o trabalho pedagógico em diferentes áreas do conhecimento",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-53",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Alfabetização e letramento",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-54",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Gêneros textuais, textos multimodais e usos sociais",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-55",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Leitura e literatura na escola",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-56",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Competências leitora e escritora",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-57",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "O trabalho pedagógico em diferentes áreas do conhecimento",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-58",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "A interdisciplinaridade",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-59",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Avaliação",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-60",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "A avaliação dos processos de ensino e de aprendizagem",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-61",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Avaliação institucional",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-62",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Tipos, instrumentos e funções da avaliação escolar",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-63",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "As dimensões da avaliação institucional e do processo de ensino-aprendizagem",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-64",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Avaliações externas: saberes, práticas, análises e usos na perspectiva da garantia de direitos de aprendizagens",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-65",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Educação Infantil",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-66",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "A organização e planejamento dos tempos, espaços e materiais na educação infantil",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-67",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "O brincar na educação infantil",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-68",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "O registro na educação infantil",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-69",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Vivências educativas na educação infantil",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-70",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "Interações na educação infantil",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-71",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "A alimentação como experiência educativa na educação infantil",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "ce-72",
+      "parent": "ce-programa",
+      "kind": "subtopic",
+      "name": "A cultura escrita, a leitura e o acesso às diferentes linguagens na educação infantil",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "id": "bib-001",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Constituição Federal de 1988 — arts. 205 a 214",
+      "author": "BRASIL",
+      "text": "Referência exigida pelo edital, p. 57. BRASIL. [Constituição (1988)]. Constituição da República Federativa do Brasil de 1988 . Capítulo II, Seção I (artigos 205 a 214).",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-002",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Lei nº 8.069/1990 — Estatuto da Criança e do Adolescente",
+      "author": "BRASIL",
+      "url": "https://www.planalto.gov.br/ccivil_03/leis/l8069.htm",
+      "text": "Referência exigida pelo edital, p. 57. BRASIL. Lei no 8.069/1990. Dispõe sobre o Estatuto da Criança e do Adolescente e dá outras providências. Disponível em: https://www.planalto.gov.br/ccivil_03/leis/l8069.htm.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-003",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Lei nº 9.394/1996 — Diretrizes e Bases da Educação Nacional",
+      "author": "BRASIL",
+      "url": "https://www.planalto.gov.br/ccivil_03/leis/l9394.htm",
+      "text": "Referência exigida pelo edital, p. 57. BRASIL. Lei n o 9.394/1996 . Estabelece as diretrizes e bases da educação nacional. Disponível em: https://www.planalto.gov.br/ccivil_03/leis/l9394.htm.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-004",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Lei nº 10.639/2003 — História e Cultura Afro-Brasileira",
+      "author": "BRASIL",
+      "url": "https://www.planalto.gov.br/ccivil_03/leis/2003/l10.639.htm",
+      "text": "Referência exigida pelo edital, p. 57. BRASIL. Lei no 10.639/2003. Inclui a obrigatoriedade da temática “História e Cultura Afro-Brasileira” no currículo oficial da rede de ensino. Disponível em: https://www.planalto.gov.br/ccivil_03/leis/2003/l10.639.htm.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-005",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Lei nº 11.645/2008 — História e Cultura Afro-Brasileira e Indígena",
+      "author": "BRASIL",
+      "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2008/lei/l11645.htm",
+      "text": "Referência exigida pelo edital, p. 57. BRASIL. Lei no 11.645/2008. Inclui no currículo oficial da rede de ensino a obrigatoriedade da temática “História e Cultura Afro-Brasileira e Indígena”. Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2008/lei/l11645.htm.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-006",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Decreto nº 6.949/2009 — Convenção sobre os direitos das pessoas com deficiência",
+      "author": "BRASIL",
+      "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2009/decreto/d6949.htm",
+      "text": "Referência exigida pelo edital, p. 57. BRASIL. Decreto no 6.949/2009. Promulga Convenção Internacional sobre os direitos das pessoas com deficiência e seu protocolo facultativo. Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2009/decreto/d6949.htm.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-007",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Lei nº 12.288/2010 — Estatuto da Igualdade Racial, arts. 1º a 5º e 11 a 16",
+      "author": "BRASIL",
+      "url": "https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2010/lei/l12288.htm",
+      "text": "Referência exigida pelo edital, p. 57. BRASIL. Lei n o 12.288/2010 . Institui o Estatuto da Igualdade Racial (artigos 1 o ao 5 o e 11 ao 16). Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2010/lei/l12288.htm.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-008",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Lei nº 12.764/2012 — Política de proteção dos direitos da pessoa com TEA",
+      "author": "BRASIL",
+      "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2012/lei/l12764.htm",
+      "text": "Referência exigida pelo edital, p. 57. BRASIL. Lei n o 12.764/2012. Institui a política nacional de proteção dos direitos da pessoa com Transtorno do Espectro Autista (TEA). Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2012/lei/l12764.htm.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-009",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Lei nº 13.005/2014 — Plano Nacional de Educação",
+      "author": "BRASIL",
+      "url": "https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l13005.htm",
+      "text": "Referência exigida pelo edital, p. 57. BRASIL. Lei n o 13.005/2014 . Aprova o Plano Nacional de Educação – PNE e dá outras providências. Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l13005.htm.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-010",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Lei nº 13.146/2015 — Lei Brasileira de Inclusão, arts. 1º a 3º e 27 a 30",
+      "author": "BRASIL",
+      "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm",
+      "text": "Referência exigida pelo edital, p. 57. BRASIL. Lei n o 13.146/2015 . Institui a Lei Brasileira de Inclusão da Pessoa com Deficiência (Estatuto da Pessoa com Deficiência). Capítulo I – das disposições gerais (artigos 1 o ao 3 o) e Capítulo IV – Do direito à Educação (artigos 27 a 30). Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-011",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Política Nacional de Educação Especial na perspectiva da Educação Inclusiva",
+      "author": "BRASIL",
+      "text": "Referência exigida pelo edital, p. 57. BRASIL. Secretaria de Educação Especial. Política Nacional de Educação Especial na perspectiva da Educação Inclusiva . Brasília, MEC/SEESP , 2008. Disponível em: portal.mec.gov.br/arquivos/pdf/politicaeducespecial.pdf.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 57",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-012",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Base Nacional Comum Curricular — Ensino Fundamental",
+      "author": "BRASIL",
+      "url": "https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf",
+      "text": "Referência exigida pelo edital, p. 58. BRASIL. Base Nacional Comum Curricular . Ensino Fundamental. Disponível em: https://basenacionalcomum.mec.gov.br/images/BNCC_EI_EF_110518_versaofinal_site.pdf.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-013",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Lei nº 13.257/2016 — Políticas públicas para a primeira infância",
+      "author": "BRASIL",
+      "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2016/lei/l13257.htm",
+      "text": "Referência exigida pelo edital, p. 58. BRASIL. Lei n o 13.257/2016. Dispõe sobre as políticas públicas para a primeira infância e altera a Lei n o 8.069/1990. Disponível em: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2016/lei/l13257.htm.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-014",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Resolução CNE/CEB nº 04/2009 — Atendimento Educacional Especializado",
+      "author": "BRASIL",
+      "text": "Referência exigida pelo edital, p. 58. BRASIL. Resolução CNE/CEB n o 04/2009 . Diretrizes Operacionais para o Atendimento Educacional Especializado na Educação Básica, modalidade Educação Especial. Brasília: CNE, 2009. Disponível em: http://portal.mec.gov.br/dmdocuments/rceb004_09.pdf.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-015",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Parecer CNE/CEB nº 20/2009 — Diretrizes Curriculares Nacionais para a Educação Infantil",
+      "author": "BRASIL",
+      "url": "https://portal.mec.gov.br/dmdocuments/pceb020_09.pdf",
+      "text": "Referência exigida pelo edital, p. 58. BRASIL. Parecer CNE/CEB n o 20/2009 . Diretrizes Curriculares Nacionais para a Educação Infantil. Disponível em: https://portal.mec.gov.br/dmdocuments/pceb020_09.pdf.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-016",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Resolução CNE/CEB nº 04/2010 — Diretrizes Curriculares Nacionais Gerais para a Educação Básica",
+      "author": "BRASIL",
+      "url": "https://portal.mec.gov.br/dmdocuments/rceb004_10.pdf",
+      "text": "Referência exigida pelo edital, p. 58. BRASIL. Resolução CNE/CEB n o 04/2010. Diretrizes Curriculares Nacionais Gerais para a Educação Básica. Disponível em: https://portal.mec.gov.br/dmdocuments/rceb004_10.pdf.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-017",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Parecer CNE/CEB nº 03/2025 — Diretrizes Operacionais para a Educação de Jovens e Adultos",
+      "author": "BRASIL",
+      "url": "https://www.gov.br/mec/pt-br/cne/2025/janeiro-2025/pceb003_25.pdf",
+      "text": "Referência exigida pelo edital, p. 58. BRASIL. Parecer CNE/CEB n o 03/2025. Diretrizes Operacionais para a Educação de Jovens e Adultos. EJA. Disponível em: https://www.gov.br/mec/pt-br/cne/2025/janeiro-2025/pceb003_25.pdf.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-018",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Resolução CNE/CEB nº 07/2010 — Diretrizes Curriculares Nacionais para o Ensino Fundamental",
+      "author": "BRASIL",
+      "text": "Referência exigida pelo edital, p. 58. BRASIL. Resolução CNE/CEB n o 07/2010. Diretrizes Curriculares Nacionais para o Ensino Fundamental de 9 (nove) anos. Disponível em: http://portal.mec.gov.br/dmdocuments/rceb007_10.pdf.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-019",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Diretrizes Curriculares Nacionais da Educação Básica",
+      "author": "BRASIL",
+      "url": "https://www.gov.br/mec/pt-br/acesso-a-informacao/media/seb/pdf/d_c_n_educacao_basica_nova.pdf",
+      "text": "Referência exigida pelo edital, p. 58. BRASIL. Ministério da Educação. Secretaria da Educação Básica. Diretrizes Curriculares Nacionais da Educação Básica . Disponível em: https://www.gov.br/mec/pt-br/acesso-a-informacao/media/seb/pdf/d_c_n_educacao_basica_nova.pdf.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-020",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Conversando sobre violência e convivência nas escolas",
+      "author": "ABRAMOVAY, M. et al.",
+      "text": "Referência exigida pelo edital, p. 58. ABRAMOVAY , M. et al. Conversando sobre violência e convivência nas escolas . Rio de Janeiro: FLACSO – Brasil, OEI, MEC, 2012. Disponível em: http://flacso.redelivre.org.br/files/2015/03/conversando_sobre_violencia.pdf.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-021",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Tornar a educação inclusiva: como esta tarefa deve ser conceituada?",
+      "author": "AINSCOW, M.",
+      "url": "https://unesdoc.unesco.org/ark:/48223/pf0000184683",
+      "text": "Referência exigida pelo edital, p. 58. AINSCOW , M. Tornar a educação inclusiva: como esta tarefa deve ser conceituada? In: FÁVERO, O., FERREIRA, W ., IRELAND, T., BARREIROS, D. (org.). Tornar a educação inclusiva . Brasília: UNESCO, 2009, p. 11-23. Disponível em: https://unesdoc.unesco.org/ark:/48223/pf0000184683.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-022",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "O coordenador pedagógico no espaço escolar: articulador, formador e transformador",
+      "author": "ALMEIDA, L.R.; PLACCO, V.M.N.S. (org.)",
+      "text": "Referência exigida pelo edital, p. 58. ALMEIDA, L.R., PLACCO, V.M.N.S. (org.). O coordenador pedagógico no espaço escolar: articulador, formador e transformador. São Paulo: Loyola, 2015.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-023",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "O coordenador pedagógico (CP) e a formação de professores: intenções, tensões e contradições",
+      "author": "ALMEIDA, L.R.; PLACCO, V.M.N.S.; SOUZA, V.L.T.",
+      "url": "https://fvc.org.br/wp-content/uploads/2018/04/estudos_e_pesquisas_educacionais_vol_2.pdf",
+      "text": "Referência exigida pelo edital, p. 58. ALMEIDA, L. R., PLACCO, V.M.N.S., SOUZA, V.L.T. O coordenador pedagógico (CP) e a formação de professores: intenções, tensões e contradições. Estudos & Pesquisas Educacionais, n. 2, São Paulo: Fundação Victor Civita, 2011. Disponível em: https://fvc.org.br/wp-content/uploads/2018/04/estudos_e_pesquisas_educacionais_vol_2.pdf.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-024",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "O coordenador pedagógico e questões da contemporaneidade",
+      "author": "ALMEIDA, L.R.; PLACCO, V.M.N.S. (org.)",
+      "text": "Referência exigida pelo edital, p. 58. ALMEIDA, L.R., PLACCO, V.M.N.S (org.) O coordenador pedagógico e questões da contemporaneidade . São Paulo: Loyola, 2012.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-025",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Educar meninas e meninos: relações de gênero na escola",
+      "author": "AUAD, D.",
+      "text": "Referência exigida pelo edital, p. 58. AUAD, D. Educar meninas e meninos: relações de gênero na escola. São Paulo: Contexto, 2006.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-026",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Metodologias ativas para uma educação inovadora: uma abordagem teórico-prática",
+      "author": "BACICH, L.; MORAN, J. (org.)",
+      "text": "Referência exigida pelo edital, p. 58. BACICH, L., MORAN, J. (org.). Metodologias ativas para uma educação inovadora: uma abordagem teórico-prática. Porto Alegre: Penso, 2018.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-027",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Projetos pedagógicos na Educação Infantil",
+      "author": "BARBOSA, M.C.S.; HORN, M.G.S.",
+      "text": "Referência exigida pelo edital, p. 58. BARBOSA, M.C.S., HORN, M.G.S. Projetos pedagógicos na Educação Infantil. Porto Alegre: Artmed, 2008.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-028",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Ensino Fundamental de nove anos: orientações para a inclusão da criança de seis anos de idade",
+      "author": "BEAUCHAMP, J.; PAGEL, S.D.; NASCIMENTO, A.R. (org.)",
+      "text": "Referência exigida pelo edital, p. 58. BEAUCHAMP , J., PAGEL, S.D., NASCIMENTO, A.R. (org.). Ensino Fundamental de nove anos: orientações para a inclusão da criança de seis anos de idade. Brasília: MEC/SEB, 2007. Disponível em: http://portal.mec.gov.br/seb//arquivos/pdf/Ensfund/ensifund9anobasefinal.pdf.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 58",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-029",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Ideias orientadoras para a creche: a qualidade negociada",
+      "author": "BECCHI, E. et al.",
+      "text": "Referência exigida pelo edital, p. 59. BECCHI, E. et al. Ideias orientadoras para a creche : a qualidade negociada. Tradução: Maria de Lourdes Tambaschia Menon. Campinas: Autores Associados, 2012.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-030",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Aprendizagem baseada em projetos: educação diferenciada para o século XXI",
+      "author": "BENDER, W.N.",
+      "text": "Referência exigida pelo edital, p. 59. BENDER, W.N. Aprendizagem baseada em projetos : educação diferenciada para o século XXI. Tradução: Fernando de Siqueira Rodrigues. Porto Alegre: Penso, 2014.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-031",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Três gerações de avaliação da educação básica no Brasil: interfaces com o currículo da/na escola",
+      "author": "BONAMINO, A.; SOUSA, S.Z.",
+      "url": "https://revistas.usp.br/ep/article/view/47883/51613",
+      "text": "Referência exigida pelo edital, p. 59. BONAMINO, A., SOUSA, S.Z. Três gerações de avaliação da educação básica no Brasil: interfaces com o currículo da/na escola. Educação e Pesquisa , São Paulo, v. 38, n. 2, 2012. Disponível em: https://revistas.usp.br/ep/article/view/47883/51613.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-032",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Brinquedos e brincadeiras de creches: manual de orientação pedagógica",
+      "author": "BRASIL. MEC/SEB",
+      "url": "https://portal.mec.gov.br/index.php?option=com_docman&view=download&alias=12451-publicacao-brinquedo-e-brincadeiras-completa-pdf&category_slug=janeiro-2013-pdf&Itemid=30192",
+      "text": "Referência exigida pelo edital, p. 59. BRASIL. MEC/SEB. Brinquedos e brincadeiras de creches : manual de orientação pedagógica. Brasília: MEC/SEB, 2012. Disponível em: https://portal.mec.gov.br/index.php?option=com_docman&view=download&alias=12451-publicacao-brinquedo-e-brincadeiras-completa-pdf&category_slug=janeiro-2013-pdf&Itemid=30192.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-033",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Critérios para um atendimento em creches que respeite os direitos fundamentais das crianças",
+      "author": "CAMPOS, M.M.; ROSEMBERG, F.",
+      "url": "https://portal.mec.gov.br/dmdocuments/direitosfundamentais.pdf",
+      "text": "Referência exigida pelo edital, p. 59. CAMPOS, M.M., ROSEMBERG, F. Critérios para um atendimento em creches que respeite os direitos fundamentais das crianças. Brasília: MEC, SEB, 2009. Disponível em: https://portal.mec.gov.br/dmdocuments/direitosfundamentais.pdf.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-034",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Sucesso e fracasso escolar: uma questão de gênero",
+      "author": "CARVALHO, M.P.",
+      "url": "https://revistas.usp.br/ep/article/view/27906/29678",
+      "text": "Referência exigida pelo edital, p. 59. CARVALHO, M.P . Sucesso e fracasso escolar: uma questão de gênero. Educação e Pesquisa , São Paulo, v.29, n.1, 2003. Disponível em: https://revistas.usp.br/ep/article/view/27906/29678.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-035",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Educação de jovens e adultos — prática pedagógica e fortalecimento da cidadania",
+      "author": "CAPUCHO, V.",
+      "text": "Referência exigida pelo edital, p. 59. CAPUCHO, V. Educação de jovens e adultos – prática pedagógica e fortalecimento da cidadania. São Paulo: Cortez, 2012.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-036",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Racismo e antirracismo na educação: repensando nossa escola",
+      "author": "CAVALLEIRO, E. (org.)",
+      "text": "Referência exigida pelo edital, p. 59. CAVALLEIRO, E. (org.). Racismo e antirracismo na educação: repensando nossa escola. São Paulo: Selo Negro, 2024.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-037",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Relações contemporâneas escola-família",
+      "author": "CASTRO, J.M.; REGATTIERI, M.",
+      "url": "https://www.gov.br/mec/pt-br/media/seb/pdf/publicacoes/escola_familia_final.pdf/view",
+      "text": "Referência exigida pelo edital, p. 59. CASTRO, J. M., REGATTIERI, M. Relações contemporâneas escola-família. In: CASTRO, J.M., REGATTIERI, M. (org.). Interação escola-família : subsídios para práticas escolares. Brasília: UNESCO, MEC, 2009, p. 28-32. Disponível em: https://www.gov.br/mec/pt-br/media/seb/pdf/publicacoes/escola_familia_final.pdf/view.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-038",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "A autonomia de professores",
+      "author": "CONTRERAS, J.",
+      "edition": "2. ed.",
+      "text": "Referência exigida pelo edital, p. 59. CONTRERAS, J. A autonomia de professores. Tradução: Sandra Trabucco Valenzuela. 2. ed. São Paulo: Cortez, 2012.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-039",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Educação: um tesouro a descobrir — capítulos 3, 5 e 8",
+      "author": "DELORS, J.",
+      "edition": "6. ed.",
+      "text": "Referência exigida pelo edital, p. 59. DELORS, J. Educação: um tesouro a descobrir. 6. ed. São Paulo: Cortez, 2001. cap. 3, 5 e 8.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-040",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Fenômeno Bullying: como prevenir a violência nas escolas e educar para a paz",
+      "author": "FANTE, C.",
+      "text": "Referência exigida pelo edital, p. 59. FANTE, C. Fenômeno Bullying: como prevenir a violência nas escolas e educar para a paz. Campinas: Verus, 2005.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-041",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Reflexões sobre alfabetização",
+      "author": "FERREIRO, E.",
+      "edition": "26. ed.",
+      "text": "Referência exigida pelo edital, p. 59. FERREIRO, E. Reflexões sobre alfabetização. 26. ed. São Paulo: Cortez, 2011.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-042",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "A coordenação do trabalho pedagógico na escola: processo e práticas",
+      "author": "FRANCO, M.A.R.S.; CAMPOS, E.F.E. (org.)",
+      "url": "https://www.unisantos.br/wp-content/uploads/2016/12/A-coordena%C3%A7%C3%A3o-do-trabalho-pedag%C3%B3gico-na-escola-processos-e-pr%C3%A1ticas.pdf",
+      "text": "Referência exigida pelo edital, p. 59. FRANCO, M. A. R. S., CAMPOS, E. F. E. (org.). A coordenação do trabalho pedagógico na escola: processo e práticas. Santos: Editora Universitária Leopoldianum, 2016. Disponível em: https://www.unisantos.br/wp-content/uploads/2016/12/A-coordena%C3%A7%C3%A3o-do-trabalho-pedag%C3%B3gico-na-escola-processos-e-pr%C3%A1ticas.pdf.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-043",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Pedagogia do bom senso",
+      "author": "FREINET, C.",
+      "edition": "8. ed.",
+      "text": "Referência exigida pelo edital, p. 59. FREINET, C. Pedagogia do bom senso. Tradução: J. Batista. 8. ed. São Paulo: WMF Martins Fontes, 2022.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-044",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Pedagogia da Autonomia: saberes necessários à prática educativa",
+      "author": "FREIRE, P.",
+      "edition": "43. ed.",
+      "text": "Referência exigida pelo edital, p. 59. FREIRE, P . Pedagogia da Autonomia: saberes necessários à prática educativa. 43. ed. São Paulo: Paz e Terra, 2011.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-045",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Olhares para as crianças e seus tempos: caminhos, frestas, travessias",
+      "author": "FRIEDMANN, A. et al. (org.)",
+      "text": "Referência exigida pelo edital, p. 59. FRIEDMANN, A. et al. (org.). Olhares para as crianças e seus tempos: caminhos, frestas, travessias. São Paulo: Passarinho, 2022.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-046",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "O professor e a avaliação em sala de aula",
+      "author": "GATTI, B.A.",
+      "url": "https://publicacoes.fcc.org.br/eae/article/view/2179/2136",
+      "text": "Referência exigida pelo edital, p. 59. GATTI, B.A. O professor e a avaliação em sala de aula. Estudos em Avaliação Educacional , n. 27, 2003. Disponível em: https://publicacoes.fcc.org.br/eae/article/view/2179/2136.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-047",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Infância e suas linguagens",
+      "author": "GOBBI, M.A.; PINAZZA, M.A. (org.)",
+      "text": "Referência exigida pelo edital, p. 59. GOBBI, M. A., PINAZZA, M.A. (org.). Infância e suas linguagens. São Paulo: Cortez, 2014.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-048",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Avaliação — Mito & desafio — uma perspectiva construtivista",
+      "author": "HOFFMANN, J.M.L.",
+      "text": "Referência exigida pelo edital, p. 59. HOFFMANN, J.M.L Avaliação – Mito & desafio – uma perspectiva construtivista. Porto Alegre: Mediação, 2018.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-049",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Formação docente e profissional: formar-se para a mudança e a incerteza",
+      "author": "IMBERNÓN, F.",
+      "text": "Referência exigida pelo edital, p. 59. IMBERNÓN, F. Formação docente e profissional: formar-se para a mudança e a incerteza. Tradução: Silvana Cobucci Leite. São Paulo: Cortez, 2011.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-050",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Piaget, Vygotsky e Wallon: teorias psicogenéticas em discussão",
+      "author": "LA TAILLE, Y.; OLIVEIRA, M.K.O.; DANTAS, H.",
+      "text": "Referência exigida pelo edital, p. 59. LA TAILLE, Y . OLIVEIRA, M.K.O., DANTAS, H. Piaget, Vygotsky e Wallon : teorias psicogenéticas em discussão. São Paulo: Summus, 1992.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 59",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-051",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Ler e escrever na escola: o real, o possível e o necessário",
+      "author": "LERNER, D.",
+      "edition": "1. ed.",
+      "text": "Referência exigida pelo edital, p. 60. LERNER, D. Ler e escrever na escola: o real, o possível e o necessário. 1. ed. Porto Alegre: Artmed, 2002.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-052",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Organização e gestão da escola: teoria e prática",
+      "author": "LIBÂNEO, J.C.",
+      "edition": "6. ed.",
+      "text": "Referência exigida pelo edital, p. 60. LIBÂNEO, J.C. Organização e gestão da escola: teoria e prática. 6. ed. São Paulo: Heccus, 2015.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-053",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Educação Escolar: políticas, estrutura e organização — 4ª Parte, capítulos 1, 2 e 3",
+      "author": "LIBÂNEO, J.C.; OLIVEIRA, J.F.; TOSCHI, M.S.",
+      "edition": "6. ed.",
+      "text": "Referência exigida pelo edital, p. 60. LIBÂNEO, J.C., OLIVEIRA, J.F., TOSCHI, M.S. Educação Escolar: políticas, estrutura e organização. 6. ed. São Paulo: Cortez, 2012, 4ª Parte, cap. 1, 2 e 3.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-054",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Avaliação da aprendizagem escolar: estudos e proposições",
+      "author": "LUCKESI, C.C.",
+      "text": "Referência exigida pelo edital, p. 60. LUCKESI, C.C. Avaliação da aprendizagem escolar: estudos e proposições. São Paulo: Cortez, 2018.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-055",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Documentação pedagógica: teoria e prática",
+      "author": "MELLO, S.A.; BARBOSA, M.C.S.; FARIA, A.L.G. (org.)",
+      "text": "Referência exigida pelo edital, p. 60. MELLO, S.A., BARBOSA, M.C.S., FARIA, A.L.G. (org.). Documentação pedagógica: teoria e prática. São Carlos: Pedro & João Editores, 2017.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-056",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Gestão inovadora da escola com tecnologias",
+      "author": "MORAN, J.M.",
+      "url": "https://moran.eca.usp.br/textos/tecnologias_eduacacao/gestao.pdf",
+      "text": "Referência exigida pelo edital, p. 60. MORAN, J.M. Gestão inovadora da escola com tecnologias. In: VIEIRA, A. T., ALMEIDA, M.E.B., ALONSO, M. (org.). Gestão Educacional e Tecnologia . São Paulo: Avercamp, 2003. Disponível em: https://moran.eca.usp.br/textos/tecnologias_eduacacao/gestao.pdf.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-057",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Indagações sobre o currículo: currículo, conhecimento e cultura",
+      "author": "MOREIRA, A.F.B.; CANDAU, V.M.",
+      "text": "Referência exigida pelo edital, p. 60. MOREIRA, A.F.B., CANDAU, V.M. Indagações sobre o currículo: currículo, conhecimento e cultura. Brasília: MEC/SEB, 2007. Disponível em: http://portal.mec.gov.br/seb//arquivos/pdf/Ensfund/indag3.pdf",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-058",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Jovens e adultos como sujeitos de conhecimento e aprendizagem",
+      "author": "OLIVEIRA, M.K.",
+      "text": "Referência exigida pelo edital, p. 60. OLIVEIRA, M.K. Jovens e adultos como sujeitos de conhecimento e aprendizagem. Rev. Bras. Educ., Rio de Janeiro, n. 12, 1999. Disponível em: http://educa.fcc.org.br/pdf/rbedu/n12/n12a05.pdf.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-059",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "O trabalho do professor da educação infantil",
+      "author": "OLIVEIRA, Z.R. et al. (org.)",
+      "text": "Referência exigida pelo edital, p. 60. OLIVEIRA, Z.R. et al (org.). O trabalho do professor da educação infantil. São Paulo: Biruta, 2019.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-060",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Registros na Educação Infantil: pesquisa e prática pedagógica",
+      "author": "OSTETTO, L.E. (org.)",
+      "text": "Referência exigida pelo edital, p. 60. OSTETTO, L.E. (org.). Registros na Educação Infantil: pesquisa e prática pedagógica. Campinas: Papirus, 2017.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-061",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Ensinar Matemática na Educação Infantil e nas Séries Iniciais: análises e propostas",
+      "author": "PANIZZA, M. (org.)",
+      "text": "Referência exigida pelo edital, p. 60. PANIZZA, M. (org.) Ensinar Matemática na Educação Infantil e nas Séries Iniciais : análises e propostas. Porto Alegre: Artmed, 2006.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-062",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Qualidade do ensino: a contribuição dos pais",
+      "author": "PARO, V.H.",
+      "edition": "2. ed. rev.",
+      "text": "Referência exigida pelo edital, p. 60. PARO, V.H. Qualidade do ensino: a contribuição dos pais. 2. ed. rev. São Paulo: Intermeios, 2018.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-063",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "O novo professor da EJA — Pressupostos andragógicos da aprendizagem do adulto, Anexo 4",
+      "author": "PETROSINO, S.",
+      "text": "Referência exigida pelo edital, p. 60. PETROSINO, S. O novo professor da EJA. In: Pressupostos andragógicos da aprendizagem do adulto – Anexo 4. Curitiba: Departamento da educação de jovens e adultos. Educadores/Formação em Ação, 2018. Disponível em: https://acervodigital.educacao.pr.gov.br/pages/download.php?direct=1&noattach=true&ref=21329&ext=pdf&k=.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-064",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Como ser um educador antirracista",
+      "author": "PINHEIRO, B.C.S.",
+      "text": "Referência exigida pelo edital, p. 60. PINHEIRO, B. C. S. Como ser um educador antirracista. São Paulo: Planeta do Brasil, 2023.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-065",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Inclusão: questão desafiadora e emergente na escola",
+      "author": "PRANDINI, R.C.A.R.",
+      "text": "Referência exigida pelo edital, p. 60. PRANDINI, R.C.A.R. Inclusão: questão desafiadora e emergente na escola. In: PLACCO, V. M. N. S., ALMEIDA, L.R. (org.). O coordenador pedagógico e questões emergentes na escola. São Paulo: Loyola, 2019.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-066",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Fundamentos sócio-filosóficos da educação — aula 9, páginas 132 a 150",
+      "author": "QUEIROZ, C.T.A.P.; MOITA, F.M.G.S.C.",
+      "url": "https://repositorio.ufrn.br/handle/123456789/60210",
+      "text": "Referência exigida pelo edital, p. 60. QUEIROZ, C.T.A.P ., MOITA, F.M.G.S.C. Fundamentos sócio-filosóficos da educação . Natal: SEDIS-UFRN, 2024, aula 9 – As tendências pedagógicas e seus pressupostos, p. 132 – 150. Disponível em: https://repositorio.ufrn.br/handle/123456789/60210.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-067",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Vygotsky: uma perspectiva histórico-cultural da educação",
+      "author": "REGO, T.C.",
+      "text": "Referência exigida pelo edital, p. 60. REGO, T.C. Vygotsky: uma perspectiva histórico-cultural da educação. Petrópolis, RJ: Vozes, 2008.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-068",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "A Educação Especial na Perspectiva da Inclusão Escolar: a escola comum inclusiva",
+      "author": "ROPOLI, E.A.",
+      "url": "https://repositorio.ufc.br/handle/riufc/43213",
+      "text": "Referência exigida pelo edital, p. 60. ROPOLI, E. A. A Educação Especial na Perspectiva da Inclusão Escolar : a escola comum inclusiva. Brasília: MEC/SEESP . Fortaleza: UFC, 2010. Disponível em: https://repositorio.ufc.br/handle/riufc/43213.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-069",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Letramento e alfabetização: as muitas facetas",
+      "author": "SOARES, M.",
+      "url": "https://www.scielo.br/j/rbedu/a/89tX3SGw5G4dNWdHRkRxrZk/?format=html&lang=pt",
+      "text": "Referência exigida pelo edital, p. 60. SOARES, M. Letramento e alfabetização: as muitas facetas. Rev. Bras. Educ., Rio de Janeiro, n. 25, 2004. Disponível em: https://www.scielo.br/j/rbedu/a/89tX3SGw5G4dNWdHRkRxrZk/?format=html&lang=pt.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-070",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Estratégias de leitura",
+      "author": "SOLÉ, I.",
+      "text": "Referência exigida pelo edital, p. 60. SOLÉ, I. Estratégias de leitura. Tradução: Cláudia Schilling. Porto Alegre: Penso, 1998.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-071",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Educação para os Objetivos de Desenvolvimento Sustentável: objetivos de aprendizagem",
+      "author": "UNESCO",
+      "url": "https://unesdoc.unesco.org/ark:/48223/pf0000252197",
+      "text": "Referência exigida pelo edital, p. 60. UNESCO. Educação para os Objetivos de Desenvolvimento Sustentável: objetivos de aprendizagem. Brasília: UNESCO, 2017. Disponível em: https://unesdoc.unesco.org/ark:/48223/pf0000252197.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-072",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Coordenação do Trabalho Pedagógico: do projeto político-pedagógico ao cotidiano da sala de aula",
+      "author": "VASCONCELLOS, C.S.",
+      "edition": "4. ed.",
+      "text": "Referência exigida pelo edital, p. 60. VASCONCELLOS, C.S. Coordenação do Trabalho Pedagógico: do projeto político-pedagógico ao cotidiano da sala de aula. 4. ed. São Paulo: Libertad, 2002.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 60",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-073",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "Projeto político-pedagógico da escola — uma construção possível",
+      "author": "VEIGA, I.P.A. (org.)",
+      "edition": "2. ed.",
+      "text": "Referência exigida pelo edital, p. 61. VEIGA, I. P . A. (org.). Projeto político-pedagógico da escola – uma construção possível. 2. ed. Campinas: Papirus, 1996.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 61",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-074",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "O Diálogo entre o ensino e a aprendizagem",
+      "author": "WEISZ, T.",
+      "edition": "2. ed.",
+      "text": "Referência exigida pelo edital, p. 61. WEISZ, T. O Diálogo entre o ensino e a aprendizagem. 2. ed. São Paulo: Ática, 2002.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 61",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    },
+    {
+      "id": "bib-075",
+      "item": "ce-programa",
+      "kind": "bibliography",
+      "title": "A Prática Educativa: como ensinar",
+      "author": "ZABALA, A.",
+      "edition": "1. ed.",
+      "text": "Referência exigida pelo edital, p. 61. ZABALA, A. A Prática Educativa: como ensinar. 1. ed. Porto Alegre: Artmed, 1998.",
+      "sources": [
+        {
+          "title": "Edital 001/2026 — página 61",
+          "url": "https://www.vunesp.com.br/PGUA2501"
+        }
+      ]
+    }
+  ]
+}

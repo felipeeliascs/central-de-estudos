@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "type": "library_batch",
+  "materials": [
+    {
+      "id": "guaratingueta-001-2026-ficha-edital",
+      "title": "Guaratinguetá — ficha de consulta do edital de Coordenador Pedagógico",
+      "section": "Anotações pessoais",
+      "kind": "text",
+      "body": "Concurso Público nº 001/2026 — Coordenador Pedagógico — Guaratinguetá. Dados transcritos do edital fornecido, não representam inscrição realizada. 3 vagas: 2 de ampla concorrência e 1 de cota racial; PCD: traço na tabela (não foi convertido em nova reserva). Vencimento R$ 6.577,20; jornada de 40h semanais. Requisito: licenciatura plena em Pedagogia ou licenciatura e pós-graduação na área da Educação com carga horária conforme legislação vigente, e 3 anos de docência na Educação Básica (p. 3). Inscrições: 16/11/2026 às 10h até 15/12/2026 às 23h59; pagamento até 16/12/2026 (pp. 8–9). Taxa para ensino superior: R$ 115,00 (p. 9). Regime celetista (p. 8). Prova objetiva de 50 questões, 5 alternativas e 3h de duração, período da manhã (pp. 19–20). Data prevista: 21/02/2027, a confirmar em convocação (p. 22). Nota: acertos × 100 / total de questões; habilitação a partir de 50 pontos. Títulos: até 4 pontos; doutorado 2,5 e mestrado 1,5 (p. 27). Assinatura do edital em 03/11/2026, sem comprovação independente da data de publicação. A Central não faz a inscrição nem envia títulos à VUNESP.",
+      "author": "Prefeitura Municipal da Estância Turística de Guaratinguetá",
+      "work": "Edital do Concurso Público nº 001/2026",
+      "source": "https://www.vunesp.com.br/PGUA2501",
+      "content_version": "edital-fornecido-2026-11-03"
+    }
+  ]
+}
