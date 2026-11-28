@@ -87,3 +87,7 @@ Excluir definitivamente exige administrador com edição, verificação no servi
 A migração 202611270015_catalog_deletion.sql depende de 001–014. Aplicá-la apenas no ambiente autorizado, primeiro em teste. Ela adiciona funções, sem excluir concursos automaticamente. A prévia de exclusão é revalidada no salvamento, incluindo concorrência com importações. Sem essa migração, a interface informa a dependência e mantém o arquivamento disponível.
 
 Histórico de operações e Incidência histórica ficam recolhidos inicialmente. Use Exibir/Esconder; o botão funciona por teclado e não altera os registros.
+
+## Importar incidência histórica
+
+O contrato **incidence_batch 1.0** permite importar evidências para assuntos de um edital existente, separadamente das videoaulas e do edital. Use o novo prompt Calcular incidência por assunto · JSON e o importador em Desempenho → Raio-X do edital. Veja campos, limites, denominadores, lacunas e controle de substituições em [INCIDENCIA-JSON.md](INCIDENCIA-JSON.md). Requer a migração 016 no ambiente autorizado; não altera materiais ou progresso.

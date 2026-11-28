@@ -121,3 +121,9 @@ O menu da conta abre pelo profile-trigger e oferece identidade, navegação, mod
 O [diagnóstico de importação](IMPORTACAO-DIAGNOSTICO.md) documenta análise estrita por arquivo/colagem, destaque de conflitos, cobertura completa do prompt e limites da investigação do aviso de CSP. A correção não exige migração nova.
 
 A publicação do PR #2 corresponde à [execução 43](https://github.com/felipeeliascs/central-de-estudos/actions/runs/46073219115), commit b0a225f. A consulta atual somente de leitura confirmou componentes das migrações 012–014 instalados; não presuma que continuam pendentes com base nas notas históricas. O histórico da CLI permanece sujeito à reconciliação documentada. Alterações desta investigação aguardam revisão e autorização específica antes de merge ou publicação.
+
+## Incidência por JSON
+
+A Central de Prompts inclui **Calcular incidência por assunto · JSON**, para copiar e analisar fontes em uma IA externa. O administrador importa o resultado em **Desempenho → Raio-X do edital → Importar incidência JSON**, com prévia e confirmação da revisão das fontes. Percentuais são calculados a partir de ocorrências/amostra, com unidade, banca e período explícitos. Lacunas não viram zeros inventados. Veja [INCIDENCIA-JSON.md](INCIDENCIA-JSON.md).
+
+A migração 202611270016_incidence_import.sql depende de 001–015 e exige ensaio e autorização específica antes de produção. O cadastro manual continua disponível. O importador valida limites, IDs e concorrência; não verifica automaticamente a veracidade das fontes.

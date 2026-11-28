@@ -7,7 +7,7 @@ export const incidenceBatchContract = 'incidence_batch 1.0: objeto com exatament
 export type IncidenceBatch = { schema_version:"1.0"; type:"incidence_batch"; contest_id:string; board:string; measure:"exams"|"questions"; period_start:string; period_end:string; sample:number; entries:{item:string;occurrences:number;source_url:string}[]; unavailable:{item:string;reason:string}[] };
 export type IncidenceImportContext = { target:string; doc:ContestDocument; itemMap:Record<string,string>; expected:Incidence[] };
 export type IncidenceImportRow = { item:string; name:string; path:string; status:string; error:boolean; value?:Incidence };
-const fail=(path:string,message:string):never=>{throw new Error(path+": "+message);};
+function fail(path:string,message:string):never {throw new Error(path+": "+message);}
 function object(value:unknown,path:string,keys:string[]) {
  if(!value||typeof value!=="object"||Array.isArray(value)) return fail(path,"esperado objeto");
  const result=value as Record<string,unknown>;

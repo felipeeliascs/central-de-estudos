@@ -20,6 +20,7 @@ begin
  if not public.study_catalog_admin() or not public.study_edit(target) then raise exception 'Apenas administradores com edição podem importar incidência'; end if;
  if batch is null or jsonb_typeof(batch) is distinct from 'object' or octet_length(batch::text)>524288
   or batch-array['schema_version','type','contest_id','board','measure','period_start','period_end','sample','entries','unavailable']<>'{}'::jsonb
+  or jsonb_typeof(batch->'schema_version') is distinct from 'string' or jsonb_typeof(batch->'type') is distinct from 'string' or jsonb_typeof(batch->'contest_id') is distinct from 'string' or jsonb_typeof(batch->'measure') is distinct from 'string'
   or batch->>'schema_version' is distinct from '1.0' or batch->>'type' is distinct from 'incidence_batch'
   or jsonb_typeof(batch->'entries') is distinct from 'array' or jsonb_typeof(batch->'unavailable') is distinct from 'array' or request_id is null then raise exception 'Lote de incidência inválido'; end if;
  if jsonb_array_length(batch->'entries') not between 1 and 1500 or jsonb_array_length(batch->'unavailable')>1500 or jsonb_array_length(batch->'entries')+jsonb_array_length(batch->'unavailable')>1500 then raise exception 'Informe de 1 a 1500 evidências no limite total de 1500 assuntos'; end if;
