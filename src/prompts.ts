@@ -109,7 +109,7 @@ export const templates: PromptTemplate[] = [
   description,
   body,
   target: target as PromptTemplate["target"],
-  revision: 1,
+  revision: 2,
   steps:
     "1. Selecione o contexto. 2. Copie o prompt. 3. Forneça os documentos à IA externa. 4. Revise a resposta e suas fontes.",
   example:
@@ -131,6 +131,8 @@ export type Context = {
   trailTopics?: { topic_id: string; name: string; parent_id: string | null }[];
   trailContest?: string;
   videoMode?: "fixed" | "complete";
+  mockBatch?: number;
+  questionTopics?: { topic_id: string; name: string; discipline_id: string; discipline_name: string }[];
   incidenceMeasure?: "exams" | "questions";
 };
 export function videoCoverage(doc: ContestDocument) {
@@ -146,7 +148,25 @@ export function videoCoverage(doc: ContestDocument) {
   }).map(item => ({ item: item.id, kind: item.kind, name: item.name, parent: item.parent }));
 }
 
+export const libraryPromptIds = ["legislacao", "resumos", "mapas", "biblioteca-json"];
+export function mockBatches(context: Context) {
+  const doc = parseContest(context.existing);
+  const groups = doc.items.filter(i => i.kind === "discipline" && !i.archived);
+  if (!groups.length || groups.some(i => !Number.isInteger(i.questions) || !i.questions || i.questions < 1)) throw new Error("Informe a quantidade documentada de questões por disciplina antes de preparar o simulado.");
+  const total = groups.reduce((sum, i) => sum + i.questions!, 0);
+  if (doc.questions !== undefined && total !== doc.questions) throw new Error("A distribuição das disciplinas não corresponde ao total de questões do edital.");
+  if (total > 100) throw new Error("O painel de simulados aceita até 100 questões por tentativa. Prepare simulados menores e identifique a adaptação.");
+  const slots = groups.flatMap(i => Array.from({length:i.questions!}, () => ({ discipline_id:i.id, discipline_name:i.name })));
+  return Array.from({length:Math.ceil(total / 30)}, (_,index) => ({number:index+1,total,groups:groups.map(i=>({discipline_id:i.id,discipline_name:i.name,count:slots.slice(index*30,(index+1)*30).filter(s=>s.discipline_id===i.id).length})).filter(g=>g.count>0)}));
+}
+
 export function buildPrompt(template: PromptTemplate, context: Context) {
+  const libraryOutput = libraryPromptIds.includes(template.id);
+  const mock = template.id === "simulados" ? mockBatches(context) : null;
+  const batch = mock?.find(b => b.number === (context.mockBatch ?? 1));
+  if (mock && !context.questionTopics?.length) throw new Error("Selecione um concurso com UUIDs de assuntos disponíveis para o simulado.");
+  if (mock && mock.some(b => b.groups.some(g => !context.questionTopics?.some(t => t.discipline_id === g.discipline_id)))) throw new Error("Há disciplina sem UUID de assunto elegível. Confira a seleção do concurso.");
+  if (mock && !batch) throw new Error("Selecione um lote existente do simulado.");
   const incidenceDoc = template.id === "incidencia-json" ? parseContest(context.existing) : null;
   if (incidenceDoc && (!incidenceDoc.board?.trim() || incidenceDoc.archived)) throw new Error("Informe no JSON um edital ativo com banca cadastrada.");
   const videoDoc = template.id === "videos" ? parseContest(context.existing) : null;
@@ -162,12 +182,12 @@ export function buildPrompt(template: PromptTemplate, context: Context) {
         concurso: context.contest,
         banca: context.board,
         cargo: context.role,
-        disciplina: (complete || !!incidenceDoc) ? undefined : context.discipline,
-        assunto: (complete || !!incidenceDoc) ? undefined : context.topic,
-        assunto_id: (complete || !!incidenceDoc) ? undefined : context.topicId,
+        disciplina: (complete || !!incidenceDoc || !!mock) ? undefined : context.discipline,
+        assunto: (complete || !!incidenceDoc || !!mock) ? undefined : context.topic,
+        assunto_id: (complete || !!incidenceDoc || !!mock) ? undefined : context.topicId,
         autor: context.author,
         obra: context.work,
-        quantidade: (complete || !!incidenceDoc) ? undefined : context.quantity,
+        quantidade: (complete || !!incidenceDoc || !!mock) ? undefined : context.quantity,
         dificuldade: context.difficulty,
       },
       null,
@@ -200,9 +220,15 @@ export function buildPrompt(template: PromptTemplate, context: Context) {
     "IDs externos elegíveis para cobertura:", JSON.stringify(coverage, null, 2),
     "Reaproveite o ID do recurso existente somente para o mesmo vídeo do YouTube e o mesmo item. Para outro vídeo ou item, crie um novo ID único; não reutilize o ID do vídeo antigo. Cada title deve ter de 1 a 180 caracteres. Encurte o título sem perder seu sentido; detalhes adicionais vão em text. Use apenas URLs reais verificadas. Revise cobertura, IDs e limites antes de retornar apenas o JSON video_batch 1.0."
   );
-  if (template.id === "biblioteca-json") lines.push("Contrato para importação na Biblioteca:",libraryContract,"Seções aceitas: Teoria e resumos, Mapas mentais, Anotações pessoais, Bibliografia, Legislação, Videoaulas, Questões externas ou Flashcards. Frente e verso são obrigatórios em Flashcards. Não gere IDs de conta, caminhos de arquivos, permissões ou vínculos. A prévia identifica duplicatas e exige revisão humana.");
+  if (libraryOutput) lines.push(
+    "Retorne somente library_batch 1.0, para importar na Biblioteca. Não retorne texto solto nem recursos de contest. O vínculo ao assunto é escolhido na prévia da Biblioteca, fora do JSON.",
+    template.id === "resumos" ? "Cada resumo usa section: Teoria e resumos, kind: text, body com conceitos, exemplo e pontos de revisão." : template.id === "mapas" ? "Cada mapa mental é textual: section: Mapas mentais, kind: text, body com árvore usando quebras de linha escapadas. Não gere imagem, Mermaid ou caminho de arquivo." : template.id === "legislacao" ? "Materiais oficiais usam section: Legislação, kind: link e url HTTPS conferida. Coloque identificação e observações em body. Se não conseguir verificar a fonte, solicite-a antes do JSON." : "",
+    "Não use item, topic_id, contest_id, visibility ou campos de conta. Não copie os valores de exemplo como fatos. Autoria da síntese deve ser identificada como gerada por IA para revisão; autor da obra só quando documentado.",
+    "Escape aspas duplas e quebras de linha dentro dos textos. Campos opcionais desconhecidos são omitidos, sem null. IDs minúsculos ASCII estáveis, sem acentos; reimportações devem preservar os mesmos IDs.",
+  );
+  if (libraryOutput) lines.push("Contrato para importação na Biblioteca:",libraryContract,"Seções aceitas: Teoria e resumos, Mapas mentais, Anotações pessoais, Bibliografia, Legislação, Videoaulas, Questões externas ou Flashcards. Frente e verso são obrigatórios em Flashcards. Não gere IDs de conta, caminhos de arquivos, permissões ou vínculos. A prévia identifica duplicatas e exige revisão humana.");
   if (template.id === "trilhas") lines.push("Retorne apenas JSON para o importador de Trilhas:", trailContract, "UUID do concurso: " + (context.trailContest || "Selecione um concurso na Central de Prompts."), "Assuntos e relações do edital:", JSON.stringify(context.trailTopics ?? [], null, 2), 'Exemplo fictício: {"schema_version":"1.0","type":"study_trail","contest_id":"UUID_DO_CONCURSO","topics":[{"topic_id":"UUID_DO_ASSUNTO","requires":[],"minutes":45,"estimated_priority":"medium"}]}');
-  if (template.id === "retificacao" || template.id === "videos")
+  if (template.id === "retificacao" || template.id === "videos" || template.id === "simulados")
     lines.push(
       "JSON existente para atualização:",
       context.existing ||
@@ -213,17 +239,29 @@ export function buildPrompt(template: PromptTemplate, context: Context) {
       "Dados agregados revisados pelo estudante:",
       context.performance,
     );
+  if (mock && batch) lines.push(
+    "Simulado completo: use a distribuição documentada abaixo, sem concentrar todas as questões no assunto selecionado. Cada lote é importado separadamente no painel Questões. Depois monte o simulado no painel; não há contrato de importação de uma tentativa pronta.",
+    `Produza SOMENTE o lote ${batch.number} de ${mock.length}, com ${batch.groups.reduce((sum,g)=>sum+g.count,0)} questões. Total do simulado: ${batch.total}. Máximo 30 questões e 256 KiB por arquivo. Não retorne array de lotes, vários objetos concatenados, objeto batches ou cercas Markdown. Para o próximo lote, altere Lote do simulado na Central e copie novamente.`,
+    "Quantidades exatas para este lote:", JSON.stringify(batch.groups,null,2),
+    "UUIDs elegíveis por disciplina (topic_id é UUID, discipline_id abaixo é ID externo de contexto, não deve ir em cada questão):", JSON.stringify(context.questionTopics ?? [],null,2),
+    "Distribua didaticamente os assuntos dentro da disciplina; o edital não documenta frequência por assunto. Não invente pesos. Use cinco alternativas somente quando documentadas no material fornecido; confirme o formato se faltar. Enunciados devem ser distintos também entre lotes; não use apenas numeração diferente no mesmo enunciado.",
+    "Para cada questão, escolha o topic_id da disciplina correspondente na lista fornecida. Omita IDs externos e campos de tentativa. Todas as questões são inéditas: source ai_generated, reviewed false; difficulty easy, medium ou hard.",
+  );
   if (template.target !== "none")
     lines.push(
       "Retorne apenas JSON válido conforme este contrato:",
       template.id === "videos" ? videoBatchContract : contracts[template.target],
       "Exemplo fictício de estrutura:",
-      JSON.stringify(template.id === "videos" ? { schema_version: "1.0", type: "video_batch", contest_id: videoDoc?.id ?? "id-externo-do-edital", resources: [{ id: "aula-id-estavel", item: coverage[0]?.item ?? "id-externo-do-assunto", kind: "video", title: "Aula fictícia", url: "https://www.youtube.com/watch?v=abcdefghijl" }] } : contractExamples[template.target], null, 2),
-      template.target === "questions"
+      JSON.stringify(template.id === "videos" ? { schema_version: "1.0", type: "video_batch", contest_id: videoDoc?.id ?? "id-externo-do-edital", resources: [{ id: "aula-id-estavel", item: coverage[0]?.item ?? "id-externo-do-assunto", kind: "video", title: "Aula fictícia", url: "https://www.youtube.com/watch?v=abcdefghijl" }] } : template.target === "questions" ? {...contractExamples.questions, questions:contractExamples.questions.questions.map(q=>({...q,topic_id:context.topicId || context.questionTopics?.[0]?.topic_id || "UUID_DO_ASSUNTO"}))} : contractExamples[template.target], null, 2),
+      template.target === "questions" && !mock
         ? "Use exclusivamente o assunto_id fornecido no contexto em topic_id."
         : "",
     );
-  const kind: ImportType | null = template.id === "videos" ? "video_batch" : template.id === "incidencia-json" ? "incidence_batch" : template.id === "biblioteca-json" ? "library_batch" : template.id === "trilhas" ? "study_trail" : template.target === "contest" ? "contest" : template.target === "cards" ? "flashcard_deck" : template.target === "questions" ? "questions" : null;
+  const kind: ImportType | null = template.id === "videos" ? "video_batch" : template.id === "incidencia-json" ? "incidence_batch" : libraryOutput ? "library_batch" : template.id === "trilhas" ? "study_trail" : template.target === "contest" ? "contest" : template.target === "cards" ? "flashcard_deck" : template.target === "questions" ? "questions" : null;
   if (kind) lines.push("Limites compartilhados com a revisão de importação:", contractInstructions(kind));
+  if (kind) lines.push("Antes da resposta final: confira tipo/versão, nomes exatos dos campos, IDs/UUIDs, referências, limites em bytes e caracteres, enums e índices começando em zero. Não envie NaN, undefined, comentários, vírgula final, chaves repetidas, dois objetos concatenados ou placeholders de exemplo. Não adicione metadados fora do contrato. Se faltam fontes ou dados obrigatórios, peça-os antes de gerar JSON; nunca fabrique dados só para passar no importador.");
+  if (template.id === "retificacao") lines.push("Sem documento de retificação, não invente alterações nem aumente a versão. Peça a retificação oficial. Preserve também os recursos adicionados após o cadastro original, incluindo lotes de videoaulas.");
+  if (template.id === "erros") lines.push("Sem os erros e suas explicações fornecidos, solicite-os. Não invente erros do estudante nem exponha dados pessoais.");
+  if (template.id === "desempenho" || template.id === "incidencia") lines.push("Saída textual de análise, sem importação JSON neste modelo. Não confunda dados agregados de desempenho com incidência. Ausência de corpus de provas significa Sem dados de incidência, sem percentual.");
   return lines.join("\n\n");
 }
