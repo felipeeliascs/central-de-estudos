@@ -87,3 +87,7 @@ Excluir definitivamente exige administrador com edição, verificação no servi
 A migração 202611270015_catalog_deletion.sql depende de 001–014. Aplicá-la apenas no ambiente autorizado, primeiro em teste. Ela adiciona funções, sem excluir concursos automaticamente. A prévia de exclusão é revalidada no salvamento, incluindo concorrência com importações. Sem essa migração, a interface informa a dependência e mantém o arquivamento disponível.
 
 Histórico de operações e Incidência histórica ficam recolhidos inicialmente. Use Exibir/Esconder; o botão funciona por teclado e não altera os registros.
+
+## Acervo e consulta do edital
+
+Os contratos existentes permanecem compatíveis. Abrir Edital é consulta informativa; Estudar usa os mesmos materiais gerenciados pela Biblioteca. Veja [BIBLIOTECA.md](BIBLIOTECA.md) para vínculos múltiplos e o novo contrato independente library_batch. A página oficial usa sources com título Página oficial do concurso, sem remover as demais fontes.

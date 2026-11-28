@@ -1,3 +1,4 @@
+import { CollapsibleSection } from "./CollapsibleSection";
 import { PracticeDashboard } from "./PerformanceOverview";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { incidenceSummary } from "./incidence";
@@ -911,7 +912,7 @@ export function ProductivityPanel({
             answered: results.filter(r => localDay(new Date(r.recorded_at)) === day).reduce((sum, r) => sum + r.answered, 0) + answers.filter(a => localDay(new Date(a.created_at)) === day).length,
             correct: results.filter(r => localDay(new Date(r.recorded_at)) === day).reduce((sum, r) => sum + r.correct, 0) + answers.filter(a => localDay(new Date(a.created_at)) === day && a.correct).length,
           }))} />
-          <details className="performance-details"><summary>Tempo de estudo, revisões e indicadores detalhados</summary>
+          <CollapsibleSection title="Tempo de estudo, revisões e indicadores detalhados" description="Histórico de tempo e indicadores complementares." icon={null} storageKey={"central-performance:"+user+":details"}>
           <div className="overview-grid">
             <div className="catalog-entry">
               Horas líquidas no período
@@ -955,7 +956,6 @@ export function ProductivityPanel({
               </strong>
             </div>
           </div>
-          </details>
           <h3>Evolução do tempo nos últimos sete dias</h3>
           <div
             className="productivity-chart"
@@ -978,7 +978,8 @@ export function ProductivityPanel({
               </li>
             ))}
           </ul>
-          <h3>Desempenho por disciplina</h3>
+          </CollapsibleSection>
+          <CollapsibleSection title="Desempenho por disciplina" description="Acertos por área de conhecimento." icon={null} storageKey={"central-performance:"+user+":disciplines"}>
           <ul>
             {nodes
               .filter((n) => n.kind === "discipline" && matches(n.id))
@@ -1009,7 +1010,8 @@ export function ProductivityPanel({
                 );
               })}
           </ul>
-          <h3>Mapa de domínio</h3>
+          </CollapsibleSection>
+          <CollapsibleSection title="Mapa de domínio" description="Consulte evidências de aprendizagem." icon={null} storageKey={"central-performance:"+user+":mastery"}>
           <p>
             Usa histórico completo até hoje. Dominado exige pelo menos 20
             questões, 80% de acerto, duas revisões e evidências recentes.
@@ -1025,7 +1027,8 @@ export function ProductivityPanel({
               </li>
             ))}
           </ul>
-          <h3>Conteúdos prioritários</h3>
+          </CollapsibleSection>
+          <CollapsibleSection title="Conteúdos prioritários" description="Veja os próximos focos de preparação." icon={null} storageKey={"central-performance:"+user+":priorities"}>
           {priority.length ? (
             <ul>
               {priority.map((b) => (
@@ -1040,7 +1043,8 @@ export function ProductivityPanel({
               prioridades.
             </p>
           )}
-          <h3>Próximas provas</h3>
+          </CollapsibleSection>
+          <CollapsibleSection title="Próximas provas" description="Datas cadastradas e tempo disponível." icon={null} storageKey={"central-performance:"+user+":exams"}>
           <ul>
             {source?.contests
               .filter((c) => !filterContest || c.id === filterContest)
@@ -1053,6 +1057,7 @@ export function ProductivityPanel({
                 </li>
               ))}
           </ul>
+          </CollapsibleSection>
         </>
       )}
       {view === "incidence" && (

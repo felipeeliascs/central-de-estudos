@@ -385,3 +385,20 @@ Resultados das verificações em nuvem e commit final são registrados no PR des
 - [x] Usar o mesmo painel na Incidência histórica do edital, mantendo amostra, fonte, período e aviso sobre frequência.
 - [x] Acrescentar testes de teclado, confirmação, permissões, bloqueio e rollback com banco descartável. Resultados finais no PR.
 - [ ] Após autorização específica, aplicar 202611270015_catalog_deletion.sql em produção e publicar a interface. Sem a migração, o botão orienta arquivar e não executa exclusão.
+
+## Administração, Biblioteca e reorganização — 28/11/2026
+
+- [x] Partir da main 2650c89, mantendo PR de incidência independente e sem alterar produção.
+- [x] Preparar disponibilidade administrativa, confirmação e preservação das seleções ao retirar da descoberta.
+- [x] Atualizar acessos de perfil e preparar resumos/tabelas privadas para Mercado Pago, sem ativar cobrança.
+- [x] Distinguir Abrir Edital informativo, Estudar contextual e Biblioteca como acervo único, com URLs próprias.
+- [x] Criar vínculos múltiplos sem cópia, metadados, filtros, decisões de duplicidade e importação transacional library_batch.
+- [x] Preservar os contratos existentes, arquivos e IDs; documentar migrações aditivas 017 e 018.
+- [x] Reorganizar ações em menus, equivalências integral/parcial e consulta do portal oficial sem fontes redundantes.
+- [x] Manter Plano de Estudos diário/semanal no mesmo modelo, com abertura contextual e confirmação de recálculo.
+- [x] Recolher seções detalhadas de desempenho e guardar preferência por usuário.
+- [ ] Concluir verificações na nuvem e registrar resultados finais no PR.
+- [ ] Homologar HTTP/PostgREST e Storage real com contas e arquivos fictícios, quando existir ambiente separado.
+- [ ] Autorizar separadamente merge, migrações de produção e publicação. Nenhuma dessas ações foi executada nesta tarefa.
+
+Decisões e limites em BIBLIOTECA.md e MERCADO-PAGO.md.

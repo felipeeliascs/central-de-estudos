@@ -121,3 +121,7 @@ O menu da conta abre pelo profile-trigger e oferece identidade, navegação, mod
 O [diagnóstico de importação](IMPORTACAO-DIAGNOSTICO.md) documenta análise estrita por arquivo/colagem, destaque de conflitos, cobertura completa do prompt e limites da investigação do aviso de CSP. A correção não exige migração nova.
 
 A publicação do PR #2 corresponde à [execução 43](https://github.com/felipeeliascs/central-de-estudos/actions/runs/46073219115), commit b0a225f. A consulta atual somente de leitura confirmou componentes das migrações 012–014 instalados; não presuma que continuam pendentes com base nas notas históricas. O histórico da CLI permanece sujeito à reconciliação documentada. Alterações desta investigação aguardam revisão e autorização específica antes de merge ou publicação.
+
+## Biblioteca central e administração
+
+Consulte [BIBLIOTECA.md](BIBLIOTECA.md) para a separação Abrir Edital / Estudar / Biblioteca, vínculos reutilizáveis, importação e permissões. As migrações 017–018 são aditivas e independentes da 016; exigem 001–015 e homologação antes de produção. O painel administrativo inclui disponibilidade de concursos e atalhos de perfil. A [preparação Mercado Pago](MERCADO-PAGO.md) mantém uso gratuito e cobranças desativadas.

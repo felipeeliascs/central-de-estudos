@@ -1,3 +1,7 @@
+import { LibraryPanel } from "./LibraryPanel";
+import { NoticePage } from "./NoticePage";
+import { StudyLibraryLinks } from "./StudyLibraryLinks";
+import { appliesTo, linkedNodes } from "./library";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   ArrowDown,
@@ -122,10 +126,10 @@ function Workspace({
     () => localStorage.getItem("central-theme") || "light",
   );
   const [online, setOnline] = useState(navigator.onLine);
-  type Module = "catalog" | "planner" | "prompts" | "productivity" | "trails";
+  type Module = "catalog" | "planner" | "prompts" | "productivity" | "trails" | "library" | "notice";
   const [modulePage, setModulePage] = useState<Module | null>(() => {
     const page = readRoute().page;
-    return ["catalog", "planner", "prompts", "productivity", "trails"].includes(page) ? page as Module : null;
+    return ["catalog", "planner", "prompts", "productivity", "trails", "library", "notice"].includes(page) ? page as Module : null;
   });
   const trailsOpen = modulePage === "trails";
   const plannerOpen = modulePage === "planner";
@@ -235,7 +239,7 @@ function Workspace({
     ...snapshot,
     nodes: snapshot.nodes.filter((n) => !hidden.has(n.id)),
     materials: snapshot.materials.filter(
-      (m) => !m.catalog_archived && !hidden.has(m.topic_id),
+      (m) => !m.catalog_archived,
     ),
   };
   async function openCatalog(confirmed = false) {
@@ -365,6 +369,9 @@ function Workspace({
           m.role === "editor" &&
           m.contest_id === (n.kind === "contest" ? n.id : chain[0]?.id),
       ));
+  async function linkLibraryMaterial(m: Material, target: string, active: boolean) {
+    return run(async () => { if (!repo.linkMaterial || snapshot.libraryReady === false) throw new Error("Vínculos exigem a migração 018."); await repo.linkMaterial(m.id,target,active); }, active ? "Material vinculado, sem cópia." : "Vínculo removido. O material continua no acervo.");
+  }
   function openProfile() {
     if (dirty && !window.confirm("Sair sem salvar as anotações?")) return false;
     setDirty(false);
@@ -392,7 +399,7 @@ function Workspace({
   const [previousHref, setPreviousHref] = useState("");
   const displayedHref = useRef(pageHref(currentPage, selected));
   function followRoute(route: Route) {
-    if (route.page === currentPage && (route.page !== "study" || !route.item || route.item === selected)) return true;
+    if (route.page === currentPage && (!["study","notice"].includes(route.page) || !route.item || route.item === selected)) return true;
     if (dirty && !window.confirm("Sair sem salvar as anotações?")) return;
     setDirty(false);
     setMobile(false);
@@ -400,8 +407,8 @@ function Workspace({
     setAccountPage(null);
     setHome(route.page === "home");
     if (route.page === "profile" || route.page === "admin") setAccountPage(route.page);
-    if (["catalog", "planner", "prompts", "productivity", "trails"].includes(route.page)) openModule(route.page as Module);
-    if (route.page === "study" && route.item) setSelected(route.item);
+    if (["catalog", "planner", "prompts", "productivity", "trails", "library", "notice"].includes(route.page)) openModule(route.page as Module);
+    if (["study","notice"].includes(route.page) && route.item) setSelected(route.item);
     return true;
   }
   useEffect(() => {
@@ -436,7 +443,7 @@ function Workspace({
     ? progress(data.nodes, data.checks, node.id, repo.user)
     : { done: 0, total: 0, percent: 0 };
   const list = data.materials
-    .filter((m) => m.topic_id === selected && m.section === section)
+    .filter((m) => appliesTo(m,selected,snapshot.nodes,snapshot.materialLinks,repo.user) && m.section === section)
     .sort((a, b) => a.position - b.position || a.id.localeCompare(b.id));
   async function openFile(m: Material) {
     setError("");
@@ -543,11 +550,11 @@ function Workspace({
                   () => void openCatalog(true),
                 ],
                 ["Estudar", BookOpen, () => setHome(false)],
-                ["Planejamento", CalendarDays, () => setPlannerOpen(true)],
+                ["Plano de Estudos", CalendarDays, () => setPlannerOpen(true)],
                 ["Trilhas", RouteIcon, () => openModule("trails")],
                 ["Questões", CircleHelp, () => setQuestionsOpen(true)],
                 ["Revisões", Layers, () => setFlashcardsOpen(true)],
-                ["Biblioteca", Library, () => setHome(false)],
+                ["Biblioteca", Library, () => openModule("library")],
                 ["Desempenho", BarChart3, () => setProductivityOpen(true)],
                 [
                   "Central de Prompts",
@@ -569,7 +576,8 @@ function Workspace({
               const current =
                 (label === "Início" && home && !accountPage && !modulePage) ||
                 (label === "Meus concursos" && catalogOpen) ||
-                (label === "Planejamento" && plannerOpen) ||
+                (label === "Plano de Estudos" && plannerOpen) ||
+                (label === "Biblioteca" && modulePage === "library") ||
                 (label === "Trilhas" && trailsOpen) ||
                 (label === "Central de Prompts" && promptsOpen) ||
                 (label === "Desempenho" && productivityOpen) ||
@@ -673,14 +681,14 @@ function Workspace({
               </button>
               <span>
                 {modulePage
-                  ? { catalog: "Meus concursos", planner: "Planejamento", prompts: "Central de Prompts", productivity: "Desempenho", trails: "Trilhas" }[modulePage]
+                  ? { catalog: "Meus concursos", planner: "Plano de Estudos", prompts: "Central de Prompts", productivity: "Desempenho", trails: "Trilhas", library: "Biblioteca", notice: "Abrir Edital" }[modulePage]
                   : accountPage === "admin"
                   ? "Administração"
                   : accountPage === "profile"
                     ? "Conta"
                     : home
                       ? "Início"
-                      : "Biblioteca & estudo"}
+                      : "Estudar"}
               </span>
             </div>
             <button
@@ -722,11 +730,15 @@ function Workspace({
             )}
             <nav className="page-breadcrumbs" aria-label="Caminho da página">
               <a href={pageHref("home")} onClick={routeLink}>Início</a>
-              {currentPage !== "home" && <><ChevronRight size={14} aria-hidden="true" /><a href={pageHref(currentPage, selected)} onClick={routeLink} aria-current="page">{{ study: "Estudar", profile: "Meu perfil", admin: "Administração", catalog: "Meus concursos", planner: "Planejamento", prompts: "Central de Prompts", productivity: "Meu desempenho", trails: "Trilha da Semana", home: "Início" }[currentPage]}</a></>}
+              {currentPage !== "home" && <><ChevronRight size={14} aria-hidden="true" /><a href={pageHref(currentPage, selected)} onClick={routeLink} aria-current="page">{{ study: "Estudar", profile: "Meu perfil", admin: "Administração", catalog: "Meus concursos", planner: "Plano de Estudos", library: "Biblioteca", notice: "Abrir Edital", prompts: "Central de Prompts", productivity: "Meu desempenho", trails: "Trilha da Semana", home: "Início" }[currentPage]}</a></>}
               {previousHref && <a className="previous-page" href={previousHref} onClick={routeLink}>← Página anterior</a>}
             </nav>
             {modulePage ? (
               <>
+        {modulePage === "notice" && <NoticePage id={selected} snapshot={snapshot} demo={repo.demo} close={() => openModule("catalog")} study={navigate} />}
+        {modulePage === "library" && <LibraryPanel snapshot={snapshot} repo={repo} close={() => openModule(null)} add={() => setMaterialForm("new")} edit={setMaterialForm} refresh={refresh}
+          study={navigate} prompts={() => setPromptsOpen(true)} link={linkLibraryMaterial}
+          renderMaterial={m => <MaterialCard m={m} own={false} disabled={busy} edit={() => setMaterialForm(m)} remove={() => setDeleting(m)} move={() => {}} open={() => openFile(m)} />} />}
         {trailsOpen && (
           <Suspense fallback={<p role="status">Carregando trilhas…</p>}>
             <TrailPanel snapshot={snapshot} user={repo.user} demo={repo.demo}
@@ -777,6 +789,7 @@ function Workspace({
               user={repo.user}
               demo={repo.demo}
               close={() => setPlannerOpen(false)}
+              study={navigate}
               openReviews={() => {
                 setPlannerOpen(false);
                 setFlashcardsOpen(true);
@@ -794,7 +807,7 @@ function Workspace({
                   {snapshot.nodes.filter(n => n.kind === "contest").map(n => (
                     <article className="catalog-entry" key={n.id}>
                       <h2>{n.name}</h2>
-                      <button className="secondary" onClick={() => navigate(n.id)}>Abrir edital de {n.name}</button>
+                      <button className="primary" onClick={() => navigate(n.id)}>Estudar {n.name}</button><button className="secondary" onClick={() => { setSelected(n.id); openModule("notice"); }}>Abrir Edital</button>
                     </article>
                   ))}
                 </div>
@@ -823,6 +836,7 @@ function Workspace({
                 setImportTarget(null);
               }}
               refresh={refresh}
+              notice={(id) => { setSelected(id); openModule("notice"); }}
               open={(id) => {
                 navigate(id);
                 setCatalogOpen(false);
@@ -834,6 +848,7 @@ function Workspace({
             ) : accountPage === "admin" && catalogAdmin ? (
               <AdminDashboard
                 onBack={() => setAccountPage(null)}
+                onProfile={() => setAccountPage("profile")}
                 onCatalog={() => void openCatalog()}
                 onPrompts={() => setPromptsOpen(true)}
                 onIncidence={() => {
@@ -1126,12 +1141,12 @@ function Workspace({
                         <strong>
                           {
                             data.materials.filter((m) =>
-                              [
+                              linkedNodes(m,snapshot.materialLinks,repo.user).some(id => [
                                 selected,
                                 ...descendants(data.nodes, selected).map(
                                   (n) => n.id,
                                 ),
-                              ].includes(m.topic_id),
+                              ].includes(id)),
                             ).length
                           }
                         </strong>
@@ -1151,6 +1166,8 @@ function Workspace({
                 )}
                 {isTopic && node ? (
                   <>
+                    <StudyLibraryLinks snapshot={snapshot} repo={repo} selected={selected} link={linkLibraryMaterial} refresh={refresh} prompts={() => setPromptsOpen(true)} library={() => openModule("library")} />
+                    <div className="study-tools"><button className="text-button" onClick={() => setQuestionsOpen(true)}>Resolver questões</button><button className="text-button" onClick={() => setFlashcardsOpen(true)}>Estudar flashcards e revisões</button><button className="text-button" onClick={() => setProductivityOpen(true)}>Registrar sessão de estudo</button></div>
                     <div
                       className="tabs"
                       role="tablist"
@@ -1311,9 +1328,7 @@ function Workspace({
                         <>
                           {section === "Flashcards" && (
                             <p className="muted">
-                              Cartões de consulta por assunto. Agendamento FSRS
-                              pertence à etapa de revisões e ainda não está
-                              disponível.
+                              Consulte os cartões do assunto ou abra Revisões para praticar com agendamento FSRS.
                             </p>
                           )}
                           {list.length ? (
@@ -1505,12 +1520,14 @@ function Workspace({
         )}
 
 
-        {materialForm && isTopic && (
+        {materialForm && (isTopic || modulePage === "library") && (
           <MaterialForm
             initial={materialForm === "new" ? undefined : materialForm}
-            topic={selected}
+            topic={modulePage === "library" ? "" : selected}
+            materials={snapshot.materials}
+            useExisting={async m => modulePage === "library" ? (setMaterialForm(null), true) : linkLibraryMaterial(m, selected, true)}
             user={repo.user}
-            section={section}
+            section={modulePage === "library" ? "Teoria e resumos" : section}
             demo={repo.demo}
             busy={busy}
             close={() => setMaterialForm(null)}

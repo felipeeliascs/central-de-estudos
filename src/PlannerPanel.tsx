@@ -49,12 +49,14 @@ export function PlannerPanel({
   demo,
   close,
   openReviews,
+  study,
 }: {
   snapshot: Snapshot;
   user: string;
   demo: boolean;
   close: () => void;
   openReviews?: () => void;
+  study?: (id: string) => void;
 }) {
   const [today, setToday] = useState(todayInBrazil);
   const [day, setDay] = useState(today);
@@ -184,6 +186,7 @@ export function PlannerPanel({
           {b.completed ? " · Concluída" : ""}
         </p>
         <small>{b.reason}</small>
+        {study && b.topicIds.map(id => <button key={id} className="text-button" onClick={() => study(id)}>Estudar {snapshot.nodes.find(n=>n.id===id)?.name || "conteúdo"} e materiais</button>)}
         {b.kind === "review" && !b.completed && openReviews && (
           <div>
             <button className="secondary" onClick={openReviews}>
@@ -220,7 +223,7 @@ export function PlannerPanel({
       });
   }
   return (
-    <ModulePage title="Planejamento adaptativo" close={close} busy={busy}>
+    <ModulePage title="Plano de Estudos" close={close} busy={busy}>
       {error && (
         <p role="alert" className="error">
           {error}
@@ -402,11 +405,11 @@ export function PlannerPanel({
           </details>
           <div className="catalog-actions">
             <button
-              className="secondary"
+              className="text-button"
               disabled={busy}
-              onClick={() => void save(settings)}
+              onClick={() => { if (window.confirm("Recalcular as atividades pendentes com os dados e a disponibilidade atuais? Tarefas concluídas, histórico, sessões e desempenho serão preservados.")) void save(settings); }}
             >
-              Regenerar plano
+              Recalcular plano de estudos
             </button>
           </div>
           <nav className="catalog-actions" aria-label="Visões do planejamento">

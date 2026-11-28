@@ -1,3 +1,4 @@
+import { BillingStatus } from "./BillingStatus";
 import { useEffect, useState, type FormEvent } from "react";
 import { ArrowLeft, Camera, ChevronDown, CreditCard, KeyRound, ShieldCheck, UserRound } from "lucide-react";
 import { AccountDeletion } from "./AccountDeletion";
@@ -411,7 +412,7 @@ export function ProfilePage({
           </details>
           <details>
             <summary><span className="profile-section-icon"><CreditCard size={19} /></span><span><strong>Minha assinatura</strong><small>Uso gratuito</small></span><ChevronDown size={18} className="profile-chevron" /></summary>
-            <div className="profile-feedback"><p>A Central não possui assinatura, cobrança ou pagamento integrado. O acesso a serviços externos segue as condições desses serviços.</p></div>
+            <BillingStatus demo={demo} />
           </details>
           <AccountDeletion demo={demo} />
         </div>
