@@ -1079,7 +1079,7 @@ function ContestEditor({
         value={doc.notice.url}
         set={(s) => update({ notice: { ...doc.notice, url: optional(s) } })}
       />
-      <label>Página oficial do concurso<input type="url" maxLength={2000} value={officialPortal(doc)} placeholder="https://" onChange={e => update({ sources: [...(doc.sources ?? []).filter(s => s.title.trim().toLocaleLowerCase("pt-BR") !== "página oficial do concurso"), ...(e.target.value ? [{ title: "Página oficial do concurso", url: e.target.value }] : [])] })} /></label>
+      <label>Página oficial do concurso<input type="url" maxLength={2000} value={doc.sources?.find(s => s.title.trim().toLocaleLowerCase("pt-BR") === "página oficial do concurso")?.url ?? ""} placeholder="https://" onChange={e => update({ sources: [...(doc.sources ?? []).filter(s => s.title.trim().toLocaleLowerCase("pt-BR") !== "página oficial do concurso"), ...(e.target.value ? [{ title: "Página oficial do concurso", url: e.target.value }] : [])] })} /></label>
       <label className="check-label">
         <input
           type="checkbox"

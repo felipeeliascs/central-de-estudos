@@ -48,11 +48,15 @@ create policy library_link_read on public.study_material_links for select to aut
 create policy library_link_write on public.study_material_links for insert to authenticated with check(
   user_id=auth.uid() and public.study_read(node_id) and exists(select 1 from public.study_materials m where m.id=material_id));
 create policy library_link_update on public.study_material_links for update to authenticated using(user_id=auth.uid())
-  with check(user_id=auth.uid() and public.study_read(node_id) and exists(select 1 from public.study_materials m where m.id=material_id));
+  with check(user_id=auth.uid() and (not active or (public.study_read(node_id) and exists(select 1 from public.study_materials m where m.id=material_id))));
 create function public.study_link_library_material(material_id uuid,target uuid,linked boolean) returns void
 language plpgsql security invoker set search_path='' as $$
 begin
   if linked is null or auth.uid() is null then raise exception 'Vínculo inválido' using errcode='22023'; end if;
+  if not linked and exists(select 1 from public.study_material_links l where l.user_id=auth.uid() and l.material_id=study_link_library_material.material_id and l.node_id=target) then
+    update public.study_material_links l set active=false where l.user_id=auth.uid() and l.material_id=study_link_library_material.material_id and l.node_id=target;
+    return;
+  end if;
   if not public.study_read(target) or not exists(select 1 from public.study_materials m where m.id=material_id) then
     raise exception 'Sem acesso ao material ou conteúdo' using errcode='42501'; end if;
   insert into public.study_material_links(user_id,material_id,node_id,active) values(auth.uid(),material_id,target,linked)
@@ -187,3 +191,49 @@ end; $$;
 create trigger study_sync_bibliography_metadata after insert or update on public.study_bibliographies
 for each row execute function public.study_sync_bibliography_metadata();
 revoke all on function public.study_sync_bibliography_metadata() from public,anon,authenticated;
+
+-- Include new library references in the deletion preflight, including links in other contests.
+create or replace function public.study_contest_delete_blocked(target uuid) returns boolean
+language sql stable security definer set search_path='' as $$
+ with nodes as (
+  select id from public.study_nodes where id=target or public.study_root(id)=target
+ ), managed as (
+  select material_id,bibliography_id from public.study_catalog_resources where contest_id=target
+ ), references_to_study as (
+  select node_id as topic_id from public.study_material_links
+  union all select topic_id from public.study_checks
+  union all select topic_id from public.study_notes
+  union all select topic_id from public.study_progress
+  union all select topic_id from public.study_sessions
+  union all select topic_id from public.study_external_results
+  union all select topic_id from public.study_questions
+  union all select topic_id from public.study_exams
+  union all select topic_id from public.study_errors
+  union all select topic_id from public.study_decks
+  union all select topic_id from public.study_plan_items
+  union all select topic_id from public.study_prompts
+  union all select topic_id from public.study_historical_incidence
+  union all select first_topic from public.study_topic_equivalences
+  union all select second_topic from public.study_topic_equivalences
+ )
+ select exists(select 1 from references_to_study where topic_id in (select id from nodes))
+ or exists(select 1 from public.study_material_links l where l.material_id in (select material_id from managed))
+ or exists(select 1 from public.study_trails where contest_id=target)
+ or exists(select 1 from public.study_materials where topic_id in (select id from nodes)
+   and (not catalog_managed or id not in (select material_id from managed) or file_path<>''))
+ or exists(select 1 from public.study_bibliographies where topic_id in (select id from nodes)
+   and id not in (select bibliography_id from managed where bibliography_id is not null))
+ -- Adaptive plans persist UUID references inside JSON rather than FKs. Be conservative.
+ or exists(select 1 from public.study_adaptive_plans p cross join nodes n where strpos(lower(p.state::text),n.id::text)>0);
+$$;
+
+create function public.study_library_link_identity() returns trigger
+language plpgsql set search_path='' as $$
+begin
+  if new.user_id is distinct from old.user_id or new.material_id is distinct from old.material_id or new.node_id is distinct from old.node_id then
+    raise exception 'Identidade do vínculo imutável'; end if;
+  return new;
+end; $$;
+create trigger study_library_link_identity before update on public.study_material_links
+for each row execute function public.study_library_link_identity();
+revoke all on function public.study_library_link_identity() from public,anon,authenticated;

@@ -45,6 +45,7 @@ const chrome = spawn(
     "C:/Program Files/Google/Chrome/Application/chrome.exe",
   [
     "--headless=new",
+    ...(process.env.CI ? ["--no-sandbox","--disable-dev-shm-usage"] : []),
     "--no-first-run",
     "--no-default-browser-check",
     "--disable-background-networking",
@@ -55,11 +56,13 @@ const chrome = spawn(
   { windowsHide: true, stdio: ["ignore", "ignore", "pipe"] },
 );
 let socket;
+let chromeDiagnostics="";
+chrome.stderr.on("data",chunk=>{ chromeDiagnostics=(chromeDiagnostics+String(chunk)).slice(-3000); });
 try {
   const debuggerUrl = await new Promise((resolve, reject) => {
     const timer = setTimeout(
-      () => reject(new Error("Chrome debugger unavailable")),
-      10000,
+      () => reject(new Error("Chrome debugger unavailable: "+chromeDiagnostics)),
+      30000,
     );
     chrome.on("error", reject);
     chrome.on("exit", (code) => reject(new Error(`Chrome exited ${code}`)));
