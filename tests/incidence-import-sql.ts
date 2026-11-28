@@ -1,0 +1,45 @@
+import type {PGlite} from "@electric-sql/pglite";
+import {expect} from "vitest";
+import {incidenceDoc,incidenceBatch} from "./incidence-fixture";
+import type {IncidenceImportContext} from "../src/incidence-import";
+export async function exerciseIncidenceImport(db:PGlite,a:string,b:string){
+ const account=(id:string)=>db.exec("reset role;set role authenticated;set request.jwt.claim.sub='"+id+"'");
+ await account(a);
+ const target=(await db.query<{id:string}>("select public.study_apply_catalog($1::jsonb,null,null,gen_random_uuid(),'import') id",[JSON.stringify({...incidenceDoc,listed:true})])).rows[0].id;
+ const context=async()=>(await db.query<{ctx:IncidenceImportContext}>("select public.study_incidence_import_context($1) ctx",[target])).rows[0].ctx;
+ const first=await context();
+ const apply=(batch:unknown,ctx:IncidenceImportContext)=>db.query<{count:number}>("select public.study_apply_incidence_batch($1,$2::jsonb,$3::jsonb,$4::jsonb,gen_random_uuid()) count",[target,JSON.stringify(batch),JSON.stringify(ctx.doc),JSON.stringify(ctx.expected)]);
+ const topic=first.itemMap["gestao.10"];
+ await account(b);
+ await db.query("insert into public.study_enrollments(user_id,contest_id) values($1,$2)",[b,target]);
+ await db.query("insert into public.study_notes(user_id,topic_id,body) values($1,$2,'Preservar progresso pessoal')",[b,topic]);
+ await expect(context()).rejects.toThrow(/administradores/);
+ await expect(apply(incidenceBatch,first)).rejects.toThrow(/administradores/);
+ await account(a);
+ const invalid={...incidenceBatch,entries:incidenceBatch.entries.map((e,i)=>i===29?{...e,occurrences:21}:e)};
+ await expect(apply(invalid,first)).rejects.toThrow(/amostra/);
+ expect((await context()).expected).toEqual([]);
+ await expect(apply({...incidenceBatch,board:"Outra banca"},first)).rejects.toThrow(/banca/);
+ await expect(apply({...incidenceBatch,contest_id:"outro"},first)).rejects.toThrow(/destino/);
+ await expect(apply({...incidenceBatch,entries:[{...incidenceBatch.entries[0],item:topic}]},first)).rejects.toThrow(/Referência/);
+ await expect(apply({...incidenceBatch,entries:[incidenceBatch.entries[0],incidenceBatch.entries[0]]},first)).rejects.toThrow(/duplicado/);
+ await expect(apply({...incidenceBatch,entries:[{...incidenceBatch.entries[0],source_url:"https://a:b@example.org"}]},first)).rejects.toThrow(/HTTPS/);
+ expect((await apply(incidenceBatch,first)).rows[0].count).toBe(31);
+ const after=await context();expect(after.expected).toHaveLength(31);
+ const receipts=async()=>(await db.query("select id from public.study_imports where kind='incidence:import' and summary->>'contest_id'=$1",[target])).rows.length;
+ expect(await receipts()).toBe(1);
+ expect((await apply(incidenceBatch,after)).rows[0].count).toBe(0);
+ expect(await receipts()).toBe(1);
+ // Explicit gaps and omissions never zero or erase previously documented evidence.
+ const partial={...incidenceBatch,sample:30,entries:[incidenceBatch.entries[0]],unavailable:[{item:incidenceBatch.entries[1].item,reason:"Fonte ainda não disponível"}]};
+ expect((await apply(partial,after)).rows[0].count).toBe(1);
+ const partialContext=await context();expect(partialContext.expected).toHaveLength(31);
+ const omitted=partialContext.expected.find(x=>x.topic_id===first.itemMap[incidenceBatch.entries[1].item])!;
+ expect(omitted.sample).toBe(20);
+ await expect(apply(incidenceBatch,after)).rejects.toThrow(/desatualizada/);
+ await account(b);
+ expect((await db.query("select * from public.study_notes where topic_id=$1",[topic])).rows).toHaveLength(1);
+ await db.exec("reset role;set role anon");
+ await expect(context()).rejects.toThrow(/permission denied/);
+ await expect(apply(incidenceBatch,partialContext)).rejects.toThrow(/permission denied/);
+}

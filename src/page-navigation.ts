@@ -1,6 +1,6 @@
-export type Page = "home" | "study" | "profile" | "admin" | "catalog" | "planner" | "prompts" | "productivity" | "trails";
+export type Page = "home" | "study" | "profile" | "admin" | "catalog" | "planner" | "prompts" | "productivity" | "trails" | "library" | "notice";
 export type Route = { page: Page; item: string };
-const pages: Page[] = ["home","study","profile","admin","catalog","planner","prompts","productivity","trails"];
+const pages: Page[] = ["home","study","profile","admin","catalog","planner","prompts","productivity","trails","library","notice"];
 export function readRoute(search = location.search): Route {
   const params = new URLSearchParams(search);
   const page = params.get("page") as Page;
@@ -8,6 +8,6 @@ export function readRoute(search = location.search): Route {
 }
 export function pageHref(page: Page, item = "") {
   const params = new URLSearchParams({ page });
-  if (page === "study" && item) params.set("item", item);
+  if ((page === "study" || page === "notice") && item) params.set("item", item);
   return location.pathname + "?" + params.toString();
 }

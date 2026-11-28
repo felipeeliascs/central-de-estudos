@@ -29,7 +29,7 @@ O arquivo é um objeto JSON UTF-8 de até 512 KiB. São aceitos exatamente `sche
 3. Confirme. O banco grava catálogo, estrutura, recursos, versão e recibo em uma única transação. Se outro administrador salvar entre prévia e confirmação, gere a prévia novamente. A reaplicação do mesmo documento salvo devolve o concurso existente sem duplicar a estrutura ou o recibo. Para retificação, aumente `notice.version`. Uma edição dentro da mesma versão atualiza o snapshot daquela versão.
 4. Ao adotar um concurso cadastrado antes deste módulo, exporte pelo próprio painel, mantenha os IDs existentes e selecione o concurso como destino na primeira importação. O catálogo vincula os UUIDs que a biblioteca já usa. A exportação inclui somente a estrutura e os recursos do catálogo, sem materiais pessoais, registros de estudo, credenciais ou IDs de contas.
 
-**Duplicar** cria outro concurso com ID próprio e copia a estrutura e os recursos cadastrados no catálogo. A cópia começa fora do catálogo de estudantes. **Equivalências** exige selecionar dois assuntos de concursos diferentes e confirmar a associação. O vínculo é consultável e pode ser removido, preservando os históricos individuais. Nesta etapa a associação registra equivalência de conteúdo. Reaproveitamento automático de evidências entre editais permanece pendente.
+**Duplicar** cria outro concurso com ID próprio e copia a estrutura e os recursos cadastrados no catálogo. A cópia começa fora do catálogo de estudantes. **Equivalências** exige selecionar dois assuntos de concursos diferentes e confirmar a associação. O vínculo é consultável e pode ser removido, preservando os históricos individuais. A revisão de cobertura integral/parcial, as sugestões de materiais e o reaproveitamento confirmado de etapas e consulta de evidências são descritos em [BIBLIOTECA.md](BIBLIOTECA.md). Associações antigas precisam de revisão antes de consolidar evidências.
 
 Os exemplos `examples/concurso-ficticio.json` e `examples/retificacao-ficticia.json` são inteiramente fictícios. Importe o primeiro, importe novamente para observar a idempotência e então use o segundo para observar edição, inclusão e arquivamento.
 
@@ -87,3 +87,12 @@ Excluir definitivamente exige administrador com edição, verificação no servi
 A migração 202611270015_catalog_deletion.sql depende de 001–014. Aplicá-la apenas no ambiente autorizado, primeiro em teste. Ela adiciona funções, sem excluir concursos automaticamente. A prévia de exclusão é revalidada no salvamento, incluindo concorrência com importações. Sem essa migração, a interface informa a dependência e mantém o arquivamento disponível.
 
 Histórico de operações e Incidência histórica ficam recolhidos inicialmente. Use Exibir/Esconder; o botão funciona por teclado e não altera os registros.
+
+## Acervo e consulta do edital
+
+Os contratos existentes permanecem compatíveis. Abrir Edital é consulta informativa; Estudar usa os mesmos materiais gerenciados pela Biblioteca. Veja [BIBLIOTECA.md](BIBLIOTECA.md) para vínculos múltiplos e o novo contrato independente library_batch. A página oficial usa sources com título Página oficial do concurso, sem remover as demais fontes.
+
+
+## Importar incidência histórica
+
+O contrato **incidence_batch 1.0** permite importar evidências para assuntos de um edital existente, separadamente das videoaulas e do edital. Use o novo prompt Calcular incidência por assunto · JSON e o importador em Desempenho → Raio-X do edital. Veja campos, limites, denominadores, lacunas e controle de substituições em [INCIDENCIA-JSON.md](INCIDENCIA-JSON.md). Requer a migração 016 no ambiente autorizado; não altera materiais ou progresso.

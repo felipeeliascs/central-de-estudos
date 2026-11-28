@@ -1,3 +1,5 @@
+import { fullEquivalencePairs } from "./equivalences";
+import { appliesTo } from "./library";
 import { incidenceSummary } from "./incidence";
 import type { Incidence } from "./productivity-data";
 import type { ContestDocument } from "./contest-schema";
@@ -132,9 +134,9 @@ export async function plannerInputs(
           "contest_id,document",
           ["contest_id"],
         ),
-        rows<{ first_topic: string; second_topic: string }>(
+        rows<{ first_topic: string; second_topic: string; coverage?: string; review_notes?: string }>(
           "study_topic_equivalences",
-          "first_topic,second_topic",
+          "*",
           ["first_topic", "second_topic"],
         ),
         rows<{ topic_id: string; answered: number; correct: number }>(
@@ -255,7 +257,7 @@ export async function plannerInputs(
       ),
     ];
     const materials = snapshot.materials.filter(
-      (m) => m.topic_id === node.id && !m.catalog_archived,
+      (m) => appliesTo(m,node.id,snapshot.nodes,snapshot.materialLinks,user) && !m.catalog_archived,
     );
     const score = scores.get(node.id);
     const evidence = incidence.find(
@@ -306,6 +308,6 @@ export async function plannerInputs(
   return {
     contests,
     topics,
-    equivalences: links.map((l) => [l.first_topic, l.second_topic]),
+    equivalences: fullEquivalencePairs(links),
   };
 }

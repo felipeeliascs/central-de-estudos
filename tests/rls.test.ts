@@ -1,3 +1,5 @@
+import { exerciseIncidenceImport } from "./incidence-import-sql";
+import { exerciseAdminLibrary } from "./admin-library-sql";
 import { exerciseCatalogDeletion } from "./catalog-deletion-sql";
 import { exerciseTrailsStreak } from "./trails-streak-sql";
 // @vitest-environment node
@@ -420,6 +422,12 @@ it("executa a migração e verifica isolamento no PostgreSQL com duas contas, le
     await db.exec("reset role");
     await db.exec(readFileSync(new URL("../supabase/migrations/202611270015_catalog_deletion.sql", import.meta.url), "utf8"));
     await exerciseCatalogDeletion(db,a,b);
+    await db.exec("reset role");
+    await db.exec(readFileSync(new URL("../supabase/migrations/202611270016_incidence_import.sql",import.meta.url),"utf8"));
+    await exerciseIncidenceImport(db,a,b);
+    await db.exec("reset role");
+    for (const file of ["202611280017_admin_catalog_billing.sql","202611280018_central_library.sql"]) await db.exec(readFileSync(new URL("../supabase/migrations/"+file,import.meta.url),"utf8"));
+    await exerciseAdminLibrary(db,a,b);
     await db.exec("reset role;set role anon;");
     await expect(
       db.query("select public.study_admin_overview()"),
@@ -427,6 +435,9 @@ it("executa a migração e verifica isolamento no PostgreSQL com duas contas, le
     await expect(
       db.query("select * from public.study_materials"),
     ).rejects.toThrow(/permission denied/);
+  } catch (error) {
+    const e=error as Error & { position?: string; internalPosition?: string; internalQuery?: string; where?: string };
+    throw new Error(e.message+" | SQL context: "+JSON.stringify({ position:e.position,internalPosition:e.internalPosition,where:e.where,internalQuery:e.internalQuery }));
   } finally {
     await db.close();
   }

@@ -41,6 +41,7 @@ it("cria, edita, ordena e remove materiais, preservando os dados após reabrir",
     within(dialog).getByRole("button", { name: "Salvar material" }),
   );
   await screen.findByRole("heading", { name: "Meu resumo" });
+  await user.click(screen.getByLabelText("Ações do material Meu resumo"));
   await user.click(
     screen.getByRole("button", { name: "Mover Meu resumo para cima" }),
   );
@@ -49,6 +50,7 @@ it("cria, edita, ordena e remove materiais, preservando os dados após reabrir",
       "Meu resumo",
     ),
   );
+  await user.click(screen.getByLabelText("Ações do material Meu resumo"));
   await user.click(screen.getByRole("button", { name: "Editar Meu resumo" }));
   dialog = screen.getByRole("dialog");
   await user.clear(within(dialog).getByLabelText("Título"));
@@ -66,6 +68,7 @@ it("cria, edita, ordena e remove materiais, preservando os dados após reabrir",
   });
   await user.click(screen.getByRole("tab", { name: "Teoria e resumos" }));
   await screen.findByRole("heading", { name: "Resumo revisado" });
+  await user.click(screen.getByLabelText("Ações do material Resumo revisado"));
   await user.click(
     screen.getByRole("button", { name: "Remover Resumo revisado" }),
   );

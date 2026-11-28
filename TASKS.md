@@ -385,3 +385,34 @@ Resultados das verificações em nuvem e commit final são registrados no PR des
 - [x] Usar o mesmo painel na Incidência histórica do edital, mantendo amostra, fonte, período e aviso sobre frequência.
 - [x] Acrescentar testes de teclado, confirmação, permissões, bloqueio e rollback com banco descartável. Resultados finais no PR.
 - [ ] Após autorização específica, aplicar 202611270015_catalog_deletion.sql em produção e publicar a interface. Sem a migração, o botão orienta arquivar e não executa exclusão.
+
+## Administração, Biblioteca e reorganização — 28/11/2026
+
+- [x] Partir da main 2650c89, mantendo PR de incidência independente e sem alterar produção.
+- [x] Preparar disponibilidade administrativa, confirmação e preservação das seleções ao retirar da descoberta.
+- [x] Atualizar acessos de perfil e preparar resumos/tabelas privadas para Mercado Pago, sem ativar cobrança.
+- [x] Distinguir Abrir Edital informativo, Estudar contextual e Biblioteca como acervo único, com URLs próprias.
+- [x] Criar vínculos múltiplos sem cópia, metadados, filtros, decisões de duplicidade e importação transacional library_batch.
+- [x] Preservar os contratos existentes, arquivos e IDs; documentar migrações aditivas 017 e 018.
+- [x] Reorganizar ações em menus, equivalências integral/parcial e consulta do portal oficial sem fontes redundantes.
+- [x] Manter Plano de Estudos diário/semanal no mesmo modelo, com abertura contextual e confirmação de recálculo.
+- [x] Recolher seções detalhadas de desempenho e guardar preferência por usuário.
+- [x] Aprovar lint, 120 testes/32 arquivos, build e Chrome em 1440/768/390 pixels; referência Actions 46103895048. O PR registra o commit final. Relatório em RELATORIO-BIBLIOTECA.md.
+- [ ] Homologar HTTP/PostgREST e Storage real com contas e arquivos fictícios, quando existir ambiente separado.
+- [ ] Autorizar separadamente merge, migrações de produção e publicação. Nenhuma dessas ações foi executada nesta tarefa.
+
+Decisões e limites em BIBLIOTECA.md e MERCADO-PAGO.md.
+
+
+## Prompt e importação de incidência — 27/11/2026
+
+- [x] Partir da main 2650c89 e conferir implementação, documentação e ausência de AGENTS.md na árvore.
+- [x] Adicionar prompt Calcular incidência por assunto · JSON, com unidade escolhida, IDs externos de todos os assuntos/subassuntos ativos e contagem documentada sem quantidade fixa.
+- [x] Criar contrato incidence_batch 1.0, arquivo/colagem, prévia, duplicatas, substituições, lacunas, omissões e confirmação após revisão das fontes.
+- [x] Reutilizar erros de JSON em português, linha/coluna quando disponíveis, texto preservado, limites, índice original e destaque das linhas inválidas.
+- [x] Preparar migração 016 com papel/permissão no servidor, validação integral, transação, concorrência e reimportação idempotente; preservar materiais/progresso.
+- [x] Acrescentar testes de contrato, UI e SQL com corpus e contas fictícios; resultado final registrado no PR.
+- [ ] Homologar APIs do Supabase com contas fictícias em projeto separado.
+- [ ] Aplicar migração 016, incorporar e publicar somente após autorização específica.
+
+Contrato e instruções em INCIDENCIA-JSON.md. URLs e contagens dos testes são fictícias, sem pretensão de evidência real.

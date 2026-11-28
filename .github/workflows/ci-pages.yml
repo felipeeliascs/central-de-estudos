@@ -28,6 +28,17 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run build
+      - name: Verificar navegador e responsividade na nuvem
+        run: CENTRAL_CHROME="$(command -v google-chrome)" node scripts/test-browser-local.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verificacao-visual
+          path: |
+            work/ui-*.png
+            work/ui-report.json
+          if-no-files-found: ignore
+          retention-days: 7
 
   pages-build:
     if: github.event_name == 'workflow_dispatch' && inputs.confirm_publication == 'PUBLICAR' && github.ref_name == github.event.repository.default_branch && github.ref_type == 'branch'

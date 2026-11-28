@@ -39,6 +39,7 @@ it("mostra histórico em cartões recolhidos e permite exibir/esconder por tecla
 });
 it("exige o ID externo exato antes de excluir e mantém o histórico",async()=>{
  responses(); const user=userEvent.setup(); const refresh=show();
+ await user.click(screen.getByLabelText("Mais ações de Concurso fictício"));
  await user.click(screen.getByRole("button",{name:"Excluir concurso importado"}));
  const region=await screen.findByRole("region",{name:"Excluir concurso importado"});
  const confirm=within(region).getByRole("button",{name:"Excluir definitivamente"}) as HTMLButtonElement;
@@ -56,6 +57,7 @@ it("exige o ID externo exato antes de excluir e mantém o histórico",async()=>{
 });
 it("bloqueia exclusão com estudos e oferece arquivamento confirmado",async()=>{
  responses(false); const user=userEvent.setup(); show();
+ await user.click(screen.getByLabelText("Mais ações de Concurso fictício"));
  await user.click(screen.getByRole("button",{name:"Excluir concurso importado"}));
  const region=await screen.findByRole("region",{name:"Excluir concurso importado"});
  expect((within(region).getByRole("button",{name:"Excluir definitivamente"}) as HTMLButtonElement).disabled).toBe(true);
@@ -69,12 +71,15 @@ it("bloqueia exclusão com estudos e oferece arquivamento confirmado",async()=>{
 });
 it("cancelar não exclui e erro de migração ausente orienta arquivar",async()=>{
  responses(); const user=userEvent.setup(); show();
+ await user.click(screen.getByLabelText("Mais ações de Concurso fictício"));
  await user.click(screen.getByRole("button",{name:"Excluir concurso importado"}));
  await user.click(await screen.findByRole("button",{name:"Cancelar exclusão"}));
  expect(rpc.mock.calls.some(call=>call[0]==="study_delete_contest")).toBe(false);
  rpc.mockImplementation(async(name:string)=>name==="study_catalog_document"?{data:sample,error:null}:{data:null,error:{code:"PGRST202",message:"Missing function"}});
+ await user.click(screen.getByLabelText("Mais ações de Concurso fictício"));
  await user.click(screen.getByRole("button",{name:"Excluir concurso importado"}));
  expect((await screen.findByRole("alert")).textContent).toContain("migração 015");
+ await user.click(screen.getByLabelText("Mais ações de Concurso fictício"));
  expect(screen.getByRole("button",{name:"Arquivar no catálogo"})).toBeTruthy();
 });
 it.each([[false,true],[true,false]])("restringe ações de catálogo a admin com edição: %s/%s",(admin,editable)=>{

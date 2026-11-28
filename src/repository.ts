@@ -6,6 +6,7 @@ import {
   type Node,
   type Check,
   type Note,
+  type MaterialLink,
   empty,
   validateFile,
   validateMaterial,
@@ -40,6 +41,7 @@ export interface Repository {
   members(): Promise<Member[]>;
   member(m: Member, remove?: boolean): Promise<void>;
   move(m: Material, direction: number): Promise<void>;
+  linkMaterial?(material: string, target: string, linked: boolean): Promise<void>;
 }
 const key = "central-estudos-demo-v1";
 export function demoRepository(): Repository {
@@ -57,7 +59,11 @@ export function demoRepository(): Repository {
     user: demoUser,
     demo: true,
     async load() {
-      return structuredClone(state);
+      return { ...structuredClone(state), libraryReady: true };
+    },
+    async linkMaterial(material, target, active) {
+      if (!state.materials.some(m => m.id === material) || !state.nodes.some(n => n.id === target)) throw new Error("Material ou conteúdo inválido.");
+      persist({ ...state, materialLinks: [...(state.materialLinks ?? []).filter(l => !(l.material_id === material && l.node_id === target && l.user_id === demoUser)), { user_id: demoUser, material_id: material, node_id: target, active }] });
     },
     async saveMaterial(m, file) {
       if (m.owner_id !== demoUser) throw new Error("Sem permissão.");
@@ -166,7 +172,10 @@ export function remoteRepository(user: string): Repository {
         readAll("study_checks", ["user_id", "topic_id", "step"]),
         readAll("study_notes", ["user_id", "topic_id"]),
       ]);
-      return { nodes, materials, checks, notes } as Snapshot;
+      let materialLinks: MaterialLink[] = []; let libraryReady = true;
+      try { materialLinks = await readAll("study_material_links", ["user_id","material_id","node_id"]) as MaterialLink[]; }
+      catch (e) { if (/study_material_links|schema cache|does not exist/.test((e as Error).message)) libraryReady = false; else throw e; }
+      return { nodes, materials: (materials as Material[]).map(m => ({ ...m, topic_id: m.topic_id ?? "" })), checks, notes, materialLinks, libraryReady } as Snapshot;
     },
     async saveMaterial(m, file) {
       validateMaterial(m);
@@ -188,7 +197,7 @@ export function remoteRepository(user: string): Repository {
         .maybeSingle();
       fail(previous.error);
       const old = previous.data as Material | null;
-      const value = { ...m };
+      const value = { ...m, topic_id: m.topic_id || null };
       if (file)
         value.file_path = `${user}/${m.id}/${crypto.randomUUID()}.${file.type === "application/pdf" ? "pdf" : file.type.split("/")[1]}`;
       if ((value.kind === "pdf" || value.kind === "image") && !value.file_path)
@@ -255,6 +264,10 @@ export function remoteRepository(user: string): Repository {
       const r = await bucket.createSignedUrl(m.file_path, 60);
       fail(r.error);
       return r.data!.signedUrl;
+    },
+    async linkMaterial(material, target, linked) {
+      const r = await db.rpc("study_link_library_material", { material_id: material, target, linked });
+      fail(r.error);
     },
     async members() {
       const r = await db.from("study_members").select("*");

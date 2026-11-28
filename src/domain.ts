@@ -5,6 +5,7 @@ export const sections = [
   "Legislação",
   "Mapas mentais",
   "Questões externas",
+  "Anotações pessoais",
   "Anotações",
   "Flashcards",
   "Progresso e checklist",
@@ -29,6 +30,12 @@ export type Node = {
   position: number;
 };
 export type Material = {
+  library_key?: string;
+  author?: string;
+  work?: string;
+  edition?: string;
+  source?: string;
+  content_version?: string;
   catalog_managed?: boolean;
   catalog_archived?: boolean;
   id: string;
@@ -54,7 +61,10 @@ export type Check = {
   user_id: string;
 };
 export type Note = { topic_id: string; body: string; user_id: string };
+export type MaterialLink = { user_id: string; material_id: string; node_id: string; active: boolean };
 export type Snapshot = {
+  materialLinks?: MaterialLink[];
+  libraryReady?: boolean;
   nodes: Node[];
   materials: Material[];
   checks: Check[];

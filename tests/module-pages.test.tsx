@@ -19,7 +19,7 @@ it("abre os quatro módulos na mesma main e mantém o menu acessível", async ()
   const nav = within(screen.getByRole("navigation", { name: "Módulos principais" }));
   for (const [menu, title] of [
     ["Meus concursos", "Meus concursos"],
-    ["Planejamento", "Planejamento adaptativo"],
+    ["Plano de Estudos", "Plano de Estudos"],
     ["Central de Prompts", "Central de Prompts e Inteligência Artificial"],
     ["Desempenho", "Meu desempenho"],
     ["Trilhas", "Trilha da Semana"],
@@ -47,12 +47,12 @@ it("abre atalhos do Início, volta e entra no edital pela página de concursos",
   render(<App />);
   const main = screen.getByRole("main");
   await user.click(await within(main).findByRole("button", { name: "Abrir planejamento →" }));
-  await within(main).findByRole("heading", { name: "Planejamento adaptativo", level: 1 });
+  await within(main).findByRole("heading", { name: "Plano de Estudos", level: 1 });
   await user.click(within(main).getByRole("button", { name: "Voltar" }));
   await within(main).findByRole("heading", { name: "Plano de hoje" });
   const nav = within(screen.getByRole("navigation", { name: "Módulos principais" }));
   await user.click(nav.getByRole("button", { name: "Meus concursos" }));
-  await user.click(await within(main).findByRole("button", { name: /^Abrir edital de / }));
+  await user.click(await within(main).findByRole("button", { name: /^Estudar / }));
   await within(main).findByRole("heading", { name: "Disciplinas do concurso" });
   expect(screen.queryByRole("dialog")).toBeNull();
 });

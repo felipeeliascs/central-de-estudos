@@ -1,9 +1,11 @@
+import { ActionMenu } from "./ActionMenu";
+import { officialPortal } from "./library";
 import { History, Archive, Trash2 } from "lucide-react";
 import { CollapsibleSection } from "./CollapsibleSection";
 import { parseImportJson } from "./import-json";
 import { useEffect, useId, useState } from "react";
 import type { Node } from "./domain";
-import { safeUrl, steps } from "./domain";
+import { steps } from "./domain";
 import { ModulePage } from "./ModulePage";
 import {
   compareContest,
@@ -26,7 +28,7 @@ type Edition = {
   mode: "manual" | "duplicate" | "import";
 };
 type Enrollment = { contest_id: string; status: string };
-type Link = { first_topic: string; second_topic: string };
+type Link = { first_topic: string; second_topic: string; coverage?: "full" | "partial"; review_notes?: string };
 type Receipt = {
   id: string;
   kind: string;
@@ -56,6 +58,7 @@ export function ContestPanel({
   close,
   refresh,
   open,
+  notice = open,
 }: {
   nodes: Node[];
   startImport?: boolean;
@@ -65,6 +68,7 @@ export function ContestPanel({
   close: () => void;
   refresh: () => Promise<void>;
   open: (id: string) => void;
+  notice?: (id: string) => void;
 }) {
   const importId = useId();
   const [deletion, setDeletion] = useState<{ target: string; doc: ContestDocument; canDelete: boolean; reason: string } | null>(null);
@@ -90,6 +94,8 @@ export function ContestPanel({
   );
   const [first, setFirst] = useState("");
   const [second, setSecond] = useState("");
+  const [coverage,setCoverage] = useState<"full" | "partial">("partial");
+  const [reviewNotes,setReviewNotes] = useState("");
   const roots = nodes.filter((n) => n.kind === "contest");
   const visibleRoots = roots.filter(n => {
     const doc = documents[n.id];
@@ -112,7 +118,7 @@ export function ContestPanel({
   async function lists() {
     const [e, l, h, d] = await Promise.all([
       db.from("study_enrollments").select("contest_id,status"),
-      db.from("study_topic_equivalences").select("first_topic,second_topic"),
+      db.from("study_topic_equivalences").select("*"),
       admin
         ? db
             .from("study_imports")
@@ -490,7 +496,7 @@ export function ContestPanel({
                   {r.board && <p>Banca: {r.board}</p>}
 
                   {documents[r.id] && (
-                    <details className="contest-outline"><summary>Consultar edital e fontes</summary><PublishedOutline doc={documents[r.id]} /></details>
+                    <div className="contest-official">{officialPortal(documents[r.id]) ? <a href={officialPortal(documents[r.id])} target="_blank" rel="noopener noreferrer">Acessar página oficial do concurso ↗</a> : <small className="muted">Página oficial não cadastrada.</small>}</div>
                   )}
                   <div className="catalog-actions">
                     {!r.catalog_archived && (
@@ -523,12 +529,13 @@ export function ContestPanel({
                           className="secondary"
                           onClick={() => open(r.id)}
                         >
-                          Abrir edital
+                          Estudar
                         </button>
                       </>
                     )}
+                    <button className="secondary" onClick={() => notice(r.id)}>Abrir Edital</button>
                     {admin && editable.has(r.id) && (
-                      <>
+                      <ActionMenu label={`Mais ações de ${r.name}`}>
                         {(
                           ["manual", "duplicate", "export"] as const
                         ).map((mode) => (
@@ -546,22 +553,21 @@ export function ContestPanel({
                             }
                           </button>
                         ))}
-                      </>
-                    )}
-                  </div>
-                  {admin && editable.has(r.id) && (
-                    <div className="contest-management" aria-label="Gerenciar concurso">
+
                       <button type="button" className="secondary" onClick={() => edit(r.id, "archive")}><Archive size={16} aria-hidden="true" />{r.catalog_archived ? "Reativar no catálogo" : "Arquivar no catálogo"}</button>
                       <button type="button" className="text-button contest-delete-button" onClick={() => reviewDeletion(r.id)}><Trash2 size={16} aria-hidden="true" />Excluir concurso importado</button>
-                    </div>
-                  )}
+                      </ActionMenu>
+                    )}
+                  </div>
                 </article>
               );
             })}
             </div>
+            <details className="equivalence-panel"><summary>Equivalências entre concursos · {links.length} associações</summary>
+            <p>Compare conteúdo, profundidade e exigências. A semelhança dos títulos não confirma equivalência.</p>
             {admin && (
               <>
-                <h3>Equivalências entre concursos</h3>
+                <h3>Revisar associação</h3>
                 <p>
                   Confirme uma associação após comparar o conteúdo dos dois
                   assuntos. Cada edital mantém seu checklist.
@@ -603,15 +609,18 @@ export function ContestPanel({
                     </select>
                   </label>
                 </div>
+                <div className="catalog-fields"><label>Cobertura da equivalência<select value={coverage} onChange={e => setCoverage(e.target.value as "full" | "partial")}><option value="partial">Parcial — exige complementação</option><option value="full">Integral — conteúdo e profundidade comparados</option></select></label><label>Comparação de exigências dos editais<textarea value={reviewNotes} maxLength={1000} required onChange={e => setReviewNotes(e.target.value)} placeholder="Registre profundidade, limites, diferenças e complementos necessários." /></label></div>
                 <button
                   className="secondary"
-                  disabled={!first || !second}
+                  disabled={!first || !second || !reviewNotes.trim()}
                   onClick={() =>
                     void run(async () => {
-                      const result = await db.rpc("study_set_equivalence", {
+                      const result = await db.rpc("study_review_equivalence", {
                         first_id: first,
                         second_id: second,
                         confirmed: true,
+                        coverage,
+                        review_notes: reviewNotes,
                       });
                       if (result.error) throw new Error(result.error.message);
                       await lists();
@@ -623,11 +632,12 @@ export function ContestPanel({
               </>
             )}
             {links.length > 0 && (
-              <ul>
+              <ul className="equivalence-list">
                 {links.map((link) => (
                   <li key={link.first_topic + link.second_topic}>
                     {name(root(link.first_topic))} / {name(link.first_topic)} ↔{" "}
                     {name(root(link.second_topic))} / {name(link.second_topic)}{" "}
+                    <span className="catalog-badge">{link.coverage === "full" ? "Integral revisada" : "Parcial / a revisar"}</span><p>{link.review_notes || "Compare as exigências antes de reaproveitar progresso."}</p>
                     {admin && (
                       <button
                         className="text-button"
@@ -654,6 +664,7 @@ export function ContestPanel({
                 ))}
               </ul>
             )}
+            {!links.length && <p>Nenhuma equivalência confirmada.</p>}</details>
             {admin && (
               <CollapsibleSection title="Histórico de operações" description="Acompanhe as últimas importações e alterações do catálogo." meta={`${receipts.length} recentes`} icon={<History size={21} />}>
                 {receipts.length ? (
@@ -676,81 +687,6 @@ export function ContestPanel({
         )}
       </fieldset>
     </ModulePage>
-  );
-}
-
-function PublishedOutline({ doc }: { doc: ContestDocument }) {
-  function sourceLink(s: Source) {
-    try {
-      return (
-        <a href={safeUrl(s.url)} target="_blank" rel="noreferrer">
-          {s.title}
-        </a>
-      );
-    } catch {
-      return <span>{s.title}</span>;
-    }
-  }
-  function branch(parent: string | null) {
-    return (
-      <ul>
-        {doc.items
-          .filter((x) => x.parent === parent && !x.archived)
-          .map((item) => (
-            <li key={item.id}>
-              {item.name}
-              {item.questions !== undefined && ` · ${item.questions} questões`}
-              {item.weight !== undefined && ` · peso ${item.weight}`}
-              {item.minutes !== undefined && ` · ${item.minutes} min`}
-              {item.priority &&
-                ` · prioridade ${{ low: "baixa", medium: "média", high: "alta" }[item.priority]}`}
-              {item.checklist?.length ? (
-                <small>
-                  {" "}
-                  · {item.checklist.map((i) => steps[i]).join(", ")}
-                </small>
-              ) : null}
-              {item.sources?.map((source, index) => (
-                <div key={index}>{sourceLink(source)}</div>
-              ))}
-              {doc.items.some((x) => x.parent === item.id && !x.archived) &&
-                branch(item.id)}
-            </li>
-          ))}
-      </ul>
-    );
-  }
-  return (
-    <details>
-      <summary>Dados e edital verticalizado</summary>
-      <dl>
-        {(
-          [
-            ["Órgão", doc.organization],
-            ["Cargo", doc.role],
-            ["Data da prova", doc.exam_date],
-            ["Questões", doc.questions],
-            ["Peso", doc.weight],
-            ["Versão", doc.notice.version],
-            ["Publicação", doc.notice.published_on],
-          ] as const
-        ).map(
-          ([label, value]) =>
-            value !== undefined && (
-              <div key={label}>
-                <dt>{label}</dt>
-                <dd>{value}</dd>
-              </div>
-            ),
-        )}
-      </dl>
-      {doc.notice.url &&
-        sourceLink({ title: "Edital oficial", url: doc.notice.url })}
-      {doc.sources?.map((s, i) => (
-        <div key={i}>{sourceLink(s)}</div>
-      ))}
-      {branch(null)}
-    </details>
   );
 }
 
@@ -1143,6 +1079,7 @@ function ContestEditor({
         value={doc.notice.url}
         set={(s) => update({ notice: { ...doc.notice, url: optional(s) } })}
       />
+      <label>Página oficial do concurso<input type="url" maxLength={2000} value={doc.sources?.find(s => s.title.trim().toLocaleLowerCase("pt-BR") === "página oficial do concurso")?.url ?? ""} placeholder="https://" onChange={e => update({ sources: [...(doc.sources ?? []).filter(s => s.title.trim().toLocaleLowerCase("pt-BR") !== "página oficial do concurso"), ...(e.target.value ? [{ title: "Página oficial do concurso", url: e.target.value }] : [])] })} /></label>
       <label className="check-label">
         <input
           type="checkbox"

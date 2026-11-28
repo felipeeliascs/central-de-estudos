@@ -1,3 +1,6 @@
+import { IncidenceImporter } from "./IncidenceImporter";
+import { equivalentEvidenceIds } from "./equivalences";
+import { CollapsibleSection } from "./CollapsibleSection";
 import { PracticeDashboard } from "./PerformanceOverview";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { incidenceSummary } from "./incidence";
@@ -60,6 +63,7 @@ export function ProductivityPanel({
   externalMock = false,
   startIncidence = false,
   startDashboard = false,
+  initialTopic = "",
 }: {
   snapshot: Snapshot;
   user: string;
@@ -68,6 +72,7 @@ export function ProductivityPanel({
   externalMock?: boolean;
   startIncidence?: boolean;
   startDashboard?: boolean;
+  initialTopic?: string;
 }) {
   const [view, setView] = useState<
     "timer" | "dashboard" | "results" | "incidence"
@@ -91,9 +96,9 @@ export function ProductivityPanel({
   const lock = useRef(false);
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
-  const [contest, setContest] = useState("");
-  const [discipline, setDiscipline] = useState("");
-  const [topic, setTopic] = useState("");
+  const [contest, setContest] = useState(() => ancestors(snapshot.nodes,initialTopic).find(n=>n.kind==="contest")?.id ?? "");
+  const [discipline, setDiscipline] = useState(() => ancestors(snapshot.nodes,initialTopic).find(n=>n.kind==="discipline")?.id ?? "");
+  const [topic, setTopic] = useState(initialTopic);
   const [mode, setMode] = useState<Mode>("theory");
   const [pomodoro, setPomodoro] = useState(false);
   const [focus, setFocus] = useState(25);
@@ -452,13 +457,14 @@ export function ProductivityPanel({
           .slice(0, 5)
       : [];
   function evidence(id: string): Evidence {
-    const ss = (data?.sessions ?? []).filter((s) => s.topic_id === id);
-    const rr = (data?.results ?? []).filter((r) => r.topic_id === id);
+    const evidenceTopics = equivalentEvidenceIds(id,source?.equivalences ?? []);
+    const ss = (data?.sessions ?? []).filter((s) => evidenceTopics.has(s.topic_id));
+    const rr = (data?.results ?? []).filter((r) => evidenceTopics.has(r.topic_id));
     const aa = (data?.answers ?? []).filter(
-      (a) => a.study_questions?.topic_id === id,
+      (a) => !!a.study_questions && evidenceTopics.has(a.study_questions.topic_id),
     );
     const vv = (data?.reviews ?? []).filter(
-      (r) => cardTopic.get(r.card_id) === id,
+      (r) => evidenceTopics.has(cardTopic.get(r.card_id) ?? ""),
     );
     const newest = (values: string[]) => values.sort().at(-1);
     return {
@@ -911,7 +917,7 @@ export function ProductivityPanel({
             answered: results.filter(r => localDay(new Date(r.recorded_at)) === day).reduce((sum, r) => sum + r.answered, 0) + answers.filter(a => localDay(new Date(a.created_at)) === day).length,
             correct: results.filter(r => localDay(new Date(r.recorded_at)) === day).reduce((sum, r) => sum + r.correct, 0) + answers.filter(a => localDay(new Date(a.created_at)) === day && a.correct).length,
           }))} />
-          <details className="performance-details"><summary>Tempo de estudo, revisões e indicadores detalhados</summary>
+          <CollapsibleSection title="Tempo de estudo, revisões e indicadores detalhados" description="Histórico de tempo e indicadores complementares." icon={null} storageKey={"central-performance:"+user+":details"}>
           <div className="overview-grid">
             <div className="catalog-entry">
               Horas líquidas no período
@@ -955,7 +961,6 @@ export function ProductivityPanel({
               </strong>
             </div>
           </div>
-          </details>
           <h3>Evolução do tempo nos últimos sete dias</h3>
           <div
             className="productivity-chart"
@@ -978,7 +983,8 @@ export function ProductivityPanel({
               </li>
             ))}
           </ul>
-          <h3>Desempenho por disciplina</h3>
+          </CollapsibleSection>
+          <CollapsibleSection title="Desempenho por disciplina" description="Acertos por área de conhecimento." icon={null} storageKey={"central-performance:"+user+":disciplines"}>
           <ul>
             {nodes
               .filter((n) => n.kind === "discipline" && matches(n.id))
@@ -1009,10 +1015,11 @@ export function ProductivityPanel({
                 );
               })}
           </ul>
-          <h3>Mapa de domínio</h3>
+          </CollapsibleSection>
+          <CollapsibleSection title="Mapa de domínio" description="Consulte evidências de aprendizagem." icon={null} storageKey={"central-performance:"+user+":mastery"}>
           <p>
             Usa histórico completo até hoje. Dominado exige pelo menos 20
-            questões, 80% de acerto, duas revisões e evidências recentes.
+            questões, 80% de acerto, duas revisões e evidências recentes. Equivalências integrais revisadas permitem consultar as evidências compartilhadas sem copiar registros; equivalências parciais não consolidam domínio.
           </p>
           <ul>
             {relevant.map((n) => (
@@ -1021,11 +1028,12 @@ export function ProductivityPanel({
                   .slice(1)
                   .map((x) => x.name)
                   .join(" / ")}{" "}
-                · {dominance(evidence(n.id), new Date(tick))}
+                · {dominance(evidence(n.id), new Date(tick))}{source?.equivalences.some(pair=>pair.includes(n.id)) && <small> · Inclui evidências de equivalência integral revisada. Pesos e prioridades continuam específicos do edital.</small>}
               </li>
             ))}
           </ul>
-          <h3>Conteúdos prioritários</h3>
+          </CollapsibleSection>
+          <CollapsibleSection title="Conteúdos prioritários" description="Veja os próximos focos de preparação." icon={null} storageKey={"central-performance:"+user+":priorities"}>
           {priority.length ? (
             <ul>
               {priority.map((b) => (
@@ -1040,7 +1048,8 @@ export function ProductivityPanel({
               prioridades.
             </p>
           )}
-          <h3>Próximas provas</h3>
+          </CollapsibleSection>
+          <CollapsibleSection title="Próximas provas" description="Datas cadastradas e tempo disponível." icon={null} storageKey={"central-performance:"+user+":exams"}>
           <ul>
             {source?.contests
               .filter((c) => !filterContest || c.id === filterContest)
@@ -1053,10 +1062,12 @@ export function ProductivityPanel({
                 </li>
               ))}
           </ul>
+          </CollapsibleSection>
         </>
       )}
       {view === "incidence" && (
         <>
+          {admin && !demo && <IncidenceImporter nodes={nodes} onSaved={reload} />}
           <p>
             Registros com período, fonte e amostra. A lista usa a interseção com
             o período selecionado. Frequência histórica não é probabilidade da próxima prova.

@@ -1,3 +1,4 @@
+import { possibleDuplicates } from "./library";
 import {
   createContext,
   useContext,
@@ -74,7 +75,11 @@ export function MaterialForm({
   close,
   busy,
   demo,
+  materials = [],
+  onUseExisting,
 }: {
+  materials?: Material[];
+  onUseExisting?: (m: Material) => Promise<boolean>;
   initial?: Material;
   topic: string;
   user: string;
@@ -109,6 +114,8 @@ export function MaterialForm({
         verified: false,
       },
   );
+  const [duplicates, setDuplicates] = useState<Material[]>([]);
+  const [pending, setPending] = useState<{ value: Material; file?: File } | null>(null);
   const [recipients, setRecipients] = useState(m.shared_with.join(", "));
   const [file, setFile] = useState<File>();
   const [error, setError] = useState("");
@@ -129,6 +136,8 @@ export function MaterialForm({
       if (file) validateFile(file);
       if ((m.kind === "pdf" || m.kind === "image") && !file && !m.file_path)
         throw new Error("Selecione um arquivo.");
+      const matches = possibleDuplicates(value, materials);
+      if (!initial && matches.length) { setDuplicates(matches); setPending({ value, file }); return; }
       if (await onSave(value, file)) close();
     } catch (e) {
       setError((e as Error).message);
@@ -197,6 +206,13 @@ export function MaterialForm({
               </select>
             </label>
           </div>
+          <details className="material-metadata"><summary>Autor, obra e identificação do material</summary>
+            <label>Autor<input maxLength={180} value={m.author ?? ""} onChange={e => field("author", e.target.value)} /></label>
+            <label>Obra<input maxLength={180} value={m.work ?? ""} onChange={e => field("work", e.target.value)} /></label>
+            <label>Edição<input maxLength={180} value={m.edition ?? ""} onChange={e => field("edition", e.target.value)} /></label>
+            <label>Fonte<input maxLength={2000} value={m.source ?? ""} onChange={e => field("source", e.target.value)} /></label>
+            <label>Versão do conteúdo<input maxLength={80} value={m.content_version ?? ""} onChange={e => field("content_version", e.target.value)} /></label>
+          </details>
           {(m.kind === "youtube" || m.kind === "link") && (
             <label>
               Endereço HTTPS
@@ -309,6 +325,10 @@ export function MaterialForm({
               </small>
             </label>
           )}
+          {pending && <section className="duplicate-review" aria-label="Possíveis materiais duplicados"><h3>Possíveis materiais duplicados</h3><p>Compare conteúdo, fonte e versão. Nenhum material foi alterado.</p><ul>{duplicates.map(existing => <li key={existing.id}><strong>{existing.title}</strong> · {existing.author || "Autor não informado"} · {existing.edition || "Edição não informada"}
+            {onUseExisting && <button type="button" className="text-button" onClick={async () => { if (await onUseExisting(existing)) close(); }}>Utilizar material existente</button>}
+            {existing.owner_id === user && !existing.catalog_managed && <button type="button" className="text-button" onClick={async () => { if (!window.confirm("Atualizar este material? O novo conteúdo aparecerá em todos os seus vínculos.")) return; if (await onSave({ ...pending.value, id: existing.id, library_key: existing.library_key, topic_id: existing.topic_id, owner_id: existing.owner_id, visibility: existing.visibility, shared_with: existing.shared_with, file_path: ["pdf","image"].includes(pending.value.kind) ? existing.file_path : "" }, pending.file)) close(); }}>Atualizar material existente</button>}
+          </li>)}</ul><button type="button" className="secondary" onClick={async () => { if (await onSave(pending.value, pending.file)) close(); }}>Manter ambos como materiais distintos</button><button type="button" className="text-button" onClick={() => { setPending(null); setDuplicates([]); }}>Voltar à edição do material</button></section>}
           {error && (
             <p className="error" role="alert">
               {error}

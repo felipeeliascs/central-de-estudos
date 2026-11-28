@@ -4,7 +4,7 @@ import { supabase } from "./repository";
 import { readStreak } from "./streak-data";
 import type { Streak } from "./streak";
 import { todayInBrazil, addDays } from "./planner";
-type Destination = "profile"|"catalog"|"planner"|"trails"|"questions"|"study";
+type Destination = "library"|"profile"|"catalog"|"planner"|"trails"|"questions"|"study";
 export function AccountMenu({ user, demo, theme, toggleTheme, navigate, logout, refreshKey }: {
   user: string; demo: boolean; theme: string; toggleTheme: () => void;
   navigate: (target: Destination) => void; logout: () => Promise<void>; refreshKey: string;
@@ -69,9 +69,9 @@ export function AccountMenu({ user, demo, theme, toggleTheme, navigate, logout, 
       <span className="account-menu-label">SEUS ESTUDOS</span>
       <button role="menuitem" onClick={()=>go("catalog")}><BookOpen size={18}/>Meus concursos</button>
       <button role="menuitem" onClick={()=>go("trails")}><Route size={18}/>Minhas trilhas</button>
-      <button role="menuitem" onClick={()=>go("planner")}><CalendarDays size={18}/>Planejamento</button>
+      <button role="menuitem" onClick={()=>go("planner")}><CalendarDays size={18}/>Plano de Estudos</button>
       <button role="menuitem" onClick={()=>go("questions")}><GraduationCap size={18}/>Questões e simulados</button>
-      <button role="menuitem" onClick={()=>go("study")}><BookOpen size={18}/>Biblioteca e anotações</button>
+      <button role="menuitem" onClick={()=>go("library")}><BookOpen size={18}/>Biblioteca</button>
       <span className="account-menu-label">SUAS PREFERÊNCIAS</span>
       <button role="menuitemcheckbox" aria-checked={theme==="dark"} onClick={toggleTheme}><Moon size={18}/>Modo noturno<span className={"account-toggle "+(theme==="dark"?"on":"")} aria-hidden="true"/></button>
       <button role="menuitem" onClick={()=>go("profile")}><Settings size={18}/>Configurações do perfil</button>

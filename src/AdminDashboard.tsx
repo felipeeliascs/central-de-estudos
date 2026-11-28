@@ -1,3 +1,5 @@
+import { AdminCatalogAvailability } from "./AdminCatalogAvailability";
+import { BillingStatus } from "./BillingStatus";
 import { AdminDeletionRequests } from "./AccountDeletion";
 import { useEffect, useState, type FormEvent } from "react";
 import {
@@ -40,11 +42,13 @@ export function AdminDashboard({
   onCatalog,
   onPrompts,
   onIncidence,
+  onProfile,
 }: {
   onBack: () => void;
   onCatalog: () => void;
   onPrompts: () => void;
   onIncidence: () => void;
+  onProfile: () => void;
 }) {
   const [directory, setDirectory] = useState<Directory | null>(null);
   const [search, setSearch] = useState("");
@@ -176,7 +180,10 @@ export function AdminDashboard({
       {loading && <p role="status">Carregando administração…</p>}
       {directory && (
         <>
+          <AdminCatalogAvailability onCatalog={onCatalog} />
+          <section className="admin-card"><h2>Perfil e conta</h2><p>Meu Perfil reúne dados da conta, foto privada, descrição, senha, privacidade, uso gratuito e solicitação de exclusão.</p><button className="secondary" onClick={onProfile}>Abrir Meu Perfil</button><p className="muted">O administrador consulta nome, e-mail e papel das contas. Telefones, fotos, descrições e estudos de outras pessoas permanecem privados.</p></section>
           <AdminDeletionRequests />
+          <section className="admin-card"><h2>Assinaturas e Mercado Pago</h2><BillingStatus admin /></section>
           <dl className="admin-metrics">
             <div>
               <dt>Contas</dt>
