@@ -51,11 +51,11 @@ export function parseImportJson(raw: string, limitBytes = maxImportBytes): unkno
 /** JSON.parse silently keeps only the last duplicate property. Reject before any importer can save it. */
 function rejectDuplicateKeys(source: string) {
   let cursor = 0;
-  const space = () => { while (/\\s/.test(source[cursor] ?? "") && cursor < source.length) cursor++; };
+  const space = () => { while (/\s/.test(source[cursor] ?? "") && cursor < source.length) cursor++; };
   function stringToken() {
     const start = cursor++;
     while (cursor < source.length) {
-      if (source[cursor] === "\\\\") { cursor += 2; continue; }
+      if (source[cursor] === "\\") { cursor += 2; continue; }
       if (source[cursor++] === '"') break;
     }
     return JSON.parse(source.slice(start,cursor)) as string;
@@ -83,7 +83,7 @@ function rejectDuplicateKeys(source: string) {
       }
       cursor++;
     } else if (source[cursor] === '"') stringToken();
-    else { while (cursor < source.length && !/[\\s,}\\]]/.test(source[cursor])) cursor++; }
+    else { while (cursor < source.length && !/[\s,}\]]/.test(source[cursor])) cursor++; }
   }
   value("$");
 }
