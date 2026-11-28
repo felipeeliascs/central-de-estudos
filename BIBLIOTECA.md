@@ -29,7 +29,7 @@ A migração 017 torna a disponibilidade visível no admin. Publicar no catálog
 
 Associações antigas começam como parciais/a revisar. A revisão administrativa registra cobertura integral/parcial e comparação de profundidade e exigências. Títulos semelhantes não geram associação automática.
 
-A Biblioteca sugere materiais acessíveis dos assuntos associados; a pessoa confirma cada vínculo. Somente equivalência **integral revisada** permite reaproveitar etapas de checklist, com confirmação pessoal e comparação da prévia. A origem é preservada; etapas concluídas do destino não são desmarcadas. Pesos, prioridades e exigências do destino permanecem próprios. Questões/respostas, tempo, revisões, histórico FSRS e evidências de domínio não são duplicados: não se inventam novos estudos ou domínio consolidado a partir de checklist.
+A Biblioteca sugere materiais acessíveis dos assuntos associados; a pessoa confirma cada vínculo. Somente equivalência **integral revisada** permite reaproveitar etapas de checklist, com confirmação pessoal e comparação da prévia. A origem é preservada; etapas concluídas do destino não são desmarcadas. Pesos, prioridades e exigências do destino permanecem próprios. Questões/respostas, tempo, revisões e histórico FSRS não são duplicados. O mapa de domínio consulta as evidências originais dos assuntos diretamente equivalentes com cobertura integral revisada, deduplicando o conjunto de assuntos por ID. Essa visão é identificada como reaproveitada; totais gerais e histórico permanecem baseados nos eventos originais. Equivalências parciais não consolidam evidências. Não se inventa domínio a partir de checklist.
 
 ## Importação própria do acervo
 

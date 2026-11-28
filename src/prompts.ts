@@ -14,7 +14,6 @@ export type PromptTemplate = {
   revision: number;
 };
 export const templates: PromptTemplate[] = [
-  ["biblioteca-json","Gerar materiais para a Biblioteca · JSON","Criar materiais reutilizáveis no acervo.","Produza materiais a partir das fontes fornecidas, sem vincular a um concurso nem inventar fatos, autores, obras, edições ou URLs. Use IDs externos estáveis e apenas os campos do contrato library_batch. Resumos, mapas mentais textuais e anotações usam kind text; links verificados usam link/youtube. Para mapas em imagem ou PDFs, o envio será pelo cadastro individual. Retorne somente JSON válido, sem cercas de código, até 512 KiB e 300 entradas. Cada título tem até 180 caracteres; detalhes vão no body. Dados opcionais desconhecidos devem ser omitidos, sem null.","none"],
   [
     "edital",
     "Analisar edital PDF",
@@ -100,6 +99,7 @@ export const templates: PromptTemplate[] = [
     "none",
   ],
   ["trilhas", "Organizar trilha lógica de estudos", "Sugerir pré-requisitos e ordem revisável para o edital.", "Organize os assuntos fornecidos em uma sequência lógica, com pré-requisitos pedagógicos justificáveis, duração estimada e prioridade estimada. Use somente os UUIDs fornecidos. Priorize incidência histórica apenas quando houver banca, unidade (provas ou questões), período, fonte e amostra documentados. Não estime probabilidade da próxima prova. O sistema utiliza o Raio-X para ordenar pela frequência documentada; não invente taxas ou inclua incidência no JSON de configuração. Preserve conteúdos e progresso existentes.", "none"],
+  ["biblioteca-json","Gerar materiais para a Biblioteca · JSON","Criar materiais reutilizáveis no acervo.","Produza materiais a partir das fontes fornecidas, sem vincular a um concurso nem inventar fatos, autores, obras, edições ou URLs. Use IDs externos estáveis e apenas os campos do contrato library_batch. Resumos, mapas mentais textuais e anotações usam kind text; links verificados usam link/youtube. Para mapas em imagem ou PDFs, o envio será pelo cadastro individual. Retorne somente JSON válido, sem cercas de código, até 512 KiB e 300 entradas. Cada título tem até 180 caracteres; detalhes vão no body. Dados opcionais desconhecidos devem ser omitidos, sem null.","none"],
 ].map(([id, title, description, body, target]) => ({
   id,
   title,

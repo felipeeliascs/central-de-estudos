@@ -766,6 +766,7 @@ function Workspace({
         {promptsOpen && (
           <Suspense fallback={<p role="status">Carregando prompts…</p>}>
             <PromptPanel
+              openLibrary={() => openModule("library")}
               startTrail={trailPrompt}
               openTrails={() => { setTrailPrompt(false); openModule("trails"); }}
               nodes={data.nodes}
@@ -1596,7 +1597,7 @@ function Workspace({
           >
             <p>
               “{deleting.title}” será removido para você e os destinatários. O
-              arquivo associado também será excluído. Seu checklist será
+              arquivo associado e todos os vínculos deste material também serão excluídos. Seu checklist será
               preservado.
             </p>
             <div className="form-actions">

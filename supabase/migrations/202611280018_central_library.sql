@@ -121,7 +121,7 @@ begin
     entry=op->'entry'; action=op->>'action';
     if action is null or action not in ('create','use','update') or entry-array['id','title','section','kind','body','back','url','author','work','edition','source','content_version']<>'{}'::jsonb then raise exception 'Campos desconhecidos ou ação inválida'; end if;
     for key in select jsonb_object_keys(entry) loop
-      if jsonb_typeof(entry->key)<>'string' or length(entry->>key) > case when key in ('body','back') then 100000 when key in ('url','source') then 2000 when key='content_version' then 80 else 180 end then raise exception 'Campo deve ser texto dentro do limite: %',key; end if;
+      if jsonb_typeof(entry->key)<>'string' or length(entry->>key) > (case when key in ('body','back') then 100000 when key in ('url','source') then 2000 when key='content_version' then 80 else 180 end) then raise exception 'Campo deve ser texto dentro do limite: %',key; end if;
     end loop;
     if coalesce(entry->>'id','') !~ '^[a-z0-9][a-z0-9._-]{0,79}$' or entry->>'id'=any(used_keys)
       or coalesce(length(trim(entry->>'title')),0) not between 1 and 180
@@ -143,7 +143,11 @@ begin
         values(auth.uid(),null,key,entry->>'title',entry->>'section',entry->>'kind',coalesce(entry->>'body',''),coalesce(entry->>'back',''),coalesce(entry->>'url',''),
           coalesce(entry->>'author',''),coalesce(entry->>'work',''),coalesce(entry->>'edition',''),coalesce(entry->>'source',''),coalesce(entry->>'content_version','')) returning id into material;
     else
-      select * into old from public.study_materials m where m.id=(op->>'existing_id')::uuid for update;
+      if action='update' then
+        select * into old from public.study_materials m where m.id=(op->>'existing_id')::uuid for update;
+      else
+        select * into old from public.study_materials m where m.id=(op->>'existing_id')::uuid;
+      end if;
       if not found then raise exception 'Material existente não encontrado ou sem acesso' using errcode='42501'; end if;
       if (op->>'expected_updated_at')::timestamptz is distinct from old.updated_at then raise exception 'Material alterado após a prévia. Atualize o acervo'; end if;
       material=old.id;

@@ -412,7 +412,7 @@ export function PlannerPanel({
               Recalcular plano de estudos
             </button>
           </div>
-          <nav className="catalog-actions" aria-label="Visões do planejamento">
+          <nav className="segmented plan-views" aria-label="Visões do planejamento">
             {(Object.keys(viewNames) as View[]).map((v) => (
               <button
                 key={v}

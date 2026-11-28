@@ -19,6 +19,7 @@ export function PromptPanel({
   close,
   openImporter,
   openTrails,
+  openLibrary,
   startTrail = false,
 }: {
   nodes: Node[];
@@ -26,6 +27,7 @@ export function PromptPanel({
   demo: boolean;
   close: () => void;
   openTrails?: () => void;
+  openLibrary?: () => void;
   startTrail?: boolean;
   openImporter: (target: "contest" | "cards" | "questions") => void;
 }) {
@@ -506,6 +508,7 @@ export function PromptPanel({
             >
               Abrir ChatGPT
             </a>
+            {selected.id === "biblioteca-json" && openLibrary && <button className="secondary" onClick={openLibrary}>Abrir importador da Biblioteca</button>}
             {selected.id === "trilhas" && openTrails && <button className="secondary" onClick={openTrails}>Abrir importador de Trilhas</button>}
             {selected.target !== "none" && (
               <button
@@ -520,7 +523,7 @@ export function PromptPanel({
               </button>
             )}
           </div>
-          {selected.target === "none" && selected.id !== "trilhas" && (
+          {selected.target === "none" && selected.id !== "trilhas" && selected.id !== "biblioteca-json" && (
             <p>
               A resposta é textual. Revise e cadastre os dados na seção
               correspondente.

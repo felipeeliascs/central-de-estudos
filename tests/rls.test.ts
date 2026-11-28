@@ -431,6 +431,9 @@ it("executa a migração e verifica isolamento no PostgreSQL com duas contas, le
     await expect(
       db.query("select * from public.study_materials"),
     ).rejects.toThrow(/permission denied/);
+  } catch (error) {
+    const e=error as Error & { position?: string; internalPosition?: string; internalQuery?: string; where?: string };
+    throw new Error(e.message+" | SQL context: "+JSON.stringify({ position:e.position,internalPosition:e.internalPosition,where:e.where,internalQuery:e.internalQuery }));
   } finally {
     await db.close();
   }
