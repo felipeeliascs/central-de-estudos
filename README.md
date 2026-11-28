@@ -115,3 +115,9 @@ Na Central de Prompts, **Organizar trilha lógica de estudos** gera study_trail 
 A migração 202611270014_trails_streak.sql cria a persistência privada de trilhas, controle de revisão e a RPC de ofensiva. Requer 001–013 e validação em homologação antes de produção. Cada pessoa só acessa a própria trilha; escritas concorrentes exigem recarga.
 
 O menu da conta abre pelo profile-trigger e oferece identidade, navegação, modo noturno, ajuda e saída. A ofensiva conta dias distintos em America/Sao_Paulo com tempo de estudo finalizado, resultado de questões com quantidade positiva, respostas ou revisões registradas. Várias atividades no mesmo dia contam uma vez. A sequência de ontem continua enquanto hoje ainda está aberto; se ontem e hoje não têm atividade, a sequência atual é zero e o recorde permanece. Registros futuros são ignorados. Abrir páginas, gerar planejamento ou marcar estimativas da trilha não cria tempo estudado nem ofensiva.
+
+## Diagnóstico de importação e estado publicado
+
+O [diagnóstico de importação](IMPORTACAO-DIAGNOSTICO.md) documenta análise estrita por arquivo/colagem, destaque de conflitos, cobertura completa do prompt e limites da investigação do aviso de CSP. A correção não exige migração nova.
+
+A publicação do PR #2 corresponde à [execução 43](https://github.com/felipeeliascs/central-de-estudos/actions/runs/46073219115), commit b0a225f. A consulta atual somente de leitura confirmou componentes das migrações 012–014 instalados; não presuma que continuam pendentes com base nas notas históricas. O histórico da CLI permanece sujeito à reconciliação documentada. Alterações desta investigação aguardam revisão e autorização específica antes de merge ou publicação.

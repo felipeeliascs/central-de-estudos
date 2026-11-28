@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { ModulePage } from "./ModulePage";
 import { productivityStore } from "./productivity-data";
 import { supabase } from "./repository";
@@ -29,6 +29,7 @@ export function PromptPanel({
   startTrail?: boolean;
   openImporter: (target: "contest" | "cards" | "questions") => void;
 }) {
+  const promptId = useId();
   const [custom, setCustom] = useState<PromptTemplate[]>([]);
   const [id, setId] = useState(startTrail ? "trilhas" : templates[0].id);
   const [admin, setAdmin] = useState(false);
@@ -42,6 +43,7 @@ export function PromptPanel({
   const [role, setRole] = useState("");
   const [author, setAuthor] = useState("");
   const [work, setWork] = useState("");
+  const [videoMode, setVideoMode] = useState<"fixed" | "complete">("fixed");
   const [quantity, setQuantity] = useState(5);
   const [difficulty, setDifficulty] = useState("Média");
   const [existing, setExisting] = useState("");
@@ -139,12 +141,16 @@ export function PromptPanel({
     author,
     work,
     quantity,
+    videoMode,
     difficulty,
     existing,
     performance,
     trailContest: contest,
     trailTopics: subjects.map(n => ({ topic_id: n.id, name: n.name, parent_id: n.parent_id })),
   };
+  let previewText: string;
+  try { previewText = buildPrompt(selected, context); }
+  catch (e) { previewText = "Corrija o contexto antes de copiar: " + (e as Error).message; }
   async function copy() {
     try {
       if (selected.id === "trilhas" && (!contest || !subjects.length)) throw new Error("Selecione um concurso com assuntos antes de copiar.");
@@ -423,7 +429,14 @@ export function PromptPanel({
               Obra
               <input value={work} onChange={(e) => setWork(e.target.value)} />
             </label>
-            <label>
+            {selected.id === "videos" && <label>
+              Cobertura das videoaulas
+              <select id={`${promptId}-video-coverage`} name="video-coverage" value={videoMode} onChange={e => setVideoMode(e.target.value as "fixed" | "complete")}>
+                <option value="fixed">Quantidade fixa</option>
+                <option value="complete">Cobertura completa do edital</option>
+              </select>
+            </label>}
+            {!(selected.id === "videos" && videoMode === "complete") && <label>
               Quantidade
               <input
                 type="number"
@@ -432,7 +445,7 @@ export function PromptPanel({
                 value={quantity}
                 onChange={(e) => setQuantity(Number(e.target.value))}
               />
-            </label>
+            </label>}
             <label>
               Dificuldade
               <select
@@ -445,6 +458,7 @@ export function PromptPanel({
               </select>
             </label>
           </div>
+          {selected.id === "videos" && videoMode === "complete" && <p role="status">A cobertura usa todos os assuntos e subassuntos ativos do JSON abaixo, incluindo assuntos com subassuntos. Não é limitada pelos filtros nem pela quantidade fixa. A meta e os IDs aparecem na prévia do prompt; URLs não verificadas não devem ser inventadas.</p>}
           {(selected.id === "retificacao" || selected.id === "videos") && (
             <label>
               JSON atual do concurso
@@ -477,7 +491,7 @@ export function PromptPanel({
           <details>
             <summary>Prévia do prompt</summary>
             <pre className="prompt-preview">
-              {buildPrompt(selected, context)}
+              {previewText}
             </pre>
           </details>
           <div className="catalog-actions">

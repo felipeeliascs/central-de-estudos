@@ -1,6 +1,7 @@
 import type { PGlite } from "@electric-sql/pglite";
 import { expect } from "vitest";
 import sample from "../examples/concurso-ficticio.json";
+import { videoBase, validVideoBatch, conflictingVideoBatch } from "./video-fixture";
 import fixture from "../examples/videoaulas-ficticias.json";
 export async function exerciseVideoIncidence(db: PGlite, a: string, b: string) {
   const account = (id: string) => db.exec("reset role;set role authenticated;set request.jwt.claim.sub='" + id + "'");
@@ -38,6 +39,43 @@ export async function exerciseVideoIncidence(db: PGlite, a: string, b: string) {
   await expect(db.query("delete from public.study_nodes where id=$1", [id])).rejects.toThrow(/permission denied/);
   await db.query("insert into public.study_historical_incidence(topic_id,board,sample,occurrences,source_url,period_start,period_end,measure) values($1,'Banca',10,2,'https://example.org','2020-01-01','2025-01-01','exams')", [topic]);
   await expect(db.query("update public.study_historical_incidence set measure=null where topic_id=$1", [topic])).rejects.toThrow(/unidade/);
+  // Full synthetic 31-link batch, with a late conflict after valid resources: all-or-nothing.
+  const fullId=(await db.query<{ id: string }>("select public.study_apply_catalog($1::jsonb,null,null,gen_random_uuid(),'import') as id",[JSON.stringify(videoBase)])).rows[0].id;
+  const fullRead=async()=>(await db.query<{doc:typeof videoBase}>("select public.study_catalog_document($1) as doc",[fullId])).rows[0].doc;
+  const fullApply=(value:unknown,expected:unknown)=>db.query("select public.study_apply_video_batch($1::jsonb,$2::jsonb,$3,gen_random_uuid())",[JSON.stringify(value),JSON.stringify(expected),fullId]);
+  const fullTopic=(await db.query<{id:string}>("select id from public.study_nodes where catalog_key='gestao.10' and public.study_root(id)=$1",[fullId])).rows[0].id;
+  await account(b);
+  await db.query("insert into public.study_enrollments(user_id,contest_id) values($1,$2)",[b,fullId]);
+  await db.query("insert into public.study_notes(user_id,topic_id,body) values($1,$2,'Anotação do estudante')",[b,fullTopic]);
+  await db.query("insert into public.study_checks(user_id,topic_id,step,done) values($1,$2,0,true)",[b,fullTopic]);
+  await db.query("insert into public.study_materials(owner_id,topic_id,section,title,kind,body) values($1,$2,'Teoria e resumos','Manual pessoal','text','Preservar')",[b,fullTopic]);
+  await account(a);
+  const fullBefore=await fullRead();
+  await expect(fullApply(conflictingVideoBatch,fullBefore)).rejects.toThrow(/outro vínculo/);
+  expect(await fullRead()).toEqual(fullBefore);
+  const countMaterials=async()=>{
+    await db.exec("reset role"); // Inspect the private mapping as the disposable DB operator only.
+    try { return (await db.query<{n:number}>("select count(*)::int n from public.study_catalog_resources where contest_id=$1",[fullId])).rows[0].n; }
+    finally { await account(a); }
+  };
+  const countReceipts=async()=>(await db.query<{n:number}>("select count(*)::int n from public.study_imports where summary->>'name'=$1",[videoBase.name])).rows[0].n;
+  expect(await countMaterials()).toBe(1);
+  const beforeReceipts=await countReceipts();
+  await fullApply(validVideoBatch,fullBefore);
+  const fullAfter=await fullRead();
+  expect(fullAfter.resources).toHaveLength(32);
+  expect(await countMaterials()).toBe(32);
+  const afterReceipts=await countReceipts();
+  expect(afterReceipts).toBe(beforeReceipts+1);
+  await fullApply(validVideoBatch,fullAfter);
+  expect(await fullRead()).toEqual(fullAfter);
+  expect(await countMaterials()).toBe(32);
+  expect(await countReceipts()).toBe(afterReceipts);
+  await account(b);
+  expect((await db.query("select * from public.study_notes where topic_id=$1",[fullTopic])).rows).toHaveLength(1);
+  expect((await db.query("select * from public.study_checks where topic_id=$1 and done",[fullTopic])).rows).toHaveLength(1);
+  expect((await db.query("select * from public.study_materials where topic_id=$1 and not catalog_managed",[fullTopic])).rows).toHaveLength(1);
+  await account(a);
   const archived = { ...updated, archived: true };
   await db.query("select public.study_apply_catalog($1::jsonb,$2::jsonb,$3,gen_random_uuid(),'manual')", [JSON.stringify(archived),JSON.stringify(updated),id]);
   await expect(apply(batch,archived)).rejects.toThrow(/Reative/);

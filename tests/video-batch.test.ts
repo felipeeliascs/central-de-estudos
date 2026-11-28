@@ -27,3 +27,20 @@ it("rejeita destino diferente, recurso que não é vídeo e vínculo arquivado",
   const archived = { ...base, items: base.items.map(x => ({ ...x, archived: x.id === "d01" })) };
   expect(previewVideoBatch(JSON.stringify(batch), archived).valid).toBe(false);
 });
+
+import { videoBase, validVideoBatch, conflictingVideoBatch, oldVideoId } from "./video-fixture";
+it("reproduz o conflito de Planejamento Reverso e aceita 31 vínculos com novo ID",()=>{
+ const before=structuredClone(videoBase);
+ const bad=previewVideoBatch(JSON.stringify(conflictingVideoBatch),videoBase);
+ expect(bad.valid).toBe(false);
+ expect(bad.rows.filter(r=>r.error)).toHaveLength(1);
+ expect(bad.rows[9].id).toBe(oldVideoId);
+ expect(bad.rows[9].status).toContain("outro vínculo ou vídeo");
+ const good=previewVideoBatch(JSON.stringify(validVideoBatch),videoBase);
+ expect(good.valid).toBe(true);
+ expect(good.rows).toHaveLength(31);
+ expect(good.doc.resources).toHaveLength(32);
+ expect(good.doc.resources.find(r=>r.id===oldVideoId)?.url).toContain("plL98oaMLsU");
+ expect(previewVideoBatch(JSON.stringify(validVideoBatch),good.doc).doc).toEqual(good.doc);
+ expect(videoBase).toEqual(before);
+});

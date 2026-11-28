@@ -58,7 +58,7 @@ A prévia mostra título, assunto/ID, novas aulas, duplicatas e referências inv
 
 A migração 202611270012_video_incidence.sql adiciona a RPC que valida permissões no banco e reaproveita study_apply_catalog em transação, sem apagar materiais, checklist, anotações ou progresso. Outra edição após a prévia exige gerar nova prévia. A reimportação sem novidades não cria material nem recibo adicional.
 
-**Seleção e arquivamento:** “Remover dos meus concursos” pausa somente a seleção do usuário; o concurso sai de sua navegação e pode ser selecionado novamente no catálogo. “Arquivar no catálogo” exige administrador com edição e afeta a disponibilidade geral. A prévia e confirmação de salvamento continuam obrigatórias. Não existe exclusão definitiva na interface; authenticated não pode executar DELETE em study_nodes.
+**Seleção e arquivamento:** “Remover dos meus concursos” pausa somente a seleção do usuário; o concurso sai de sua navegação e pode ser selecionado novamente no catálogo. “Arquivar no catálogo” exige administrador com edição e afeta a disponibilidade geral. A prévia e confirmação de salvamento continuam obrigatórias. A exclusão definitiva é oferecida a administradores com edição, mediante verificação de vínculos e confirmação pelo ID externo. A migração 015 é necessária; authenticated continua sem DELETE direto em study_nodes.
 
 **Aparecida / AVANÇASP:** confirmou-se que o prompt anterior gerava texto (target none) e que o importador aceitava apenas contest 1.0 com resources no documento completo. A projeção correta converte resources[].item em UUID via item_map e grava section Videoaulas/kind youtube. Essa incompatibilidade é uma lacuna confirmada, mas não comprova a causa do caso relatado. Sem JSONs originais, snapshot do edital e recibo da operação não é possível determinar se as aulas foram persistidas ou se apontavam para IDs errados. Nenhum dado de produção foi usado ou alterado nesta investigação.
 
@@ -67,3 +67,23 @@ A migração 202611270012_video_incidence.sql adiciona a RPC que valida permiss�
 O edital reutiliza os registros do Raio-X. Cada percentual informa se mede **provas com o assunto / provas analisadas** ou **questões do assunto / questões analisadas**, além de banca, período, fonte e tamanho da amostra. A migração acrescenta measure (exams/questions); registros antigos ficam sem unidade, sem inventar classificação. Devem ser revisados no Raio-X antes de exibir percentuais. Ausência de evidência completa mostra “Sem dados de incidência”; falha de consulta aparece como erro. Frequência histórica não é probabilidade da próxima prova. Prioridade estimada do planejamento permanece separada.
 
 Antes da publicação, ensaie a migração em homologação e valide Auth e API real com contas fictícias. O CI exercita banco descartável com PGlite e mocks de Auth, sem validar SMTP, PostgREST, Storage ou sincronização real.
+
+## Correção de entradas e cobertura de videoaulas
+
+Upload e colagem usam a mesma análise estrita. Envie somente o objeto JSON, sem cercas de código, introdução ou texto depois dele. Sintaxe inválida mostra motivo em português e linha/coluna quando disponíveis. Erros de contrato indicam o campo, como $.resources[29].title. Mantenha cada title entre 1 e 180 caracteres, sem truncamento automático; coloque detalhes em text.
+
+Na prévia de videoaulas, erros aparecem primeiro e a quantidade é exibida perto de Confirmar e salvar. Use o link ao primeiro erro ou Voltar e corrigir JSON; o texto e o destino são preservados. Duplicata válida não bloqueia a confirmação. Se o mesmo ID já identifica outro vídeo ou vínculo, atribua um novo ID ao novo recurso. Reaproveitar o mesmo vídeo no mesmo assunto preserva o ID e os materiais existentes.
+
+No prompt Pesquisar videoaulas gratuitas, escolha Quantidade fixa ou Cobertura completa do edital. Cobertura completa usa todos os topic e subtopic ativos do JSON atual, incluindo pais com filhos; não é limitada por disciplina/assunto selecionado nem envia quantidade fixa. A meta e cada ID elegível são exibidos no prompt. Solicite apenas URLs verificadas e revise as lacunas; uma meta não permite inventar aulas. O contrato continua video_batch 1.0, com contest_id e item externos exatos.
+
+Veja evidências, testes e limites em [IMPORTACAO-DIAGNOSTICO.md](IMPORTACAO-DIAGNOSTICO.md).
+
+## Arquivar ou excluir concurso importado
+
+Nos cartões do catálogo, Arquivar no catálogo e Excluir concurso importado são ações diferentes. Arquivar exige prévia e confirmação, pode ser revertido e preserva dados e seleções. Remover dos meus concursos altera apenas a seleção pessoal.
+
+Excluir definitivamente exige administrador com edição, verificação no servidor e digitação do ID externo exato. Remove estrutura, recursos importados, versões e seleções de todas as contas, sem remover o histórico de operações. Qualquer nota, checklist, material pessoal, progresso, sessão, resultado, questão, simulado, baralho, planejamento, trilha, evidência de incidência ou equivalência vinculada impede excluir; use arquivamento. Referências desconhecidas protegidas por FK também impedem a operação e revertem a transação integralmente.
+
+A migração 202611270015_catalog_deletion.sql depende de 001–014. Aplicá-la apenas no ambiente autorizado, primeiro em teste. Ela adiciona funções, sem excluir concursos automaticamente. A prévia de exclusão é revalidada no salvamento, incluindo concorrência com importações. Sem essa migração, a interface informa a dependência e mantém o arquivamento disponível.
+
+Histórico de operações e Incidência histórica ficam recolhidos inicialmente. Use Exibir/Esconder; o botão funciona por teclado e não altera os registros.
