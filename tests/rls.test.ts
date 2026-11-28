@@ -1,3 +1,4 @@
+import {exerciseIncidenceImport} from "./incidence-import-sql";
 import { exerciseCatalogDeletion } from "./catalog-deletion-sql";
 import { exerciseTrailsStreak } from "./trails-streak-sql";
 // @vitest-environment node
@@ -420,6 +421,9 @@ it("executa a migração e verifica isolamento no PostgreSQL com duas contas, le
     await db.exec("reset role");
     await db.exec(readFileSync(new URL("../supabase/migrations/202611270015_catalog_deletion.sql", import.meta.url), "utf8"));
     await exerciseCatalogDeletion(db,a,b);
+    await db.exec("reset role");
+    await db.exec(readFileSync(new URL("../supabase/migrations/202611270016_incidence_import.sql", import.meta.url), "utf8"));
+    await exerciseIncidenceImport(db,a,b);
     await db.exec("reset role;set role anon;");
     await expect(
       db.query("select public.study_admin_overview()"),

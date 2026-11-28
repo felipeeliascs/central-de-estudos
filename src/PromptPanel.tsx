@@ -19,6 +19,7 @@ export function PromptPanel({
   close,
   openImporter,
   openTrails,
+  openIncidence,
   startTrail = false,
 }: {
   nodes: Node[];
@@ -26,6 +27,7 @@ export function PromptPanel({
   demo: boolean;
   close: () => void;
   openTrails?: () => void;
+  openIncidence?: () => void;
   startTrail?: boolean;
   openImporter: (target: "contest" | "cards" | "questions") => void;
 }) {
@@ -43,6 +45,7 @@ export function PromptPanel({
   const [role, setRole] = useState("");
   const [author, setAuthor] = useState("");
   const [work, setWork] = useState("");
+  const [incidenceMeasure, setIncidenceMeasure] = useState<"exams" | "questions">("exams");
   const [videoMode, setVideoMode] = useState<"fixed" | "complete">("fixed");
   const [quantity, setQuantity] = useState(5);
   const [difficulty, setDifficulty] = useState("Média");
@@ -142,6 +145,7 @@ export function PromptPanel({
     work,
     quantity,
     videoMode,
+    incidenceMeasure,
     difficulty,
     existing,
     performance,
@@ -154,7 +158,7 @@ export function PromptPanel({
   async function copy() {
     try {
       if (selected.id === "trilhas" && (!contest || !subjects.length)) throw new Error("Selecione um concurso com assuntos antes de copiar.");
-      if (selected.id === "videos") parseContest(existing);
+      if ((selected.id === "videos" || selected.id === "incidencia-json")) parseContest(existing);
       if (selected.target === "questions" && !topic)
         throw new Error("Selecione um assunto para preencher o identificador.");
       if (selected.id === "desempenho" && !performance.trim())
@@ -436,7 +440,7 @@ export function PromptPanel({
                 <option value="complete">Cobertura completa do edital</option>
               </select>
             </label>}
-            {!(selected.id === "videos" && videoMode === "complete") && <label>
+            {selected.id !== "incidencia-json" && !(selected.id === "videos" && videoMode === "complete") && <label>
               Quantidade
               <input
                 type="number"
@@ -459,7 +463,8 @@ export function PromptPanel({
             </label>
           </div>
           {selected.id === "videos" && videoMode === "complete" && <p role="status">A cobertura usa todos os assuntos e subassuntos ativos do JSON abaixo, incluindo assuntos com subassuntos. Não é limitada pelos filtros nem pela quantidade fixa. A meta e os IDs aparecem na prévia do prompt; URLs não verificadas não devem ser inventadas.</p>}
-          {(selected.id === "retificacao" || selected.id === "videos") && (
+          {selected.id === "incidencia-json" && <label>Unidade para calcular incidência<select id={`${promptId}-incidence-measure`} name="incidence-measure" value={incidenceMeasure} onChange={e=>setIncidenceMeasure(e.target.value as "exams" | "questions")}><option value="exams">Provas com o assunto / provas analisadas</option><option value="questions">Questões do assunto / questões analisadas</option></select></label>}
+          {(selected.id === "retificacao" || selected.id === "videos" || selected.id === "incidencia-json") && (
             <label>
               JSON atual do concurso
               <textarea
@@ -506,6 +511,7 @@ export function PromptPanel({
             >
               Abrir ChatGPT
             </a>
+            {selected.id === "incidencia-json" && openIncidence && <button className="secondary" onClick={openIncidence}>Abrir importador de incidência</button>}
             {selected.id === "trilhas" && openTrails && <button className="secondary" onClick={openTrails}>Abrir importador de Trilhas</button>}
             {selected.target !== "none" && (
               <button
@@ -520,7 +526,7 @@ export function PromptPanel({
               </button>
             )}
           </div>
-          {selected.target === "none" && selected.id !== "trilhas" && (
+          {selected.target === "none" && selected.id !== "trilhas" && selected.id !== "incidencia-json" && (
             <p>
               A resposta é textual. Revise e cadastre os dados na seção
               correspondente.

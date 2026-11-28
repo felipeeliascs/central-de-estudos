@@ -737,6 +737,7 @@ function Workspace({
         {promptsOpen && (
           <Suspense fallback={<p role="status">Carregando prompts…</p>}>
             <PromptPanel
+              openIncidence={() => { setPromptsOpen(false); setExternalMock(false); setIncidenceOpen(true); setProductivityOpen(true); }}
               startTrail={trailPrompt}
               openTrails={() => { setTrailPrompt(false); openModule("trails"); }}
               nodes={data.nodes}

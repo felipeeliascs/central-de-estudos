@@ -1,3 +1,4 @@
+import { IncidenceImporter } from "./IncidenceImporter";
 import { PracticeDashboard } from "./PerformanceOverview";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { incidenceSummary } from "./incidence";
@@ -1076,6 +1077,7 @@ export function ProductivityPanel({
                 </li>
               ))}
           </ul>
+          {admin && !demo && <IncidenceImporter nodes={nodes} onSaved={reload} />}
           {(admin || demo) && (
             <details className="catalog-entry">
               <summary>Cadastrar incidência histórica</summary>
