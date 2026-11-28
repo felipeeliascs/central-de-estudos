@@ -416,7 +416,6 @@ Decisões e limites em BIBLIOTECA.md e MERCADO-PAGO.md.
 - [ ] Aplicar migração 016, incorporar e publicar somente após autorização específica.
 
 Contrato e instruções em INCIDENCIA-JSON.md. URLs e contagens dos testes são fictícias, sem pretensão de evidência real.
-\n
 
 ## Revisão assistida de importação JSON
 

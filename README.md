@@ -132,7 +132,6 @@ Consulte [BIBLIOTECA.md](BIBLIOTECA.md) para a separação Abrir Edital / Estuda
 A Central de Prompts inclui **Calcular incidência por assunto · JSON**, para copiar e analisar fontes em uma IA externa. O administrador importa o resultado em **Desempenho → Raio-X do edital → Importar incidência JSON**, com prévia e confirmação da revisão das fontes. Percentuais são calculados a partir de ocorrências/amostra, com unidade, banca e período explícitos. Lacunas não viram zeros inventados. Veja [INCIDENCIA-JSON.md](INCIDENCIA-JSON.md).
 
 A migração 202611270016_incidence_import.sql depende de 001–015 e exige ensaio e autorização específica antes de produção. O cadastro manual continua disponível. O importador valida limites, IDs e concorrência; não verifica automaticamente a veracidade das fontes.
-\n
 
 ## Revisão assistida de importação JSON
 
